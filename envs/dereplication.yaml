@@ -1,0 +1,8 @@
+name: dereplication
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - dinopy=2.0.3
+  - cd-hit=4.8.1

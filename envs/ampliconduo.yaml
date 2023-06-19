@@ -1,0 +1,11 @@
+name: amplicon_duo
+channels:
+  - conda-forge
+  - bioconda
+  - r
+dependencies:
+  - cairo=1.16.0
+  - r-ampliconduo=1.1
+  - r-base=3.6.1
+  - r-data.table=1.12.2
+  - r-rcpp=1.0.6

@@ -1,0 +1,7 @@
+name: swarm
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - swarm=3.0.0=hc9558a2_0

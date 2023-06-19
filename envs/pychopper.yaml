@@ -1,0 +1,8 @@
+name: pychopper
+channels:
+  - epi2melabs
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - "epi2melabs::pychopper"

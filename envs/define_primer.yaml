@@ -1,0 +1,7 @@
+name: define_primer
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - pandas=1.2.3

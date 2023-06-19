@@ -1,0 +1,8 @@
+name: natrix
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - snakemake=5.32.2
+  - dinopy=2.0.1
