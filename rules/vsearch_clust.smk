@@ -1,4 +1,6 @@
 #Global # VSEARCH
+#rule combined_fasta:
+#        input: 
 rule vsearch_clust:
 	input:
 		fasta=os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
@@ -12,7 +14,7 @@ rule vsearch_clust:
 		"""
 			vsearch --cluster_size {input} \
 			--threads {threads} \
-			--id 0.97 \
+			--id 0.98 \
 			--strand plus \
 			--sizein \
 			--sizeout \
