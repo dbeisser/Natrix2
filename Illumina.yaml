@@ -84,4 +84,4 @@ dataset:
 pychop:
         qual: 7 #Minimum mean base quality (default 7)
 
-clustering: "vsearch"
+clustering: "vsearch" # swarm or vsearch
