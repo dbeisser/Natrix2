@@ -80,8 +80,8 @@ postcluster:
 
 # nanopore
 dataset:
-        nanopore: FALSE
+        nanopore: FALSE # TRUE or FALSE for nanopore data
 pychop:
         qual: 7 #Minimum mean base quality (default 7)
 
-clustering: "vsearch"
+clustering: "vsearch" # clustering method "vsearch" or "swarm"
