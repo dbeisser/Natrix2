@@ -1,8 +1,8 @@
 # General options
 general:
-        filename: Illumina_test_1 # The path / filename of the project folder, primertable (.csv) and configfile (.yaml). If the raw data folder is not in the root directory of Natrix, please add the path relative to the root directory (e.g. input/example_data)
-        output_dir: Illumina_test_1_out # Path to custom output directory / relative to the root directory of natrix. Do not use a dash in the folder name.
-        primertable: Illumina_test_1.csv # Path to the primertable. If the primertable is not in the root directory of Natrix, please add the path relative to the root directory (e.g. input/example_data.yaml)
+        filename: Illumina_data # The path / filename of the project folder, primertable (.csv) and configfile (.yaml). If the raw data folder is not in the root directory of Natrix, please add the path relative to the root directory (e.g. input/example_data)
+        output_dir: Illumina_results # Path to custom output directory / relative to the root directory of natrix. Do not use a dash in the folder name.
+        primertable: Illumina.csv # Path to the primertable. If the primertable is not in the root directory of Natrix, please add the path relative to the root directory (e.g. input/example_data.yaml)
         units: units.tsv # Path to the sequencing unit sheet. (name will be concatenated with output_dir)
         cores: 20 # Amount of cores available for the workflow.
         memory: 10000 # Available RAM in Mb.
@@ -39,7 +39,7 @@ chim:
 # Merging
 merge:
         filter_method: split_sample # If the split sample approach was used (split_sample) or not (not_split).
-        ampliconduo: FALSE # Boolean, whether AmpliconDuo should be used for statistical analysis of the data.
+        ampliconduo: FALSE # Boolean, (It should be FALSE when Nanopre is TRUE )whether AmpliconDuo should be used for statistical analysis of the data.
         cutoff: 2 # An additional abundance filter if the split sample approach was not used. For a read to be kept, the sum of abundances over all samples needs to be above the cutoff.
         ampli_corr: fdr # Specifies the correction method for Fisher's exact test.
         save_format: png # File format for the frequency-frequency plot.
@@ -78,7 +78,7 @@ blast:
 postcluster:
         mumu: TRUE # Boolean for the use of MUMU, only for OTU clustering.
 
-# nanopore
+# nanopore (for OTUs only)
 dataset:
         nanopore: FALSE # TRUE or FALSE for nanopore data
 pychop:
