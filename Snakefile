@@ -29,6 +29,7 @@ rule all:
         os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") if config["general"]["seq_rep"] == "OTU" and config['clustering']=="swarm" and not config['dataset']['nanopore'] else [],
         # Vsearch clustering
         os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus_tab.txt") if config["general"]["seq_rep"] == "OTU" and config['clustering']=="vsearch"  else [],
+        os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv") if config['clustering']=="vsearch" else [],
         #mothur
         expand(os.path.join(config["general"]["output_dir"],"finalData/{database}/OTU_table.csv"), database=config['classify']['database']) if config['classify']['mothur'] else [],
         expand(os.path.join(config["general"]["output_dir"],"finalData/{database}/OTU_table_mumu.csv"), database=config['classify']['database']) if config["general"]["seq_rep"] == "OTU" and  config['classify']['mothur'] and config['postcluster']['mumu'] else [],
