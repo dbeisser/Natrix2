@@ -27,7 +27,7 @@ out2 = final_file[["seqid", "sequences", "taxonomy"]]
 
 # substitute bootstrap values if present and append to dataframe
 taxonomy2 = out2["taxonomy"].tolist()
-if re.match("(\d*)", taxonomy2[0]):
+if  isinstance(taxonomy2[0], str) and re.match("(\d*)", taxonomy2[0]):
     taxonomy2 = list(map(lambda x: x if pd.isna(x) else re.sub(r"\([^()]*\)", "", x), taxonomy2))
     pd.options.mode.chained_assignment = None
     out2.loc[:,'taxonomy2'] = taxonomy2

@@ -6,21 +6,40 @@ rule vsearch_clust:
 		fasta=os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
 	output:
 		os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus.fasta"),
-		os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus_tab.txt")
+		os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus_tab.txt"),
+		os.path.join(config["general"]["output_dir"],"clustering/vsearch_uc.txt")
 	threads: config["general"]["cores"]
 	conda:
 		"../envs/vsearch.yaml"
 	shell:
 		"""
-			vsearch --cluster_size {input} \
+			vsearch --cluster_fast {input} \
 			--threads {threads} \
 			--id 0.98 \
-			--strand plus \
-			--sizein \
-			--sizeout \
-			--fasta_width 0 \
-			--relabel OTU_ \
 			--centroids {output[0]} \
-			--otutabout {output[1]}
-			--otutabout {output[1]}
+			--otutabout {output[1]}\
+                        --uc {output[2]}
 		"""
+
+## to make cluster file for merging
+
+rule  write_clusters_uc:
+    input:
+        os.path.join(config["general"]["output_dir"],"clustering/vsearch_uc.txt")
+    output:
+        os.path.join(config["general"]["output_dir"],"clustering/vsearch_clusters_names.txt")
+    script:
+        "../scripts/vsearch_uc.py"
+
+
+
+rule clust_merge_results_vsearch:
+    input:
+        merged=os.path.join(config["general"]["output_dir"],"clustering/vsearch_clusters_names.txt"),
+        final_table_path2=os.path.join(config["general"]["output_dir"],"filtering/filtered_table.csv")
+    output:
+        out=os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv")
+    conda:
+        "../envs/merge_results.yaml"
+    script:
+        "../scripts/merge_clust_results.py"

@@ -22,4 +22,4 @@ for j in range(len(seq_names)):
         sum([value for key, value in swarm_dict[j].items() if not key in {"seqid", "sequences"}]))
 
 df = pd.DataFrame.from_dict(swarm_dict, orient="index").set_index("seqid")
-df.to_csv(snakemake.output[0])
+df.to_csv(snakemake.output['out'])

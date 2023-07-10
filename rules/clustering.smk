@@ -33,16 +33,16 @@ if not config['dataset']['nanopore'] and config['clustering']== 'swarm':
         shell:
             "swarm -t {threads} -f -z -w {output[0]} < {input} > {output[1]}"
 
-    rule swarm_results:
+    rule clust_merge_results:
         input:
-            merged=os.path.join(config["general"]["output_dir"],"clustering/merged.swarms"),
+            merged=os.path.join(config["general"]["output_dir"],"clustering/merged.swarms") if config['clustering'] == "swarm" else os.path.join(config["general"]["output_dir"],"clustering/vsearch_clusters_names.txt"),
             final_table_path2=os.path.join(config["general"]["output_dir"],"filtering/filtered_table.csv")
         output:
-            os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv")
+            out=os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") if config['clustering'] == "swarm" else os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv")
         conda:
             "../envs/merge_results.yaml"
         script:
-            "../scripts/merge_swarm_results.py"
+            "../scripts/merge_clust_results.py"
 
     # SWARM clustering runs on all samples after AmpliconDuo
     rule write_fasta:

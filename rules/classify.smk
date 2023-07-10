@@ -3,7 +3,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
     if config["classify"]["database"] == "pr2":
         rule mothur_classify:
             input:
-                os.path.join(config["general"]["output_dir"],"clustering/representatives.fasta") if config["general"]["seq_rep"] == "OTU" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
+                os.path.join(config["general"]["output_dir"],"clustering/representatives.fasta") if config["general"]["seq_rep"] == "OTU" and config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
                 expand("database/pr2db.{pr2_db_version}.fasta", pr2_db_version=config["database_version"]["pr2"])
             output:
                 os.path.join(config["general"]["output_dir"], "mothur/pr2/mothur_out.summary"),
@@ -30,7 +30,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
     elif config["classify"]["database"] == "unite":
         rule mothur_classify:
             input:
-                os.path.join(config["general"]["output_dir"],"clustering/representatives.fasta") if config["general"]["seq_rep"] == "OTU" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
+                os.path.join(config["general"]["output_dir"],"clustering/representatives.fasta") if config["general"]["seq_rep"] == "OTU" and config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
                 "database/unite_v8.3.fasta"
             output:
                 os.path.join(config["general"]["output_dir"],"mothur/unite/mothur_out.summary"),
@@ -57,7 +57,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
     elif config["classify"]["database"] == "silva":
         rule mothur_classify:
             input:
-                os.path.join(config["general"]["output_dir"],"clustering/representatives.fasta") if config["general"]["seq_rep"] == "OTU" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
+                os.path.join(config["general"]["output_dir"],"clustering/representatives.fasta") if config["general"]["seq_rep"] == "OTU" and config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
                 expand(["database/silva_db.{silva_db_version}.fasta", "database/silva_db.{silva_db_version}.tax"], silva_db_version=config["database_version"]["silva"])
             output:
                 os.path.join(config["general"]["output_dir"],"mothur/silva/mothur_out.summary"),
@@ -84,7 +84,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
     rule merge_output:
         input:
             os.path.join(config["general"]["output_dir"],"mothur/{database}/mothur_out.taxonomy"),
-            os.path.join(config["general"]["output_dir"], "clustering/swarm_table.csv") if config["general"]["seq_rep"] == "OTU" and config['clustering']=="swarm" else (os.path.join(config["general"]["output_dir"], "clustering/vsearch_all_otus_tab.txt") if config['clustering'] == "vsearch" else os.path.join(config["general"]["output_dir"], "filtering/filtered_table.csv")),
+            os.path.join(config["general"]["output_dir"], "clustering/swarm_table.csv") if config["general"]["seq_rep"] == "OTU" and config['clustering']=="swarm" else (os.path.join(config["general"]["output_dir"], "clustering/vsearch_table.csv") if config['clustering'] == "vsearch" else os.path.join(config["general"]["output_dir"], "filtering/filtered_table.csv")),
         output:
             os.path.join(config["general"]["output_dir"],"finalData/{database}/full_table.csv"),
             os.path.join(config["general"]["output_dir"],"finalData/{database}/OTU_table.csv"),
@@ -97,7 +97,7 @@ elif config['dataset']['nanopore']:
     if config["classify"]["database"] == "pr2":
         rule mothur_classify:
             input:
-                os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
+                expand(os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus.fasta")) if config['clustering'] == "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
                 expand("database/pr2db.{pr2_db_version}.fasta",pr2_db_version=config["database_version"]["pr2"])
             output:
                 os.path.join(config["general"]["output_dir"],"mothur/pr2/mothur_out.summary"),
@@ -126,7 +126,7 @@ elif config['dataset']['nanopore']:
     elif config["classify"]["database"] == "unite":
         rule mothur_classify:
             input:
-                os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
+                expand(os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus.fasta")) if config['clustering'] == "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
                 "database/unite_v8.3.fasta"
             output:
                 os.path.join(config["general"]["output_dir"],"mothur/unite/mothur_out.summary"),
@@ -155,7 +155,7 @@ elif config['dataset']['nanopore']:
     elif config["classify"]["database"] == "silva":
         rule mothur_classify:
             input:
-                os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
+                expand(os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus.fasta")) if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
                 expand(["database/silva_db.{silva_db_version}.fasta",
                 "database/silva_db.{silva_db_version}.tax"],silva_db_version=config["database_version"]["silva"])
             output:
@@ -185,7 +185,7 @@ elif config['dataset']['nanopore']:
     rule merge_output:
         input:
             os.path.join(config["general"]["output_dir"],"mothur/{database}/mothur_out.taxonomy"),
-            os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") if config["general"]["seq_rep"] == "OTU" and config ["dataset"]["nanopore"] == "FALSE" else os.path.join(config["general"]["output_dir"],"filtering/filtered_table.csv")
+            expand(os.path.join(config["general"]["output_dir"], "clustering/vsearch_table.csv")) if config['clustering'] == "vsearch" else os.path.join(config["general"]["output_dir"], "filtering/filtered_table.csv"),
         output:
             os.path.join(config["general"]["output_dir"],"finalData/{database}/full_table.csv"),
             os.path.join(config["general"]["output_dir"],"finalData/{database}/OTU_table.csv"),

@@ -22,7 +22,7 @@ if config['classify']['mothur']:
 
     rule run_mumu:
         input:
-            os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") if config ['clustering']== "swarm" or config["dataset"]["nanopore"] == "FALSE"  else (os.path.join(config["general"]["output_dir"], "clustering/vsearch_all_otus_tab.txt") if config['clustering'] == "vsearch" else os.path.join(config["general"]["output_dir"], "filtering/filtered_table.csv")),
+            os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") if config ['clustering']== "swarm" or config["dataset"]["nanopore"] == "FALSE"  else (os.path.join(config["general"]["output_dir"], "clustering/vsearch_table.csv") if config['clustering'] == "vsearch" else os.path.join(config["general"]["output_dir"], "filtering/filtered_table.csv")),
             expand(os.path.join(config["general"]["output_dir"],"mothur/{database}/match_scores.txt"), database=config['classify']['database']),
         output:
             temp(expand(os.path.join(config["general"]["output_dir"], "mothur/{database}/OTU_table_mumu.tmp"), database=config['classify']['database'])),
