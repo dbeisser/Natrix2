@@ -6,3 +6,4 @@ channels:
   - defaults
 dependencies:
   - "epi2melabs::pychopper"
+  - pandas=1.5.1
