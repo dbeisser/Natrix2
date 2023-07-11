@@ -10,8 +10,6 @@ The need for a scalable, reproducible workflow for the processing of environment
 
 ![DAG of an example workflow](documentation/images/Natrix2_workflow.png)
 *Fig. 2: Schematic diagram of processing nanopore reads with Natrix2 for OTU generation and taxonomic assignment. The color scheme represents the main steps of this variant of the workflow.*
-If you use Natrix, please cite:
-Welzel, M., Lange, A., Heider, D. et al. Natrix: a Snakemake-based workflow for processing, clustering, and taxonomically assigning amplicon sequencing reads. BMC Bioinformatics 21, 526 (2020). https://doi.org/10.1186/s12859-020-03852-4
 
 ---
 
