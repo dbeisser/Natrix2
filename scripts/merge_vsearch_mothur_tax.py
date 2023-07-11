@@ -1,6 +1,5 @@
 import pandas as pd
 import re
-import sys
 
 otu_file=open(snakemake.input[1], "r")
 taxonomy=open(snakemake.input[0], "r")
@@ -9,16 +8,20 @@ output_all=open(snakemake.output[0], "w")
 output_table=open(snakemake.output[1], "w")
 output_meta=open(snakemake.output[2], "w")
 
-
 taxonomy = pd.read_csv(taxonomy, sep='\t', names=['seqid', 'taxonomy']) # read mothur taxonomy file
 #print(taxonomy.head())
 otu_count = pd.read_csv(otu_file) #read otu table
 
 tax=taxonomy['taxonomy']
-ID=taxonomy['seqid']
+ID=taxonomy['seqid'].replace(r"^", "N", regex=True).replace(r"\;size\=.*$", "", regex=True).replace(r"\;", "", regex=True) # change seqid as per otu seqid
 concat_col=pd.concat([ID, tax], axis=1) #concatenate the id and taxonomy column
 
-otu_count['seqid']=otu_count['seqid'] # change ID if ASV table
+#for item in ID:
+#	print(item)
+
+
+## for vsearch file
+otu_count['seqid']=otu_count['seqid'].replace(r"_.*", "", regex=True).replace(r"\;size\=", "_", regex=True).replace(r"\;", "", regex=True) # change ID if ASV table
 
 #for item in otu_count['seqid']:
 #	print(item)

@@ -2,7 +2,7 @@ if config['dataset']['nanopore']:
     ## fastq to fasta
     rule fastq2fasta:
         input:
-            expand(os.path.join(config["general"]["output_dir"],"pychopper_merged/{{sample}}_{{unit}}_R{read}.fastq"),read=reads)
+            expand(os.path.join(config["general"]["output_dir"],"pychopper/pychopper_merged/{{sample}}_{{unit}}_R{read}.fastq"),read=reads)
         output:
             expand(os.path.join(config["general"]["output_dir"],"fasta/{{sample}}_{{unit}}_R{read}.fasta"),read=reads)
         conda:

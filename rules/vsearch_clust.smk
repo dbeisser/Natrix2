@@ -43,3 +43,13 @@ rule clust_merge_results_vsearch:
         "../envs/merge_results.yaml"
     script:
         "../scripts/merge_clust_results.py"
+
+
+rule vsearch_header:
+    input:
+        os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus.fasta"),
+        os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv")
+    output:
+        os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta")
+    script:
+        "../scripts/vsearch_fasta_headers.py"

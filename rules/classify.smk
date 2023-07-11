@@ -3,7 +3,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
     if config["classify"]["database"] == "pr2":
         rule mothur_classify:
             input:
-                os.path.join(config["general"]["output_dir"],"clustering/representatives.fasta") if config["general"]["seq_rep"] == "OTU" and config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
+                os.path.join(config["general"]["output_dir"],"clustering/representatives_mod.fasta") if config["general"]["seq_rep"] == "OTU" and config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
                 expand("database/pr2db.{pr2_db_version}.fasta", pr2_db_version=config["database_version"]["pr2"])
             output:
                 os.path.join(config["general"]["output_dir"], "mothur/pr2/mothur_out.summary"),
@@ -23,6 +23,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
             shell:
                 """
                     mothur "#set.logfile(name={log}); classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
+                    sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
                     mv {params.input}/*.taxonomy {params.output}/mothur/pr2/mothur_out.taxonomy;
                     mv {params.input}/*.summary {params.output}/mothur/pr2/mothur_out.summary;
                 """
@@ -30,7 +31,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
     elif config["classify"]["database"] == "unite":
         rule mothur_classify:
             input:
-                os.path.join(config["general"]["output_dir"],"clustering/representatives.fasta") if config["general"]["seq_rep"] == "OTU" and config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
+                os.path.join(config["general"]["output_dir"],"clustering/representatives_mod.fasta") if config["general"]["seq_rep"] == "OTU" and config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
                 "database/unite_v8.3.fasta"
             output:
                 os.path.join(config["general"]["output_dir"],"mothur/unite/mothur_out.summary"),
@@ -50,6 +51,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
             shell:
                 """
                     mothur "#classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
+                    sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
                     mv {params.input}/*.taxonomy {params.output}/mothur/unite/mothur_out.taxonomy;
                     mv {params.input}/*.summary {params.output}/mothur/unite/mothur_out.summary;
                 """
@@ -57,7 +59,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
     elif config["classify"]["database"] == "silva":
         rule mothur_classify:
             input:
-                os.path.join(config["general"]["output_dir"],"clustering/representatives.fasta") if config["general"]["seq_rep"] == "OTU" and config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
+                os.path.join(config["general"]["output_dir"],"clustering/representatives_mod.fasta") if config["general"]["seq_rep"] == "OTU" and config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
                 expand(["database/silva_db.{silva_db_version}.fasta", "database/silva_db.{silva_db_version}.tax"], silva_db_version=config["database_version"]["silva"])
             output:
                 os.path.join(config["general"]["output_dir"],"mothur/silva/mothur_out.summary"),
@@ -77,10 +79,11 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
             shell:
                 """
                     mothur "#classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
+                    sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
                     mv {params.input}/*.taxonomy {params.output}/mothur/silva/mothur_out.taxonomy;
                     mv {params.input}/*.summary {params.output}/mothur/silva/mothur_out.summary;
                 """
-
+    ##
     rule merge_output:
         input:
             os.path.join(config["general"]["output_dir"],"mothur/{database}/mothur_out.taxonomy"),
@@ -97,7 +100,7 @@ elif config['dataset']['nanopore']:
     if config["classify"]["database"] == "pr2":
         rule mothur_classify:
             input:
-                expand(os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus.fasta")) if config['clustering'] == "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
+                expand(os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta")) if config['clustering'] == "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
                 expand("database/pr2db.{pr2_db_version}.fasta",pr2_db_version=config["database_version"]["pr2"])
             output:
                 os.path.join(config["general"]["output_dir"],"mothur/pr2/mothur_out.summary"),
@@ -119,6 +122,7 @@ elif config['dataset']['nanopore']:
             shell:
                 """
                     mothur "#set.logfile(name={log}); classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
+                    sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
                     mv {params.input}/*.taxonomy {params.output}/mothur/pr2/mothur_out.taxonomy;
                     mv {params.input}/*.summary {params.output}/mothur/pr2/mothur_out.summary;
                 """
@@ -126,7 +130,7 @@ elif config['dataset']['nanopore']:
     elif config["classify"]["database"] == "unite":
         rule mothur_classify:
             input:
-                expand(os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus.fasta")) if config['clustering'] == "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
+                expand(os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta")) if config['clustering'] == "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
                 "database/unite_v8.3.fasta"
             output:
                 os.path.join(config["general"]["output_dir"],"mothur/unite/mothur_out.summary"),
@@ -148,6 +152,7 @@ elif config['dataset']['nanopore']:
             shell:
                 """
                     mothur "#classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
+                    sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
                     mv {params.input}/*.taxonomy {params.output}/mothur/unite/mothur_out.taxonomy;
                     mv {params.input}/*.summary {params.output}/mothur/unite/mothur_out.summary;
                 """
@@ -155,7 +160,7 @@ elif config['dataset']['nanopore']:
     elif config["classify"]["database"] == "silva":
         rule mothur_classify:
             input:
-                expand(os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus.fasta")) if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
+                expand(os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta")) if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
                 expand(["database/silva_db.{silva_db_version}.fasta",
                 "database/silva_db.{silva_db_version}.tax"],silva_db_version=config["database_version"]["silva"])
             output:
@@ -178,6 +183,7 @@ elif config['dataset']['nanopore']:
             shell:
                 """
                     mothur "#classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
+                    sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
                     mv {params.input}/*.taxonomy {params.output}/mothur/silva/mothur_out.taxonomy;
                     mv {params.input}/*.summary {params.output}/mothur/silva/mothur_out.summary;
                 """

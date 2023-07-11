@@ -26,10 +26,10 @@ if config['dataset']['nanopore']:
         input:
             unclass_fastq=expand(os.path.join(config["general"]["output_dir"],"pychopper/unclassified/{{sample}}_{{unit}}_R{read}.fastq"), read=reads)
         output:
-            unclass_out_fastq=expand(os.path.join(config["general"]["output_dir"],"pychopper_unclass/output/{{sample}}_{{unit}}_R{read}.fastq"), read=reads),
-            unclass_unclass_fastq=expand(os.path.join(config["general"]["output_dir"],"pychopper_unclass/unclassified/{{sample}}_{{unit}}_R{read}.fastq"),  read=reads),
-            unclass_rescue_fastq=expand(os.path.join(config["general"]["output_dir"],"pychopper_unclass/rescued/{{sample}}_{{unit}}_R{read}.fastq"), read=reads),
-            unclass_pdf=expand(os.path.join(config["general"]["output_dir"],"pychopper_unclass/reports/{{sample}}_{{unit}}_R{read}.pdf"),  read=reads)
+            unclass_out_fastq=expand(os.path.join(config["general"]["output_dir"],"pychopper/pychopper_unclass/output/{{sample}}_{{unit}}_R{read}.fastq"), read=reads),
+            unclass_unclass_fastq=expand(os.path.join(config["general"]["output_dir"],"pychopper/pychopper_unclass/unclassified/{{sample}}_{{unit}}_R{read}.fastq"),  read=reads),
+            unclass_rescue_fastq=expand(os.path.join(config["general"]["output_dir"],"pychopper/pychopper_unclass/rescued/{{sample}}_{{unit}}_R{read}.fastq"), read=reads),
+            unclass_pdf=expand(os.path.join(config["general"]["output_dir"],"pychopper/pychopper_unclass/reports/{{sample}}_{{unit}}_R{read}.pdf"),  read=reads)
         params:
             primer=config["general"]["primertable"],
             qual =config["pychop"]["qual"]
@@ -47,9 +47,9 @@ if config['dataset']['nanopore']:
     rule merge_pychopper:
         input:
             out_fastq = expand(os.path.join(config["general"]["output_dir"],"pychopper/output/{{sample}}_{{unit}}_R{read}.fastq"),  read=reads),
-            unclass_out_fastq = expand(os.path.join(config["general"]["output_dir"],"pychopper_unclass/output/{{sample}}_{{unit}}_R{read}.fastq"),  read=reads)
+            unclass_out_fastq = expand(os.path.join(config["general"]["output_dir"],"pychopper/pychopper_unclass/output/{{sample}}_{{unit}}_R{read}.fastq"),  read=reads)
         output:
-            pychopper_merged = expand(os.path.join(config["general"]["output_dir"], "pychopper_merged/{{sample}}_{{unit}}_R{read}.fastq"), read=reads)
+            pychopper_merged = expand(os.path.join(config["general"]["output_dir"], "pychopper/pychopper_merged/{{sample}}_{{unit}}_R{read}.fastq"), read=reads)
         shell:
             """
             cat {input.out_fastq} {input.unclass_out_fastq} > {output.pychopper_merged}

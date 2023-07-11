@@ -29,7 +29,7 @@ if not config['dataset']['nanopore']:
 else:
     rule fastqc:
         input:
-            os.path.join(config["general"]["output_dir"],"pychopper_merged/{sample}_{unit}_R{read}.fastq")
+            os.path.join(config["general"]["output_dir"],"pychopper/pychopper_merged/{sample}_{unit}_R{read}.fastq")
         output:
             os.path.join(config["general"]["output_dir"],"qc/{sample}_{unit}_R{read}_fastqc.html"),
             os.path.join(config["general"]["output_dir"],"qc/{sample}_{unit}_R{read}_fastqc.zip")

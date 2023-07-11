@@ -33,6 +33,16 @@ if not config['dataset']['nanopore'] and config['clustering']== 'swarm':
         shell:
             "swarm -t {threads} -f -z -w {output[0]} < {input} > {output[1]}"
 
+    rule swarm_headers:
+        input:
+            os.path.join(config["general"]["output_dir"],"clustering/representatives.fasta"),
+            os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv")
+        output:
+            os.path.join(config["general"]["output_dir"],"clustering/representatives_mod.fasta")
+        script:
+            "../scripts/swarm_fasta_headers.py"
+
+
     rule clust_merge_results:
         input:
             merged=os.path.join(config["general"]["output_dir"],"clustering/merged.swarms") if config['clustering'] == "swarm" else os.path.join(config["general"]["output_dir"],"clustering/vsearch_clusters_names.txt"),
