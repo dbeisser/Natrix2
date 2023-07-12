@@ -63,6 +63,7 @@ if config['dataset']['nanopore']:
         shell:
             """
             sed "s/[>].*[^|]|/>/" {input[0]} > {output.tmp};
+            export CUDA_VISIBLE_DEVICES=''
             medaka_consensus -i {output.tmp} -d {input[1]} -o {params.out_dir} -t 20
             """
 ## aligh medaka consesus with raw reads to get number of reads for each consensus
