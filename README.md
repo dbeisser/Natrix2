@@ -122,7 +122,7 @@ $ docker pull mw55/natrix
 The docker container has all environments pre-installed, eliminating the need for downloading the environments during first-time initialization of the workflow.
 To connect to the shell inside the docker container, input the following command:
 ```shell
-docker run -it --label natrix_container -v </host/database>:/app/database -v </host/output>:/app/output -v </host/input_folder>:/app/input mw55/natrix bash
+docker run -it --label natrix2_container -v </host/database>:/app/database -v </host/output>:/app/output -v </host/input_folder>:/app/input mw55/natrix2 bash
 ```
 */host/database* is the full path to a local folder, in which you wish to install the database (SILVA or NCBI). This part is optional and only needed if
 you want to use BLAST for taxonomic assignment.
@@ -153,8 +153,8 @@ At first launch the container will download the required databases to /srv/docke
 If you prefer to build the docker container yourself from the repository (for example, if you modified the source code of Natrix) the container can be build and started directly: (*host* folders have to be changed!)
 
 ```shell
-docker build . --tag natrix
-docker run -it --label natrix_container -v </host/database>:/app/database -v </host/output>:/app/output -v </host/input_folder>:/app/input natrix bash # -v /host/database:/app/database is optional
+docker build . --tag natrix2
+docker run -it --label natrix2_container -v </host/database>:/app/database -v </host/output>:/app/output -v </host/input_folder>:/app/input natrix2 bash # -v /host/database:/app/database is optional
 ```
 
 You will then be at the command prompt inside the docker container, from there you can follow the tutorial for [running Natrix manually](#running-natrix-manually).
