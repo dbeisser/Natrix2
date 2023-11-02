@@ -143,8 +143,8 @@ elif config['dataset']['nanopore']:
                 output=config['general']['output_dir'],
                 threads=config['general']['cores'],
                 input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"][
-                                                                                        "seq_rep"] == "OTU" and config ["dataset"]["nanopore"] == "FALSE" else os.path.join(
-                    config["general"]["output_dir"],"filtering"),
+                                                                                        "seq_rep"] == "OTU" and config ["dataset"]["nanopore"] == "FALSE" 
+                   else ( os.path.join(config["general"]["output_dir"],"clustering") if config["clustering"]=="vsearch" else os.path.join(config["general"]["output_dir"],"filtering")),
             conda:
                 "../envs/mothur.yaml"
             log:
@@ -174,8 +174,8 @@ elif config['dataset']['nanopore']:
                 output=config['general']['output_dir'],
                 threads=config['general']['cores'],
                 input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"][
-                                                                                        "seq_rep"] == "OTU" and config ["dataset"]["nanopore"] == "FALSE" else os.path.join(
-                    config["general"]["output_dir"],"filtering"),
+                                                                                        "seq_rep"] == "OTU" and config ["dataset"]["nanopore"] == "FALSE" 
+                   else ( os.path.join(config["general"]["output_dir"],"clustering") if config["clustering"]=="vsearch" else os.path.join(config["general"]["output_dir"],"filtering")),
             conda:
                 "../envs/mothur.yaml"
             log:

@@ -1,5 +1,5 @@
 import os
-if config['dataset']['nanopore']:
+if config['dataset']['nanopore'] and config['dataset']['pychopper']:
     rule pychop:
         input:
             fastq=expand(os.path.join(config["general"]["filename"],"{{sample}}_{{unit}}_R{read}.fastq.gz"), read=reads)
