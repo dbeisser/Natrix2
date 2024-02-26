@@ -35,7 +35,7 @@ if config['dataset']['nanopore']:
             maxlength = config["nanopore"]["max_length"],
             headcrop = config["nanopore"]["head_trim"],
             tailcrop = config["nanopore"]["tail_trim"],
-            threads = config["nanopore"]["threads"]
+            threads = config["general"]["cores"]
         conda:
             "../envs/quality_filtering.yaml"
         shell:
