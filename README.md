@@ -2,8 +2,8 @@
 <img src="documentation/images/logo.png" alt="logo" width="500"/>
 </p>
 
-Natrix is an open-source bioinformatics pipeline for the preprocessing of raw sequencing data.
-The need for a scalable, reproducible workflow for the processing of environmental amplicon data led to the development of Natrix. It is divided into quality assessment, read assembly, dereplication, chimera detection, split-sample merging, ASV or OTU-generation and taxonomic assessment. The pipeline is written in [Snakemake](https://snakemake.readthedocs.io) (Köster and Rahmann 2018), a workflow management engine for the development of data analysis workflows. Snakemake ensures reproducibility of a workflow by automatically deploying dependencies of workflow steps (rules) and scales seamlessly to different computing environments like servers, computer clusters or cloud services. While Natrix was only tested with 16S and 18S amplicon data, it should also work for other kinds of sequencing data. The pipeline contains seperate rules for each step of the pipeline and each rule that has additional dependencies has a seperate [conda](https://conda.io/) environment that will be automatically created when starting the pipeline for the first time. The encapsulation of rules and their dependencies allows for hassle-free sharing of rules between workflows.
+Natrix is an open-source bioinformatics pipeline for the preprocessing of long and short raw sequencing data.
+The need for a scalable, reproducible workflow for the processing of environmental amplicon data led to the development of Natrix. It is divided into quality assessment, dereplication, chimera detection, split-sample merging, ASV or OTU-generation and taxonomic assessment. The pipeline is written in [Snakemake](https://snakemake.readthedocs.io) (Köster and Rahmann 2018), a workflow management engine for the development of data analysis workflows. Snakemake ensures reproducibility of a workflow by automatically deploying dependencies of workflow steps (rules) and scales seamlessly to different computing environments like servers, computer clusters or cloud services. While Natrix was only tested with 16S and 18S amplicon data, it should also work for other kinds of sequencing data. The pipeline contains seperate rules for each step of the pipeline and each rule that has additional dependencies has a seperate [conda](https://conda.io/) environment that will be automatically created when starting the pipeline for the first time. The encapsulation of rules and their dependencies allows for hassle-free sharing of rules between workflows.
 
 ![DAG of an example workflow](documentation/images/natrix_and_update_1.png)
 *DAG of Natrix2 workflow: Schematic representation of the Natrix2 workflow. The processing of two  split samples using AmpliconDuo is depicted. The color scheme represents the main steps, dashed lines outline the OTU and dotted edges outline the ASV variant of the workflow. Stars depict updates to the original Natrix workflow. Details on the ONT part are depicted in Fig. 2*
@@ -47,7 +47,7 @@ This will create a conda environment containing all dependencies for Snakemake i
 
 With Natrix comes an example [primertable](#Example-primertable) *example_data.csv*, [configfile](#Configfile) *example_data.yaml* and an example amplicon dataset in the folder *example_data*.
 
-To try out Natrix using the example data, type in the following command:
+To try out Natrix using the example data (Illumina_data or Nanopore_data), type in the following command:
 
 ```shell
 $ ./pipeline.sh
@@ -232,34 +232,51 @@ After the workflow is finishedall output files can be found under *Natrix-Pipeli
 
 *Output file hierarchy, blue nodes represent folders, orange nodes represent files that are created in both variants of the workflow, green nodes are files exclusive to the OTU variant and purple nodes are files exclusive to the ASV variant of the workflow.*
 
-|Folder                               |File(s)                   |Description                                                                                              |
-|-------------------------------------|--------------------------|---------------------------------------------------------------------------------------------------------|
-|qc                                   |FastQC reports            |Quality reports of the FastQC application.                                                               |
-|                                     |MultiQC report            |Aggregated FastQC reports in a single file.                                                              |
-|logs                                 |Logfiles                  |Logfiles of the different rules.                                                                         |
-|assembly (one folder for each sample)|sample_low_qual.fastq     |Sequences of sample that did not pass the prinseq quality filtering.                                     |
-|                                     |sample_assembled.fastq    |With PANDAseq assembled sequences.                                                                       |
-|                                     |sample_singletons.fastq   |Sequences that could not be assembled.                                                                   |
-|                                     |sample.fasta              |FASTA file of the assembled sequences.                                                                   |
-|                                     |sample.dereplicated.fasta |Dereplicated sequences of sample                                                                         |
-|                                     |sample_chimera.fasta      |Sequences of sample that are thought to be of chimeric origin.                                           |
-|finalData                            |sample.nonchimera.fasta   |Sequences of sample that passed the chimera detection rule.                                              |
-|                                     |full_table.csv            |Table containing the sequences of all samples and their abundances per sample .                          |
-|                                     |full_table_mumu.csv       |Table containing the sequences of all samples, their abundances per sample and taxonomy after post-clustering with mumu         |
-|                                     |filtered_out_table.csv    |Table containing the sequences that did not pass the filtering rule.                                     |
-|                                     |filtered.fasta            |The sequences of the filtered_table.csv in FASTA format.                                                 |
-|                                     |filtered_blast_table.csv  |Table containing the sequences of the filtered_table.csv and the taxonomic information assigned to each. |
-|figures                              |ampliconduo_unfiltered.png|Discordance graph before the filtering.                                                                  |
-|                                     |ampliconduo_filtered.png  |Discordance graph after filtering.                                                                       |
-|                                     |AmpliconDuo.Rdata         |RData file containing the results of the AmpliconDuo statistical analysis.                               |
-
+| Folder                                | File(s)                    | Description                                                                                                              |
+|---------------------------------------|----------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| qc                                    | FastQC reports             | Quality reports of the FastQC application.                                                                               |
+|                                       | MultiQC report             | Aggregated FastQC reports in a single file.                                                                              |
+| logs                                  | Logfiles                   | Logfiles of the different rules.                                                                                         |
+| assembly (one folder for each sample) | sample_low_qual.fastq      | Sequences of sample that did not pass the prinseq quality filtering.                                                     |
+|                                       | sample_assembled.fastq     | With PANDAseq assembled sequences.                                                                                       |
+|                                       | sample_singletons.fastq    | Sequences that could not be assembled.                                                                                   |
+|                                       | sample.fasta               | FASTA file of the assembled sequences.                                                                                   |
+|                                       | sample.dereplicated.fasta  | Dereplicated sequences of sample.                                                                                        |
+|                                       | sample_chimera.fasta       | Sequences of sample that are thought to be of chimeric origin.                                                           |
+| finalData                             | sample.nonchimera.fasta    | Sequences of sample that passed the chimera detection rule.                                                              |
+|                                       | full_table.csv             | Table containing the sequences of all samples and their abundances per sample .                                          |
+|                                       | full_table_mumu.csv        | Table containing the sequences of all samples, their abundances per sample and taxonomy after post-clustering with mumu. |
+|                                       | filtered_out_table.csv     | Table containing the sequences that did not pass the filtering rule.                                                     |
+|                                       | filtered.fasta             | The sequences of the filtered_table.csv in FASTA format.                                                                 |
+|                                       | filtered_blast_table.csv   | Table containing the sequences of the filtered_table.csv and the taxonomic information assigned to each.                 |
+| figures                               | ampliconduo_unfiltered.png | Discordance graph before the filtering.                                                                                  |
+|                                       | ampliconduo_filtered.png   | Discordance graph after filtering.                                                                                       |
+|                                       | AmpliconDuo.Rdata          | RData file containing the results of the AmpliconDuo statistical analysis.                                               |
+| clustering                            | VSEARCH clustering files   | OTU clustered files with VSEARCH.                                                                                        |
+| filtering                             | unfiltered_table.csv       | Table containing cd_hit assembled representative sequences.                                                              || filtering                             |                            |                                                                                                                          |
+|                                       | filtered_table.csv         | Table containing sequences passing the cutoff value.                                                                     || filtering                             |                            |                                                                                                                          |
+|                                       | filtered_out_table.csv     | Table containing sequences not passing the cutoff value.                                                                 || filtering                             |                            |                                                                                                                          |
+| mothur                                | Database assigned taxonomy | Taxonomy, FASTA and csv files with assigned taxonomy to chosen database.                                                 |
+| quality_filtering                     | Filtered files             | Quality and length filtered Nanopore FASTQ files.                                                                        |
+| pychopper                             | output                     | Reorientated and primer trimmed output of first round of pychopper.                                                      |
+|                                       | pychopper_unclass          | Reorientated and primer trimmed output of rescue specific round of pychopper.                                            |
+|                                       | reports                    | Reorientation and trimming reports for each file.                                                                        |
+|                                       | rescued                    | Sequences that were not able to orientate and trimm, but could be rescued.                                               |
+|                                       | unclassified               | Sequences that were not able to orientate and trimm during the first round of pychopper.                                 |
+|                                       | pychopper_merged           | Reorientated and primer trimmed merged output of first round and rescue specific round of pychopper.                     |
+| read_correction                       | cd_hit                     | Representative sequences of assembled Nanopore sequences.                                                                |
+|                                       | counts_mapping             | Medaka alignment with raw reads for quantification of Medaka representative sequences.                                   |
+|                                       | medaka                     | Medaka error corrected sequences.                                                                                        |
+|                                       | minimap                    | FASTA files aligned to cd_hit representative sequences.                                                                  |
+|                                       | racon                      | Racon polished sequences for error correction.                                                                           |
 ---
 
 # Steps of the Pipeline
-## Initial demultiplexing
+
+## Initial demultiplexing (Illumina-variant)
 The sorting of reads according to their barcode is known as demultiplexing.
 
-## Quality control
+## Quality control (Illumina-variant)
 For quality control the pipeline uses the programs FastQC (Andrews 2010), MultiQC (Ewels
 et al. 2016) and PRINSEQ (Schmieder and Edwards 2011).
 
@@ -276,26 +293,7 @@ single report, allowing reviews of all FASTQ files at once.
 PRINSEQ is used to filter out sequences with an average quality score below
 the threshold that can be defined in the configuration file of the pipeline.
 
-### Pychopper (Nanopore-variant)
-Pychopper (Oxford Nanopore Technologies Ltd. 2019) reorientates ONT reverse reads based on a minimum mean base quality into forward reads and trims off sequencing adapters, barcodes and primers from ONT reads.
-
-## read correction (Nanopore-variant)
-### Conversion of FASTQ files to FASTA files
-The rule copy_to_fasta converts the FASTQ files to FASTA files to reduce the disc space occupied by the files and to allow the usage of CD-HIT, which requires FASTA formated sequencing files. 
-
-### CD-HIT clustering
-The CD-HIT-EST algorithm (Fu et al. 2012) clusters sequences together if they are either identical or if a sequence is a subsequence of another. This clustering approach is known as dereplication. Beginning with the longest sequence of the dataset as the first representative sequence, it iterates through the dataset in order of decreasing sequence length, comparing at each iteration the current query sequence to all representative sequences. If the sequence identity threshold defined in the configuration file is met for a representative sequence, the counter of the representative sequence is increased by one. If the threshold could not be met for any of the existing representative sequences, the query sequence is added to the pool of representative sequences. The output of CD-HIT clustering is mapped against the prior created FASTA files by Minimap (Li 2018).
-
-### Racon
-Error corrected consensus sequences are built by distance-based alignments of quality filtered reads with Racon (Daw 2019). 
-
-### Medaka
-Medaka (Oxford Nanopore Technologies 2023) maps FASTA files against consensus sequences built by Racon based on a neural network algorithm.
-
-## OTU generation (Nanopore-variant)
-OTUs are generated by alignment of error corrected consensus sequences to the FASTA files with Minimap for identification of corresponding number of reads per consensus sequence, followed by second round of CD-HIT clustering. 
-
-## Read assembly
+## Read assembly (Illumina-variant)
 ### Define primer
 The define_primer rule specifies the subsequences to be removed by the
 assembly rule, specified by entries of the configuration file and a primer table that contains information about the primer and barcode sequences used and the length of the poly-N subsequences. Besides removing the subsequences based on their nucleotide sequence, it is also possible to remove them based solely on their length using an offset. Using an offset can be useful if the sequence has many uncalled bases in the primer region, which could otherwise hinder matches between the target sequence defined in the primer table and the sequence read.
@@ -310,7 +308,24 @@ In the ASV variant of the workflow Cutadapt (Martin 2011) is used to remove the 
 ### ASV denoising (ASV-Variant)
 After the removal of undesired subsequences ASVs are generated using the DADA2 (Callahan et al. 2016) algorithm. It dereplicates the dataset and uses a denoising algorithm. This algorithm infers if a sequence was produced by a different sequence based on the composition, quality, and abundance of a sequence and an Illumina error model. After ASV generation, exactly overlapping forward and reverse reads are assembled. The assembled ASVs are saved as FASTA files for downstream analysis.
 
-## Similarity clustering
+
+## Quality filtering (Nanopore-variant)
+For quality control and filtering the pipeline used the program chopper (De Coster and Rademakers 2023).
+
+## Pychopper (Nanopore-variant)
+Pychopper (https://github.com/epi2me-labs/pychopper) reorientates ONT reverse reads based on a minimum mean base quality into forward reads and trims off sequencing adapters, barcodes and primers from ONT reads.
+
+## Read correction (Nanopore-variant)
+### CD-HIT clustering
+The CD-HIT-EST algorithm (Fu et al. 2012) clusters sequences together if they are either identical or if a sequence is a subsequence of another. This clustering approach is known as dereplication. Beginning with the longest sequence of the dataset as the first representative sequence, it iterates through the dataset in order of decreasing sequence length, comparing at each iteration the current query sequence to all representative sequences. If the sequence identity threshold defined in the configuration file is met for a representative sequence, the counter of the representative sequence is increased by one. If the threshold could not be met for any of the existing representative sequences, the query sequence is added to the pool of representative sequences. The output of CD-HIT clustering is mapped against the prior created FASTA files by Minimap (Li 2018).
+
+### Racon
+Error corrected consensus sequences are built by distance-based alignments of quality filtered reads with Racon (https://github.com/lbcb-sci/racon). 
+
+### Medaka
+Medaka (https://github.com/nanoporetech/medaka) maps FASTA files against consensus sequences built by Racon based on a neural network algorithm.
+
+## Similarity clustering (Illumina- & Nanopore-variant)
 ### Conversion of FASTQ files to FASTA files (OTU-variant)
 The rule copy_to_fasta converts the FASTQ files to FASTA files to reduce the disc space occupied by the files and to allow the usage of CD-HIT, which requires FASTA formated sequencing files. 
 
@@ -321,7 +336,7 @@ The CD-HIT-EST algorithm (Fu et al. 2012) clusters sequences together if they ar
 The cluster_sorting rule uses the output of the cdhit rule to count the amount of sequences represented by each cluster, followed by sorting the representative sequences in descending order according to the cluster size and adds a specific header to each
 sequence as required by the UCHIME chimera detection algorithm.
 
-## Chimera detection
+## Chimera detection (Illumina- & Nanopore-variant)
 ### VSEARCH
 VSEARCH is a open-source alternative to the USEARCH toolkit, which aims to functionally replicate the algorithms used by USEARCH for which the source code is not openly available and which are often only rudimentarily described (Rognes et al. 2016). Natrix uses as an alternative to UCHIME the VSEARCH uchime3_denovo algorithm to detect chimeric sequences (further referred to as VSEARCH3). The VSEARCH3 algorithm is a replication of the UCHIME2 algorithm with optimized standard parameters. The UCHIME2 algorithm is described by R. Edgar 2016 as follows:
 
@@ -330,7 +345,7 @@ VSEARCH is a open-source alternative to the USEARCH toolkit, which aims to funct
 
 The difference between the UCHIME2 and UCHIME3 algorithm is that to be selected as a potential parent, a sequence needs to have at least 16 times the abundance of the query sequence in the UCHIME3 algorithm, while it only needs double the abundance of the query sequence to be selected as a potential parent in the UCHIME2 algorithm.
 
-## Table creation and filtering
+## Table creation and filtering (Illumina- & Nanopore-variant)
 ### Merging of all FASTA files into a single table
 For further processing the rule unfiltered_table merges all FASTA files into a single, nested dictionary, containing each sequence as the key with another dictionary as value, whose keys are all (split -) samples in which the sequence occurred in and as values the abundance of the sequence in the particular (split - ) sample. For further pipeline processing the dictionary is temporarily saved in JSON format. To ease statistical analysis of the data the dictionary is also exported as a comma separated table. Filtering In the filtering rule of the pipeline all sequences that do not occur in both splitsamples of at least one sample are filtered out. For single-sample data, the filtering rule uses an abundance cutoff value that can be specified in the configuration file to filter out all sequences which have abundances less
 or equal the specified cutoff value. The filtered data and the filtered out data is subsequently exported as comma separated tables.
@@ -338,7 +353,7 @@ or equal the specified cutoff value. The filtered data and the filtered out data
 ### Table conversion to FASTA files
 As the swarm rule needs FASTA files as input, the resulting table of the filtering is converted to a FASTA file by the rule write_fasta.
 
-## AmpliconDuo / Split-sample approach
+## AmpliconDuo / Split-sample approach (Illumina- & Nanopore-variant)
 The pipeline supports both single-sample and split-sample FASTQ amplicon data. The split-sample protocol (Lange et al. 2015) aims to reduce the amount of sequences that are the result of PCR or sequencing errors without the usage of stringent abundance cutoffs, which often lead to the loss of rare but naturally occurring sequences. To achieve this, extracted DNA from a single sample is divided into two split-samples, which are then separately amplified and sequenced. All sequences that do not occur in both split-samples are seen as erroneous sequences and filtered out. The method is therefore based on the idea that a sequence that was created by PCR or sequencing errors does not occur in both samples. A schematic representation of the split-sample method is shown below:
 
 <p align="center">
@@ -351,7 +366,8 @@ The initial proposal for the split-sample approach by Dr. Lange was accompanied 
 If ∆<sup>u</sup><sub>Sθ</sub> = 0 each branch of sample S contains the same set of sequences, while if ∆<sup>r</sup><sub>Sθ</sub> = 0
 the read numbers for each sequence in sample S are within the error margin set by the chosen false discovery rate. The results of the discordance calculations are then plotted for visualization purposes and written to an R data file to allow the filtering of significantly deviating sequences.
 
-## OTU generation (OTU-variant)
+## OTU generation ((Illumina- & Nanopore-variant))
+### SWARM clustering
 OTUs are generated using the Swarm clustering algorithm (Mahé et al. 2015) in the identically named rule. Swarm clusters sequences into OTUs using an iterative approach with a local threshold: It creates a pool of amplicons from the input file and a empty OTU. Subsequently, it will remove the first amplicon from the pool, which will become the OTU seed. All amplicons left in the pool that differ in their nucleotide composition from the initial seed by a user given threshold (the default threshold used is 1 nucleotide) are removed from the pool and added to the OTU as subseeds. In the next iteration, each amplicon having at most a difference as high as the threshold to any of the subseeds is then removed from the
 pool and added to the OTU. This iterative process will continue until there are no amplicons left in the pool with a nucleotide difference of at most the threshold to any of the subseeds added in the previous iteration to the OTU, leading to the closure of the OTU and the opening of a new one. This approach to OTU generation circumvents two sources of OTU variability that are inherent to greedy clustering algorithms: the input order dependency, in which the first amplicon in a FASTA file will become the centroid of an OTU and the use of a global threshold, recruiting all amplicons that have less differences to the centroid than a user defined threshold. The iterative approach of Swarm produces a star-shaped minimum
 spanning tree, with an (usually highly abundant) amplicon as the center, regardless of the chosen first amplicon of the OTU, as visualized in Figure 12. The sequence of the amplicon at the center of each OTU tree is used in subsequent analysis steps as the representative sequence of the corresponding OTU.
@@ -362,10 +378,10 @@ spanning tree, with an (usually highly abundant) amplicon as the center, regardl
 *Schematic representation of the greedy clustering approach and the iterative Swarm approach. The greedy approach (a) that uses a global clustering threshold t and input order dependent centroid selection can lead to the placement of closely related amplicons into different OTUs. The iterative approach of Swarm (b), with a local threshold d, leads to
 OTUs containing only closely related amplicons with a natually forming centroid during the iterative growth process of the OTU. Image from Mahé et al. 2015.*
 
-## VSEARCH clustering
-OTUs from ONT sequences are generated using the de novo clustering algorithm from the previous mentioned VSEARCH toolkit (Rognes et al. 2016). The algorithm is based on centroids and utilizes a greedy and heuristic approach. It has a customizable threshold for sequence similarity, which is specified in the configuration file of the pipelines. The algorithm works by using input sequences as a query to search against an initially empty database of centroid sequences. The query sequence is clustered with the first centroid sequence that meets or exceeds the threshold for similarity.
+### VSEARCH clustering
+OTUs are generated using the de novo clustering algorithm from the previous mentioned VSEARCH toolkit (Rognes et al. 2016). The algorithm is based on centroids and utilizes a greedy and heuristic approach. It has a customizable threshold for sequence similarity, which is specified in the configuration file of the pipelines. The algorithm works by using input sequences as a query to search against an initially empty database of centroid sequences. The query sequence is clustered with the first centroid sequence that meets or exceeds the threshold for similarity.
 
-## Sequence comparison
+## Sequence comparison (Illumina- & Nanopore-variant)
 The assignment of taxonomic information to an OTU/ASV is an important part of the processing of environmental amplicon data, as the characteristics of known groups or species can be used to assess the environmental conditions of the samples origin. To find sequences that are similar to the representative sequence of each OTU/ASV the BLAST (basic local alignment search
 tool) algorithm (Altschul et al. 1990) is used to search for similar sequences in the SILVA database (Pruesse et al. 2007). The SILVA database contains aligned rRNA sequencing data that are curated in a multi-step process. While it has an extensive collection of highquality prokaryotic rRNA sequencing data, it only contains a limited amount of microbial
 eukaryotic sequencing data. If the database is not locally available, the required files will automatically be downloaded and the database will be build in the rule make_silva_db. The BLAST algorithm itself will be executed in the blast rule. As the aim is to find similar nucleotide sequences in the database for each query sequence the nucleotide-nucleotide BLAST (BLASTn) variation of the BLAST algorithm is used. The tab separated output file of the blast rule contains the following information for each representative sequence if the output of the BLASTn search meets the criteria defined in the [configuration](#Configfile) file:
@@ -385,7 +401,7 @@ eukaryotic sequencing data. If the database is not locally available, the requir
 | 11.        | evalue      | E-value                                       |
 | 12.        | stitle      | Title (taxonomy) of the target sequence       |
 
-## Merging of the results
+## Merging of the results (Illumina- & Nanopore-variant)
 The output data from the write_fasta, swarm and blast rules are merged to a single comma
 separated table in the merge_results rule, containing for each representative sequence the
 sequence identification number, the nucleotide sequence, the abundance of the sequence in
@@ -402,68 +418,91 @@ The primertable should be a .csv file (*project*.csv) in the following format:
 # Configfile
 Below are the explainations for the configfile (*project*.yaml) entries:
 
-|Option           |Default                                                                          |Description                                                                                                                                                                                                                                  |
-|-----------------|---------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|filename         |project                                                                          |The path / filename of the project folder, primertable (.csv) and configfile (.yaml). If the raw data folder is not in the root directory of Natrix, please add the path relative to the root directory (e.g. input/example_data)            |
-|output_dir       |output                                                                           |# path to custom output directory / relative to the root directory of natrix (DO NOT change this value if you are using docker! Leave it as output)                                                                                                            |
-|primertable      |project.csv                                                                      |Path to the primertable. If the primertable is not in the root directory of Natrix, please add the path relative to the root directory (e.g. input/example_data.yaml)                                                                        |
-|units            |units.tsv                                                                        |Path to the sequencing unit sheet.                                                                                                                                                                                                           |
-|cores            |4                                                                                |Amount of cores available for the workflow.                                                                                                                                                                                                  |
-|multiqc          |False                                                                            |Initial quality check (fastqc & multiqc), currently only works for not yet assembled reads.                                                                                                                                                  |
-|demultiplexing   |False                                                                            |Demultiplexing for reads that were not demultiplexed by the sequencing company (slow).                                                                                                                                                       |
-|read_sorting     |False                                                                            |Read sorting for paired end reads that were not sorted by the sequencing company (slow).                                                                                                                                                     |
-|already_assembled|False                                                                            |Skipping of the quality control and read assembly steps for data that is already assembled.                                                                                                                                                  |
-|seq_rep          |OTU                                                                              |How the sequences should be represented, possible values are: "ASV", amplicon sequence variants, created with DADA2 or "OTU", operational taxonomic units, created with SWARM                                                                |
-|threshold        |0.9                                                                              |PANDAseq score threshold a sequence must meet to be kept in the output.                                                                                                                                                                      |
-|minoverlap       |15                                                                               |Sets the minimum overlap between forward and reverse reads.                                                                                                                                                                                  |
-|minqual          |1                                                                                |Minimal quality score for bases in an assembled read to be accepted by PANDAseq.                                                                                                                                                             |
-|minlen           |100                                                                              |The minimal length of a sequence after primer removal to be accepted by PANDAseq.                                                                                                                                                            |
-|maxlen           |600                                                                              |The maximal length of a sequence after primer removal to be accepted by PANDAseq.                                                                                                                                                            |
-|primer_offset    |False                                                                            |Using PANDAseq to remove primer sequences by length offset instead of sequence identity.                                                                                                                                                     |
-|mq               |25                                                                               |Minimum quality sequence check (prinseq), filtering of sequences according to the PHRED quality score before the assembly.                                                                                                                   |
-|barcode_removed  |True                                                                             |Boolean that indicates if the sequence is free of barcodes.                                                                                                                                                                                  |
-|all_primer       |True                                                                             |Boolean that indicates if the sequence is free of any kind of additional subsequences (primer, barcodes etc.).                                                                                                                               |
-|clustering       |1.0                                                                              |Percent identity for cdhit (dereplication) (1 = 100%), if cdhit is solely to be used for dereplication (recommended), keep the default value.                                                                                                |
-|length_overlap   |0.0                                                                              |Length difference cutoff, default 0.0 if set to 0.9, the shorter sequences need to be at least 90% length of the representative of the cluster.                                                                                              |
-|representative   |longest                                                                          |Which sequence to use as a representative sequence per CDHIT cluster. longest = the longest sequence of the corresponding cluster, most_common = the most common sequence of the corresponding cluster.                                      |
-|beta             |8.0                                                                              |Weight of a "no" vote for the VSEARCH chimera detection algorithm.                                                                                                                                                                           |
-|pseudo_count     |1.2                                                                              |Pseudo - count prior on number of “no” votes.                                                                                                                                                                                                |
-|abskew           |16                                                                               |Minimum abundance skew, definied by (min(abund.(paren1), abund.(paren2))) / abund.(child).                                                                                                                                                   |
-|filter_method    |not_split                                                                        |If the split sample approach was used (split_sample) or not (not_split).                                                                                                                   |
-|cutoff           |3                                                                                |An additional abundance filter if the split sample approach was not used.                                                                                                                                                                    |
-|ampli_corr       |fdr                                                                              |Specifies the correction method for Fisher's exact test.                                                                                                                                                                                     |
-|save_format      |png                                                                              |File format for the frequency-frequency plot.                                                                                                                                                                                                |
-|plot_AmpDuo      |True                                                                             |If the frequency-frequency plot should be saved.                                                                                                                                                                                             |
-|paired_End       |True                                                                             |The format of the sequencing data, TRUE if the reads are in paired-end format.                                                                                                                                                               |
-|name_ext         |R1                                                                               |The identifier for the forward read (for the reverse read the 1 is switched with 2, if the data is in paired-end format), has to be included at the end of the file name, before the file format identifier (including for single end files).|
-|swarm            |True                                                                             |Boolean to indicate the use of the SWARM clustering algorithm to create operational taxonomic units (OTUs) from the data.                                                                                                                    |
-|blast            |False                                                                            |Boolean to indicate the use of the BLAST clustering algorithm to assign taxonomic information to the OTUs.                                                                                                                                   |
-|database         |SILVA                                                                            |Database against which the BLAST should be carried out, at the moment "NCBI" and "SILVA" are supported.                          |
-|drop_tax_classes |'.\*unclassified Bacteria.\*,.\*uncultured.\*bacterium.*'                        |Given a comma-separated list, drops undesired classes either by id, by name or using regex.                                                                                                                                                  |
-|db_path          |database/silva/silva.db                                                          |Path to the database file against which the BLAST should be carried out, at the moment only the SILVA and NCBI databases will be automatically downloaded, other databases have to be downloaded and configurated manually.                  |
-|max_target_seqs  |1                                                                                |Number of blast hits that are saved per sequence / OTU.                                                                                                                                                                                      |
-|ident            |90.0                                                                             |Minimal identity overlap between target and query sequence.                                                                                                                                                                                  |
-|evalue           |1e-51                                                                            |Highest accepted evalue.                                                                                                                                                                                                                     |
+| Option            | Default                                                   | Description                                                                                                                                                                                                                                   |
+|-------------------|-----------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| filename          | project                                                   | The path / filename of the project folder, primertable (.csv) and configfile (.yaml). If the raw data folder is not in the root directory of Natrix, please add the path relative to the root directory (e.g. input/example_data)             |
+| output_dir        | output                                                    | # path to custom output directory / relative to the root directory of natrix (DO NOT change this value if you are using docker! Leave it as output)                                                                                           |
+| primertable       | project.csv                                               | Path to the primertable. If the primertable is not in the root directory of Natrix, please add the path relative to the root directory (e.g. input/example_data.yaml)                                                                         |
+| units             | units.tsv                                                 | Path to the sequencing unit sheet.                                                                                                                                                                                                            |
+| cores             | 4                                                         | Amount of cores available for the workflow.                                                                                                                                                                                                   |
+| memory            | 1000                                                      | Available RAM in Mb.                                                                                                                                                                                                                          |
+| multiqc           | False                                                     | Initial quality check (fastqc & multiqc), currently only works for not yet assembled reads.                                                                                                                                                   |
+| demultiplexing    | False                                                     | Demultiplexing for reads that were not demultiplexed by the sequencing company (slow).                                                                                                                                                        |
+| read_sorting      | False                                                     | Read sorting for paired end reads that were not sorted by the sequencing company (slow).                                                                                                                                                      |
+| already_assembled | False                                                     | Skipping of the quality control and read assembly steps for data that is already assembled.                                                                                                                                                   |
+| seq_rep           | OTU                                                       | How the sequences should be represented, possible values are: "ASV", amplicon sequence variants, created with DADA2 or "OTU", operational taxonomic units, created with SWARM or VSERACH.                                                     |
+| nanopore          | FALSE                                                     | Boolean for the use of long sequences, e.g. Nanopore (TRUE) or short sequences, e.g. Illumina (FALSE).                                                                                                                                        |
+| quality_filt      | 15                                                        | Minimum Phred quality score.                                                                                                                                                                                                                  |
+| min_length        | 1000                                                      | Minimum length of reads.                                                                                                                                                                                                                      |
+| max_length        | 4500                                                      | Maximum length of reads.                                                                                                                                                                                                                      |
+| head_trim         | 0                                                         | Trim N nucleotides from the start of reads.                                                                                                                                                                                                   |
+| tail_trim         | 0                                                         | Trim N nucleotides from the end of reads.                                                                                                                                                                                                     |
+| pychopper         | TRUE                                                      | Boolean that indicates if pychopper should be used for reorientation, trimming and quality check of reads, if not done before.                                                                                                                |
+| pychopqual        | 7                                                         | Minimum mean Q-score base quality for pychopper (default 7).                                                                                                                                                                                  |
+| threshold         | 0.9                                                       | PANDAseq score threshold a sequence must meet to be kept in the output.                                                                                                                                                                       |
+| minoverlap        | 15                                                        | Sets the minimum overlap between forward and reverse reads.                                                                                                                                                                                   |
+| minqual           | 1                                                         | Minimal quality score for bases in an assembled read to be accepted by PANDAseq.                                                                                                                                                              |
+| minlen            | 100                                                       | The minimal length of a sequence after primer removal to be accepted by PANDAseq.                                                                                                                                                             |
+| maxlen            | 600                                                       | The maximal length of a sequence after primer removal to be accepted by PANDAseq.                                                                                                                                                             |
+| primer_offset     | False                                                     | Using PANDAseq to remove primer sequences by length offset instead of sequence identity.                                                                                                                                                      |
+| mq                | 25                                                        | Minimum quality sequence check (prinseq), filtering of sequences according to the PHRED quality score before the assembly.                                                                                                                    |
+| barcode_removed   | True                                                      | Boolean that indicates if the sequence is free of barcodes.                                                                                                                                                                                   |
+| all_primer        | True                                                      | Boolean that indicates if the sequence is free of any kind of additional subsequences (primer, barcodes etc.).                                                                                                                                |
+| clustering        | 1.0                                                       | Percent identity for cdhit (dereplication) (1 = 100%), if cdhit is solely to be used for dereplication (recommended), keep the default value.                                                                                                 |
+| length_overlap    | 0.0                                                       | Length difference cutoff, default 0.0 if set to 0.9, the shorter sequences need to be at least 90% length of the representative of the cluster.                                                                                               |
+| representative    | longest                                                   | Which sequence to use as a representative sequence per CDHIT cluster. longest = the longest sequence of the corresponding cluster, most_common = the most common sequence of the corresponding cluster.                                       |
+| beta              | 8.0                                                       | Weight of a "no" vote for the VSEARCH chimera detection algorithm.                                                                                                                                                                            |
+| pseudo_count      | 1.2                                                       | Pseudo - count prior on number of “no” votes.                                                                                                                                                                                                 |
+| abskew            | 16                                                        | Minimum abundance skew, definied by (min(abund.(paren1), abund.(paren2))) / abund.(child).                                                                                                                                                    |
+| filter_method     | not_split                                                 | If the split sample approach was used (split_sample) or not (not_split). (Not recommended for Nanopore data, use "cutoff" instead.)                                                                                                           |
+| amplioconduo      | FALSE                                                     | Boolean, whether AmpliconDuo should be used for statistical analysis of the data.                                                                                                                                                             |
+| cutoff            | 3                                                         | An additional abundance filter if the split sample approach was not used.                                                                                                                                                                     |
+| ampli_corr        | fdr                                                       | Specifies the correction method for Fisher's exact test.                                                                                                                                                                                      |
+| save_format       | png                                                       | File format for the frequency-frequency plot.                                                                                                                                                                                                 |
+| plot_AmpDuo       | True                                                      | If the frequency-frequency plot should be saved.                                                                                                                                                                                              |
+| paired_End        | True                                                      | The format of the sequencing data, TRUE if the reads are in paired-end format.                                                                                                                                                                |
+| name_ext          | R1                                                        | The identifier for the forward read (for the reverse read the 1 is switched with 2, if the data is in paired-end format), has to be included at the end of the file name, before the file format identifier (including for single end files). |
+| clustering        | vsearch                                                   | Allows you to specify OTU clustering method to use. Your options are: swarm and vsearch. Nanopore only supports vsearch option.                                                                                                               |
+| vsearch_id        | 0.98                                                      | Percent identity for vsearch OTU clustering (1 = 100%)..                                                                                                                                                                                      |
+| mumu              | TRUE                                                      | Boolean for the use of MUMU, only for OTU clustering.                                                                                                                                                                                         |
+| mothur            | TRUE                                                      | Boolean for the use of mothur.                                                                                                                                                                                                                |
+| search            | kmer                                                      | Allows you to specify the method to find most similar template. Your options are: suffix, kmer, blast, align and distance. The default is kmer.                                                                                               |
+| method            | wang                                                      | Allows you to specify classification method to use. Your options are: wang, knn and zap. The default is wang.                                                                                                                                 |
+| database          | pr2                                                       | Database against which MOTHUR should be carried out, at the moment "pr2" , "unite" and "silva" are supported.                                                                                                                                 |
+| pr2               | 4.14.0                                                    |                                                                                                                                                                                                                                               |
+| silva             | 138.1                                                     |                                                                                                                                                                                                                                               |
+| silva_tax         | database/silva_db.138.1.tax                               | Path for Silva taxonomy database.                                                                                                                                                                                                             |
+| silva_ref         | database/silva_db.138.1.fasta                             | Path for Silva reference database.                                                                                                                                                                                                            |
+| pr2_ref           | database/pr2db.4.14.0.fasta                               | Path for PR2 reference database.                                                                                                                                                                                                              |
+| pr2_tax           | database/pr2db.4.14.0.tax                                 | Path for PR2 taxonomy database.                                                                                                                                                                                       |
+| unite_ref         | database/unite_v8.3.fasta                                 | Path for UNITE reference database.                                                                                                                                                                                   |
+| unite_tax         | database/unite_v8.3.tax                                   | Path for UNITE taxonomy database.                                                                                                                                                                                   |
+| blast             | False                                                     | Boolean to indicate the use of the BLAST clustering algorithm to assign taxonomic information to the OTUs.                                                                                                                                    |
+| database          | SILVA                                                     | Database against which the BLAST should be carried out, at the moment "NCBI" and "SILVA" are supported.                                                                                                                                       |
+| drop_tax_classes  | '.\*unclassified Bacteria.\*,.\*uncultured.\*bacterium.*' | Given a comma-separated list, drops undesired classes either by id, by name or using regex.                                                                                                                                                   |
+| db_path           | database/silva/silva.db                                   | Path to the database file against which the BLAST should be carried out, at the moment only the SILVA and NCBI databases will be automatically downloaded, other databases have to be downloaded and configurated manually.                   |
+| max_target_seqs   | 1                                                         | Number of blast hits that are saved per sequence / OTU.                                                                                                                                                                                       |
+| ident             | 90.0                                                      | Minimal identity overlap between target and query sequence.                                                                                                                                                                                   |
+| evalue            | 1e-51                                                     | Highest accepted evalue.                                                                                                                                                                                                                      |
 
 
 ---
 # References
 
-* Köster, Johannes and Sven Rahmann (2018). “Snakemake—a scalable bioinformatics workflow engine”. In: *Bioinformatics.*
-* Andrews, S. (2010). FASTQC. A quality control tool for high throughput sequence data.
-* Ewels, P et al. (2016). “MultiQC: summarize analysis results for multiple tools and samples in a single report”. In: *Bioinformatics* 32.19, pp. 3047–3048.
-* Callahan,  B. J. et al. (2016).  “DADA2: High-resolution sample inference from illumina amplicon data.“ In: *Nature Methods*,13(7):581–583.
-* Schmieder, Robert and Robert A. Edwards (2011). “Quality control and preprocessing of metagenomic datasets.” In: *Bioinformatics* 27.6, pp. 863–864.
-* Masella, Andre P et al. (2012). “PANDAseq: paired-end assembler for illumina sequences”. In: *BMC Bioinformatics 13.1*, p. 31.
-* Fu, Limin et al. (2012). “CD-HIT: accelerated for clustering the next-generation sequencing
-data”. In: *Bioinformatics 28.23*, pp. 3150–3152.
-* Martin, M. (2011). “Cutadapt removes adapter sequences from high-throughput sequencing reads.“ In: EMB-
-net.journal, 17(1):10.
-*  Rognes, Torbjørn et al. (2016). “VSEARCH: a versatile open source tool for metagenomics”.
-In: *doi: 10.7287/peerj.preprints.2409v1.*
-* Edgar, Robert (2016). “UCHIME2: improved chimera prediction for amplicon sequencing”. In: *bioRxiv.*
-* Mahé, Frédéric et al. (2015). “Swarm v2: highly-scalable and high-resolution amplicon clustering”. In: *PeerJ 3.*
-* Lange, Anja et al. (2015). “AmpliconDuo: A Split-Sample Filtering Protocol for High-Throughput Amplicon Sequencing of Microbial Communities”. In: *Plos One 10.11.*
 * Altschul, Stephen F. et al. (1990). “Basic local alignment search tool”. In: *Journal of Molecular Biology 215.3*, pp. 403–410.
+* Andrews, S. (2010). FASTQC. A quality control tool for high throughput sequence data.
+* Callahan,  B. J. et al. (2016).  “DADA2: High-resolution sample inference from illumina amplicon data.“ In: *Nature Methods*,13(7):581–583.
+* De Coster, Wouter, and Rosa Rademakers (2023). "NanoPack2: population-scale evaluation of long-read sequencing data". In: *Bioinformatics 39.5*.
+* Edgar, Robert (2016). “UCHIME2: improved chimera prediction for amplicon sequencing”. In: *bioRxiv.*
+* Ewels, P et al. (2016). “MultiQC: summarize analysis results for multiple tools and samples in a single report”. In: *Bioinformatics* 32.19, pp. 3047–3048.
+* Fu, Limin et al. (2012). “CD-HIT: accelerated for clustering the next-generation sequencing data”. In: *Bioinformatics 28.23*, pp. 3150–3152.
+* Köster, Johannes and Sven Rahmann (2018). “Snakemake—a scalable bioinformatics workflow engine”. In: *Bioinformatics.*
+* Lange, Anja et al. (2015). “AmpliconDuo: A Split-Sample Filtering Protocol for High-Throughput Amplicon Sequencing of Microbial Communities”. In: *Plos One 10.11.*
+* Li, Heng. (2016). "Minimap and miniasm: fast mapping and de novo assembly for noisy long sequences." In: *Bioinformatics 32.14*, pp. 2103-2110.
+* Mahé, Frédéric et al. (2015). “Swarm v2: highly-scalable and high-resolution amplicon clustering”. In: *PeerJ 3.*
+* Martin, M. (2011). “Cutadapt removes adapter sequences from high-throughput sequencing reads.“ In: EMB-net.journal, 17(1):10. 
+* Masella, Andre P et al. (2012). “PANDAseq: paired-end assembler for illumina sequences”. In: *BMC Bioinformatics 13.1*, p. 31.
 * Pruesse, E. et al. (2007). “SILVA: a comprehensive online resource for quality checked and aligned ribosomal RNA sequence data compatible with ARB”. In: *Nucleic Acids Research 35.21*, pp. 7188–7196.
+* Rognes, Torbjørn et al. (2016). “VSEARCH: a versatile open source tool for metagenomics”. In: *doi: 10.7287/peerj.preprints.2409v1.*
+* Schmieder, Robert and Robert A. Edwards (2011). “Quality control and preprocessing of metagenomic datasets.” In: *Bioinformatics* 27.6, pp. 863–864.
 
