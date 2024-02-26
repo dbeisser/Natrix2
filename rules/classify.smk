@@ -91,7 +91,9 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
         output:
             os.path.join(config["general"]["output_dir"],"finalData/{database}/full_table.csv"),
             os.path.join(config["general"]["output_dir"],"finalData/{database}/OTU_table.csv"),
-            os.path.join(config["general"]["output_dir"],"finalData/{database}/metadata_table.csv"),
+            os.path.join(config["general"]["output_dir"],"finalData/{database}/metadata_table.csv")
+        params:
+            clustering=config['clustering']
         script:
                 "../scripts/merge_results2.py"
 
@@ -195,7 +197,9 @@ elif config['dataset']['nanopore']:
         output:
             os.path.join(config["general"]["output_dir"],"finalData/{database}/full_table.csv"),
             os.path.join(config["general"]["output_dir"],"finalData/{database}/OTU_table.csv"),
-            os.path.join(config["general"]["output_dir"],"finalData/{database}/metadata_table.csv"),
+            os.path.join(config["general"]["output_dir"],"finalData/{database}/metadata_table.csv")
+        params:
+            clustering=config['clustering']
         script:
             "../scripts/merge_results2.py"
 

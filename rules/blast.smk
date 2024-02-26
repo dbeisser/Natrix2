@@ -30,7 +30,7 @@ elif config["blast"]["database"] == "NCBI":
 
     rule make_ncbi_db:
         output:
-            expand(config["blast"]["db_path"] + ".00" + "{file_extension}", file_extension=[".nhd", ".nhi", ".nhr", ".nin", ".nnd", ".nni", ".nog", ".nsq"]),
+            expand(config["blast"]["db_path"] + ".000" + "{file_extension}", file_extension=[".nhd", ".nhi", ".nhr", ".nin", ".nnd", ".nni", ".nog", ".nsq"]),
             listing = temp(".listing"),
             path = config["blast"]["db_path"]
         params:

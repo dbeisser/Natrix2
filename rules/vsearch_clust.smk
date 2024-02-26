@@ -9,13 +9,15 @@ rule vsearch_clust:
 		os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus_tab.txt"),
 		os.path.join(config["general"]["output_dir"],"clustering/vsearch_uc.txt")
 	threads: config["general"]["cores"]
+	params:
+	    id=config["vsearch_id"]
 	conda:
 		"../envs/vsearch.yaml"
 	shell:
 		"""
 			vsearch --cluster_fast {input} \
 			--threads {threads} \
-			--id 0.98 \
+			--id {params.id} \
 			--centroids {output[0]} \
 			--otutabout {output[1]}\
                         --uc {output[2]}

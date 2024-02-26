@@ -56,5 +56,6 @@ include: "rules/mumu.smk"
 #include: "rules/denoise.smk"
 include: "rules/pychop.smk"
 include: "rules/read_correction.smk"
+include: "rules/quality_filt.smk"
 #vsearch global
 include: "rules/vsearch_clust.smk"

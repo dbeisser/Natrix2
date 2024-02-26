@@ -1,7 +1,7 @@
-name: medaka
+name: quality_filtering
 channels:
   - bioconda
   - conda-forge
+  - defaults
 dependencies:
-  - python=3.9
-  - medaka=1.11.3
+  - chopper
