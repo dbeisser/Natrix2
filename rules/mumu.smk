@@ -70,7 +70,7 @@ else:
 
     rule run_mumu:
         input:
-            os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") if config["general"]["seq_rep"] == "OTU" and config["dataset"]["nanopore"]== "FALSE" else os.path.join(config["general"]["output_dir"],"filtering/filtered_table_edit.csv"),
+            os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") if config ['clustering']== "swarm" or config["dataset"]["nanopore"] == "FALSE"  else (os.path.join(config["general"]["output_dir"], "clustering/vsearch_table.csv") if config['clustering'] == "vsearch" else os.path.join(config["general"]["output_dir"], "filtering/filtered_table.csv")),
             expand(os.path.join(config["general"]["output_dir"],"blast/match_scores.txt"), database=config['classify']['database']),
         output:
             temp(expand(os.path.join(config["general"]["output_dir"], "blast/OTU_table_mumu.tmp"), database=config['classify']['database'])),
