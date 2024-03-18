@@ -11,8 +11,8 @@ output_meta=open(snakemake.output[2], "w")
 
 
 taxonomy = pd.read_csv(taxonomy, sep='\t', names=['seqid', 'taxonomy']) # read mothur taxonomy file
-if snakemake.params['clustering'] == 'swarm' or snakemake.params['clustering'] == 'vsearch':
-    taxonomy['seqid'] = '>' + taxonomy['seqid'].astype(str)
+#if snakemake.params['clustering'] == 'swarm' or snakemake.params['clustering'] == 'vsearch':
+#    taxonomy['seqid'] = '>' + taxonomy['seqid'].astype(str)
 #print(taxonomy.head())
 otu_count = pd.read_csv(otu_file) #read otu table
 
