@@ -23,7 +23,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
             shell:
                 """
                     mothur "#set.logfile(name={log}); classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
-                    sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
+                    #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
                     mv {params.input}/*.taxonomy {params.output}/mothur/pr2/mothur_out.taxonomy;
                     mv {params.input}/*.summary {params.output}/mothur/pr2/mothur_out.summary;
                 """
@@ -51,7 +51,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
             shell:
                 """
                     mothur "#classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
-                    sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
+                    #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
                     mv {params.input}/*.taxonomy {params.output}/mothur/unite/mothur_out.taxonomy;
                     mv {params.input}/*.summary {params.output}/mothur/unite/mothur_out.summary;
                 """
@@ -79,7 +79,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
             shell:
                 """
                     mothur "#classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
-                    sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
+                    #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
                     mv {params.input}/*.taxonomy {params.output}/mothur/silva/mothur_out.taxonomy;
                     mv {params.input}/*.summary {params.output}/mothur/silva/mothur_out.summary;
                 """
@@ -124,7 +124,7 @@ elif config['dataset']['nanopore']:
             shell:
                 """
                     mothur "#set.logfile(name={log}); classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
-                    sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
+                    #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
                     mv {params.input}/*.taxonomy {params.output}/mothur/pr2/mothur_out.taxonomy;
                     mv {params.input}/*.summary {params.output}/mothur/pr2/mothur_out.summary;
                 """
@@ -154,7 +154,7 @@ elif config['dataset']['nanopore']:
             shell:
                 """
                     mothur "#classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
-                    sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
+                    #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
                     mv {params.input}/*.taxonomy {params.output}/mothur/unite/mothur_out.taxonomy;
                     mv {params.input}/*.summary {params.output}/mothur/unite/mothur_out.summary;
                 """
@@ -185,7 +185,7 @@ elif config['dataset']['nanopore']:
             shell:
                 """
                     mothur "#classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
-                    sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
+                    #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
                     mv {params.input}/*.taxonomy {params.output}/mothur/silva/mothur_out.taxonomy;
                     mv {params.input}/*.summary {params.output}/mothur/silva/mothur_out.summary;
                 """
