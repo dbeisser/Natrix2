@@ -16,7 +16,8 @@ def parse_uc_file(uc_file):
 def write_cluster_file(clusters, output_file):
     with open(output_file, 'w') as file:
         for cluster_id, sequences in clusters.items():
-            file.write(cluster_id + '\t' + ' '.join(sequences) + '\n')
+            for sequence_id in sequences:
+               file.write(cluster_id + '\t' + sequence_id + '\n')
 
 uc_file = snakemake.input[0] # Replace with the actual UC file path
 output_file = snakemake.output[0] # Replace with the desired output file path
