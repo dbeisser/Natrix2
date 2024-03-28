@@ -51,7 +51,7 @@ chim:
 
 # Merging
 merge:
-        filter_method: split_sample # If the split sample approach was used (split_sample) or not (not_split). (Not recommended for Nanopore data, use "cutoff" instead.)
+        filter_method: not_split # If the split sample approach was used (split_sample) or not (not_split). (Not recommended for Nanopore data, use "cutoff" instead.)
         ampliconduo: FALSE # Boolean, whether AmpliconDuo should be used for statistical analysis of the data.
         cutoff: 2 # An additional abundance filter if the split sample approach was not used. For a read to be kept, the sum of abundances over all samples needs to be above the cutoff.
         ampli_corr: fdr # Specifies the correction method for Fisher's exact test.
