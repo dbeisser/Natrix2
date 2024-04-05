@@ -19,4 +19,4 @@ rule vsearch_chim:
     shell:
         "vsearch --uchime3_denovo {input} -uchimeout {output.uchime_out}"
         " -chimeras {output.chim} -nonchimeras {output.nonchim} -xn {params.beta}"
-        "  -dn {params.pseudo_c} -abskew {params.abskew} --log {log} 2>&1"
+        "  -dn {params.pseudo_c} --threads {threads} -abskew {params.abskew} --log {log} 2>&1"
