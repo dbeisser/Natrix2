@@ -20,11 +20,11 @@ if config['dataset']['nanopore'] and config['nanopore']['pychopper']:
             primers = expand(os.path.join(config["general"]["output_dir"],"pychopper/custom_primers.fasta")),
             primers_config = expand(os.path.join(config["general"]["output_dir"],"pychopper/config_primers.txt"))
         output:
-            out_fastq = expand(os.path.join(config["general"]["output_dir"],"pychopper/output/{{sample}}_{{unit}}_R{read}.tmp"), read=reads),
-            pdf_out=expand(os.path.join(config["general"]["output_dir"],"pychopper/reports/{{sample}}_{{unit}}_R{read}.pdf"), read=reads),
-            unclass_fastq= expand(os.path.join(config["general"]["output_dir"],"pychopper/unclassified/{{sample}}_{{unit}}_R{read}.tmp"), read=reads),
-            rescue_fastq = expand(os.path.join(config["general"]["output_dir"],"pychopper/rescued/{{sample}}_{{unit}}_R{read}.fastq"), read=reads),
-            length_out = expand(os.path.join(config["general"]["output_dir"], "pychopper/unclassified/{{sample}}_{{unit}}_R{read}_length_out.tmp"), read=reads)
+            out_fastq = temp(expand(os.path.join(config["general"]["output_dir"],"pychopper/output/normal/{{sample}}_{{unit}}_R{read}.fastq"), read=reads)),
+            pdf_out = expand(os.path.join(config["general"]["output_dir"],"pychopper/reports/normal/{{sample}}_{{unit}}_R{read}.pdf"), read=reads),
+            unclass_fastq = temp(expand(os.path.join(config["general"]["output_dir"],"pychopper/unclassified/normal/{{sample}}_{{unit}}_R{read}.fastq"), read=reads)),
+            rescue_fastq = temp(expand(os.path.join(config["general"]["output_dir"],"pychopper/rescued/normal/{{sample}}_{{unit}}_R{read}.fastq"), read=reads)),
+            length_out = temp(expand(os.path.join(config["general"]["output_dir"], "pychopper/unclassified/normal/{{sample}}_{{unit}}_R{read}_length_out.fastq"), read=reads))
         threads: config["general"]["cores"]
         params:
             qual = config["nanopore"]["pychopqual"],
@@ -38,15 +38,15 @@ if config['dataset']['nanopore'] and config['nanopore']['pychopper']:
 
     rule pychopper_rescue:
         input:
-            unclass_fastq=expand(os.path.join(config["general"]["output_dir"],"pychopper/unclassified/{{sample}}_{{unit}}_R{read}.tmp"), read=reads),
+            unclass_fastq=expand(os.path.join(config["general"]["output_dir"],"pychopper/unclassified/normal/{{sample}}_{{unit}}_R{read}.fastq"), read=reads),
             primers = expand(os.path.join(config["general"]["output_dir"],"pychopper/custom_primers.fasta")),
             primers_config = expand(os.path.join(config["general"]["output_dir"],"pychopper/config_primers.txt"))
         output:
-            unclass_out_fastq=expand(os.path.join(config["general"]["output_dir"],"pychopper/pychopper_unclass/output/{{sample}}_{{unit}}_R{read}.tmp"), read=reads),
-            unclass_unclass_fastq=expand(os.path.join(config["general"]["output_dir"],"pychopper/pychopper_unclass/unclassified/{{sample}}_{{unit}}_R{read}.fastq"),  read=reads),
-            unclass_rescue_fastq=expand(os.path.join(config["general"]["output_dir"],"pychopper/pychopper_unclass/rescued/{{sample}}_{{unit}}_R{read}.fastq"), read=reads),
-            unclass_pdf=expand(os.path.join(config["general"]["output_dir"],"pychopper/pychopper_unclass/reports/{{sample}}_{{unit}}_R{read}.pdf"),  read=reads),
-            length_out = expand(os.path.join(config["general"]["output_dir"], "pychopper/unclassified/{{sample}}_{{unit}}_R{read}_length_out.tmp"), read=reads)
+            unclass_out_fastq = temp(expand(os.path.join(config["general"]["output_dir"],"pychopper/output/rescue/{{sample}}_{{unit}}_R{read}.fastq"), read=reads)),
+            unclass_unclass_fastq = expand(os.path.join(config["general"]["output_dir"],"pychopper/unclassified/rescue/{{sample}}_{{unit}}_R{read}.fastq"),  read=reads),
+            unclass_rescue_fastq = temp(expand(os.path.join(config["general"]["output_dir"],"pychopper/rescued/rescue/{{sample}}_{{unit}}_R{read}.fastq"), read=reads)),
+            unclass_pdf = expand(os.path.join(config["general"]["output_dir"],"pychopper/reports/rescue/{{sample}}_{{unit}}_R{read}.pdf"),  read=reads),
+            length_out = temp(expand(os.path.join(config["general"]["output_dir"], "pychopper/unclassified/rescue/{{sample}}_{{unit}}_R{read}_length_out.fastq"), read=reads))
         threads: config["general"]["cores"]
         params:
             qual =config["nanopore"]["pychopqual"],
@@ -60,14 +60,13 @@ if config['dataset']['nanopore'] and config['nanopore']['pychopper']:
 
     rule merge_pychopper:
         input:
-            out_fastq = expand(os.path.join(config["general"]["output_dir"],"pychopper/output/{{sample}}_{{unit}}_R{read}.tmp"),  read=reads),
-            unclass_out_fastq = expand(os.path.join(config["general"]["output_dir"],"pychopper/pychopper_unclass/output/{{sample}}_{{unit}}_R{read}.tmp"),  read=reads)
+            out_fastq = expand(os.path.join(config["general"]["output_dir"],"pychopper/output/normal/{{sample}}_{{unit}}_R{read}.fastq"),  read=reads),
+            unclass_out_fastq = expand(os.path.join(config["general"]["output_dir"],"pychopper/output/rescue/{{sample}}_{{unit}}_R{read}.fastq"),  read=reads)
         output:
-            pychopper_merged = expand(os.path.join(config["general"]["output_dir"], "pychopper/pychopper_merged/{{sample}}_{{unit}}_R{read}.fastq"), read=reads)
+            pychopper_merged = expand(os.path.join(config["general"]["output_dir"], "pychopper/output/merged/{{sample}}_{{unit}}_R{read}.fastq"), read=reads)
         shell:
             """
             cat {input.out_fastq} {input.unclass_out_fastq} > {output.pychopper_merged}
             """
-
 
 
