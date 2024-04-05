@@ -24,6 +24,7 @@ nanopore:
         tail_trim: 0 # Trim N nucleotides from the end of reads.
         pychopper: TRUE # Boolean that indicates if pychopper should be used for reorientation, trimming and quality check of reads, if not done before.
         pychopqual: 7 #Minimum mean Q-score base quality for pychopper (default 7).
+        racon: 4 #Iterations of racon for read correction. Possible values are 1, 2, 3, 4 or 5. The higher the quality of reads, the less iterations are required.
 
 # Quality check and primer removal for Illumina
 qc:
