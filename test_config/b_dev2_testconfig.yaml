@@ -10,7 +10,7 @@ general:
         demultiplexing: FALSE # Boolean, run demultiplexing for reads if they were not demultiplexed by the sequencing company (slow).
         read_sorting: FALSE # Boolean, run read sorting for paired end reads if they were not sorted by the sequencing company (slow).
         already_assembled: FALSE # Boolean, skip the quality control and read assembly steps for data if it is already assembled.
-        seq_rep: ASV # Type of sequence representative, possible values are: "ASV", amplicon sequence variants, created with DADA2 or "OTU", operational taxonomic units, created with SWARM
+        seq_rep: OTU # Type of sequence representative, possible values are: "ASV", amplicon sequence variants, created with DADA2 or "OTU", operational taxonomic units, created with SWARM
 
 # Quality check and primer removal
 qc:
@@ -66,10 +66,10 @@ database_path:
 
 # BLAST
 blast:
-        blast: FALSE # Boolean to indicate the use of the BLAST search algorithm to assign taxonomic information to the OTUs.
-        database: SILVA # Database against which the BLAST should be carried out, at the moment "NCBI" and "SILVA" are supported.
+        blast: TRUE # Boolean to indicate the use of the BLAST search algorithm to assign taxonomic information to the OTUs.
+        database: NCBI # Database against which the BLAST should be carried out, at the moment "NCBI" and "SILVA" are supported.
         drop_tax_classes: '.*unclassified Bacteria.*,.*uncultured.*bacterium.*' # Given a comma-separated list, drops undesired classes either by id, by name or using regex
-        db_path: database/silva/silva.db # Path to the database file against which the BLAST should be carried out, at the moment only the SILVA (database/silva/silva.db) and NCBI (database/ncbi/nt) databases will be automatically downloaded.
+        db_path: database/ncbi/nt # Path to the database file against which the BLAST should be carried out, at the moment only the SILVA (database/silva/silva.db) and NCBI (database/ncbi/nt) databases will be automatically downloaded.
         max_target_seqs: 10 # Number of NCBI blast hits that are saved per sequence / OTU.
         ident: 90.0 # Minimal identity overlap between target and query sequence. Set to lower threshold to be able to filter later by hand-
         evalue: 1e-20 # Highest accepted evalue. Set to higher threshold (e.g. 1e-5) to be able to filter later by hand.
@@ -78,12 +78,13 @@ blast:
 postcluster:
         mumu: FALSE # Boolean for the use of MUMU, only for OTU clustering.
 
-# nanopore (for OTUs only)
+# Nanopore(for OTUs only)
 dataset:
-        nanopore: FALSE # TRUE or FALSE for nanopore data
-        pychopper: FALSE
+        nanopore: FALSE # Set to TRUE if you are using Nanopore sequencing data
+        pychopper: FALSE # If Nanopore data is used, set pychopper to TRUE or FALSE; if no Nanopore data is used, set pychopper to FALSE.
 pychop:
-        qual: 7 #Minimum mean base quality (default 7)
+        qual: 7 # Minimum mean base quality (default 7)
 
-clustering: "vsearch" # clustering method "vsearch" or "swarm"
+# VSEARCH clustering
+clustering: "swarm" # Clustering method "vsearch" or "swarm"
 vsearch_id: 0.97 # Identity threshold for VSEARCH clustering

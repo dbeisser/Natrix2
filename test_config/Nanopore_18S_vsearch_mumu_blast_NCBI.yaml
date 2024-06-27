@@ -1,8 +1,8 @@
 # General options
 general:
-        filename: nanopore_data # The path / filename of the project folder, primertable (.csv) and configfile (.yaml). If the raw data folder is not in the root directory of Natrix, please add the path relative to the root directory (e.g. input/example_data)
+        filename: input_data/nanopore_data # The path / filename of the project folder, primertable (.csv) and configfile (.yaml). If the raw data folder is not in the root directory of Natrix, please add the path relative to the root directory (e.g. input/example_data)
         output_dir: Nanopore_results/ # Path to custom output directory / relative to the root directory of natrix. Do not use a dash in the folder name.
-        primertable: Nanopore_18S.csv # Path to the primertable. If the primertable is not in the root directory of Natrix, please add the path relative to the root directory (e.g. input/example_data.yaml)
+        primertable: primer_table/Nanopore_18S.csv # Path to the primertable. If the primertable is not in the root directory of Natrix, please add the path relative to the root directory (e.g. input/example_data.yaml)
         units: units.tsv # Path to the sequencing unit sheet. (name will be concatenated with output_dir)
         cores: 20 # Amount of cores available for the workflow.
         memory: 4000 # Available RAM in Mb.
@@ -78,14 +78,17 @@ blast:
 postcluster:
         mumu: TRUE # Boolean for the use of MUMU, only for OTU clustering.
 
-# nanopore
+# Nanopore(for OTUs only)
 dataset:
-        nanopore: TRUE
-#denoising by isOncorrect
-denoise: TRUE
+        nanopore: TRUE # Set to TRUE if you are using Nanopore sequencing data
+        pychopper: TRUE # If Nanopore data is used, set pychopper to TRUE or FALSE; if no Nanopore data is used, set pychopper to FALSE.
 
 pychop:
-        qual: 7 #Minimum mean base quality (default 7)
+        qual: 7 # Minimum mean base quality (default 7)
 
-# vsearch clustering
-clustering: "vsearch" # nanopore only support vsearch option
+# Denoising by isOncorrect
+denoise: TRUE
+
+# VSEARCH clustering
+clustering: "vsearch" # Nanopore only supports the 'vsearch' option
+vsearch_id: 0.97 # Identity threshold for VSEARCH clustering
