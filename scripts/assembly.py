@@ -29,10 +29,16 @@ if snakemake.params.paired_end:
             "-L", str(snakemake.params.maxlen),
             "-C" "min_phred:" + str(snakemake.params.minqual)])
     else:
+        r1_primer = primer_table[snakemake.wildcards.sample + "_"
+            + snakemake.wildcards.unit]["specific_forward_primer"]
+        r2_primer = primer_table[snakemake.wildcards.sample + "_"
+            + snakemake.wildcards.unit]["specific_reverse_primer"]
+
         subprocess.call(["pandaseq",
             "-f", snakemake.input[0], "-r", snakemake.input[1], "-B", "-a", "-F",
             "-g", str(snakemake.log),
             "-w", str(snakemake.output),"-N",
+            "-p", r1_primer, "-q", r2_primer,
             "-T", str(snakemake.threads),
             "-t", str(snakemake.params.threshold),
             "-o", str(snakemake.params.minoverlap),

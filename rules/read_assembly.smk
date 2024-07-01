@@ -64,7 +64,7 @@ if not config['dataset']['nanopore']:
     rule assembly:
         input:
             expand(
-            os.path.join(config["general"]["output_dir"],"assembly/{{sample}}_{{unit}}/{{sample}}_{{unit}}_{read}_cut.fastq"),
+            os.path.join(config["general"]["output_dir"],"assembly/{{sample}}_{{unit}}/{{sample}}_{{unit}}_{read}.fastq"),
             read=reads),
             primer_t=os.path.join(config["general"]["output_dir"],"primer_table.csv")
         output:

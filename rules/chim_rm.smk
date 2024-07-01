@@ -11,7 +11,7 @@ rule vsearch_chim:
         beta=config["chim"]["beta"],
         pseudo_c=config["chim"]["pseudo_count"],
         abskew=config["chim"]["abskew"]
-    threads: config["general"]["cores"]
+    threads: 1
     conda:
          "../envs/vsearch.yaml"
     log:
