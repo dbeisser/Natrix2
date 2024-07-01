@@ -1,6 +1,9 @@
 # Change Log
 All significant changes to this project are documented here.
 
+## 2024-07-01
+- File: chim_rm.smk; The parameter 'threads' has been set to 1 in the rule 'vsearch_chim'.
+
 ## 2024-06-27
 - Added: Tool fastq_inspector.py
 - Added seqkit to natrix.yaml
