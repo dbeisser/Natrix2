@@ -1,6 +1,10 @@
 # Change Log
 All significant changes to this project are documented here.
 
+## [2024-07-18]
+- Add checks to ensure seq_rep: ASV is not used with incompatible options in 'create_dataframe.py'
+- Fix issue in error message handling in 'create_dataframe.py'
+
 ## [2023-09-22]
 - Add PR2, UNITE Databases.
 - Add mumu for post clustering.

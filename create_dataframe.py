@@ -1,5 +1,4 @@
 import pathlib
-
 import yaml
 import pandas as pd
 import numpy as np
@@ -77,14 +76,15 @@ if __name__ == '__main__':
     	sys.exit("Please rename output folder, do not use a dash in the folder name")
     if config["classify"]["mothur"] and config["blast"]["blast"]:
         sys.exit("Please decide whether to use blast or classification with mothur. Both config options cannot be set to TRUE")
+
+    # Ensures [seq_rep: ASV] is not used with [postcluster: mumu]
     if config["general"]["seq_rep"] == "ASV" and config["postcluster"]["mumu"]:
-        print("Postclustering with mumu is not supported for ASVs.")
-        changeopt = input("To proceed and set the mumu config option to FALSE, type 'yes': ")
-        if changeopt == "yes":
-            print("Proceeding")
-            config["postcluster"]["mumu"] = False
-        else:
-            sys.exit("Workflow will be aborted")
+        sys.exit("\n[Error]: Postclustering with [mumu] is not supported for [ASVs].\nPlease set [mumu] to FALSE in your config file. Workflow will be aborted.\n")
+
+    # Ensures [seq_rep: ASV] is not used with [clustering: vsearch]
+    if config['general']['seq_rep'] == 'ASV' and config['clustering'] == 'vsearch':
+        sys.exit("\n[Error]: [seq_rep: ASV] cannot be used with [clustering: vsearch].\nPlease set [clustering] to [swarm] in your config file. Workflow will be aborted\n")
+
     if not config['general']['already_assembled']:
         file_path_list = [os.path.join(config["general"]["output_dir"],'demultiplexed/' + name.split('/')[-1]) for name in
                           sorted(glob(config['general']['filename'].rstrip("/") + '/*.gz'))]
