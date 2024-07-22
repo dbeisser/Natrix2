@@ -22,7 +22,7 @@ rule unzip:
     output:
         temp(os.path.join(config["general"]["output_dir"],"demultiplexed/{sample}_{unit}_{read}.tmp"))
     shell:
-         "gunzip -c {input} > {output}"
+         "pigz -d -c {input} > {output}"
 
 rule check_format:
     input:

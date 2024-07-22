@@ -12,6 +12,17 @@ The need for a scalable, reproducible workflow for the processing of environment
 *Fig. 2: Schematic diagram of processing nanopore reads with Natrix2 for OTU generation and taxonomic assignment. The color scheme represents the main steps of this variant of the workflow.*
 
 ---
+## Table of contents
+1. [Dependencies](#dependencies)
+2. [Getting Started](#getting-started)
+3. [Sequence Count](#sequence-count)
+4. [Tutorial](#tutorial)
+5. [Cluster execution](#cluster-execution)
+6. [Output](#output)
+7. [Steps of the Pipeline](#steps-of-the-pipeline)
+8. [Example primertable](#example-primertable)
+9. [Configfile](#configfile)
+10. [References](#references)
 
 ## Dependencies
 * [Conda](https://conda.io/en/latest/index.html)
@@ -36,6 +47,9 @@ All other dependencies will be automatically installed using conda environments 
 ---
 
 ## Getting Started
+**Important: After you have set up your `natrix.yaml` environment, take a look at the [Sequence Count](#sequence-count) section before you start the workflow.**
+
+---
 
 To install Natrix, you'll need the open-source package management system [conda](https://conda.io/en/latest/index.html) and, if you want to try Natrix using the accompanying `pipeline.sh` script you'll need [GNU screen](https://www.gnu.org/software/screen/).
 After cloning this repository to a folder of your choice, it is recommended to create a general natrix conda environment with the accompanying `natrix.yaml`. In the main folder of the cloned repository, execute the following command:
@@ -61,6 +75,25 @@ $ screen -r
 ```
 
 When the workflow has finished, you can press **Ctrl+a, k** (*first press Ctrl+a and then k*). This will end the screen session and any processes that are still running.
+
+---
+
+## Sequence Count
+
+Before you start the workflow, you should check the number of sequences in your `input files (*.fastq, *.fastq.gz)`. If there are too few sequences, the workflow may abort. Experience has shown that the workflow aborts if the number of sequences is less than 150. To avoid this, you should analyze your data with the `tools/fastq_inspector.py` tool.
+
+- Recommended threshold value: `150`
+
+The tool compares your specified threshold value with the number of sequences in your files. If the number of sequences falls below the threshold value, a warning is issued. You should then move the affected files out of the folder to prevent errors.
+
+### Instruction manual
+
+First, go to the `tools` folder in your `main directory`. Then use the following command:
+```shell
+python3 fastq_inspector.py <folder_path> <threshold>
+```
+
+**Once you have checked your data with the tool, you can start the workflow as usual.**
 
 ---
 

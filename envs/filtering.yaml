@@ -8,3 +8,4 @@ dependencies:
   - pytables=3.6.1
   - numpy=1.19.2
   - hdf5=1.10.6 # newer version conflicts with pytables
+  - python=3.8

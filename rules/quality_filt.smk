@@ -1,12 +1,12 @@
 import os
 if config['dataset']['nanopore']:
-    rule gunzip:
+    rule pigz_unzip:
         input:
             os.path.join(config["general"]["filename"],"{sample}_{unit}_R{read}.fastq.gz")
         output:
             temp(os.path.join(config["general"]["output_dir"],"fastq/{sample}_{unit}_{read}.tmp"))
         shell:
-            "gunzip -c {input} > {output}"
+            "pigz -d -c {input} > {output}"
             
     rule check_fastq_format:
         input:
