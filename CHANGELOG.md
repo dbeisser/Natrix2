@@ -1,7 +1,7 @@
 # Change Log
 All significant changes to this project are documented here.
 
-## [2024-07-20]
+## [2024-07-22]
 - Bug fix: Adjust the rule make_silva_db to dynamically download the latest SILVA database
 - Add tool: fastq_inspector.py; see section Sequence Count
 - Add package: seqkit=2.8.2 to natrix.yaml
