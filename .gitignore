@@ -1,0 +1,5 @@
+.snakemake
+.snakemake/**
+.DS_Store
+Nanopore_results/**
+Illumina_results_swarm/**
