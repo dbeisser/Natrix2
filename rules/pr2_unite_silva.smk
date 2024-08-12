@@ -17,15 +17,17 @@ if config["classify"]["database"] == "pr2":
 elif config["classify"]["database"] == "unite":
     rule download_unite:
         output:
-            "database/unite_v8.3.fasta",
-            "database/unite_v8.3.tax" # no version for download available, needs to be changed here not in config
+            "database/unite_v10.fasta",
+            "database/unite_v10.tax" # no version for download available, needs to be changed here not in config
         shell:
             """
-                wget -P ./ --progress=bar  -O UNITE_public_mothur_10.05.2021.tgz --progress=bar https://files.plutof.ut.ee/public/orig/38/6A/386A46113D04602A78FB02497D9B0E1A8FE2145B23C2A6314A62B419F0D08E73.tgz;
-                tar -xvf UNITE_public_mothur_10.05.2021.tgz;
-                mv UNITE_public_mothur_10.05.2021/UNITE_public_mothur_10.05.2021_taxonomy.txt database/unite_v8.3.tax;
-                mv UNITE_public_mothur_10.05.2021/UNITE_public_mothur_10.05.2021.fasta {output[0]};
-                rm -rf UNITE_public_mothur_10.05.2021;
+                wget -P ./ --progress=bar  -O sh_mothur_release_2024-04-04.tgz --progress=bar https://s3.hpc.ut.ee/plutof-public/original/10220f9f-17c8-4a2f-aada-1f852f50c0f7.tgz;
+                mkdir -p sh_mothur_release_2024-04-04;
+                tar -xvf sh_mothur_release_2024-04-04.tgz -C sh_mothur_release_2024-04-04;
+                mv sh_mothur_release_2024-04-04/UNITEv10_sh_99.tax database/unite_v10.tax;
+                mv sh_mothur_release_2024-04-04/UNITEv10_sh_99.fasta {output[0]};
+                rm -rf sh_mothur_release_2024-04-04;
+                rm sh_mothur_release_2024-04-04.tgz;
             """
 
 elif config["classify"]["database"] == "silva":
