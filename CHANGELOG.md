@@ -1,6 +1,9 @@
 # Change Log
 All significant changes to this project are documented here.
 
+## [2024-08-19]
+- Update README.md
+
 ## [2024-08-12]
 - Update UNITE Database; Release date: 2024-04-04; Version: 10.0
 
