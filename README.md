@@ -156,59 +156,71 @@ When the workflow has finished, you can press **Ctrl+a, k** (first press Ctrl+a,
 
 Natrix can be run inside a Docker container. Therefore, Docker must be installed. Please refer to the [Docker website](https://docs.docker.com/) to learn how to install Docker and set up an environment if you have not used it before.
 
-**Warning**: Do not change the output_dir in `your-project.yaml` from the default "output" if you are using Docker!
-
 To run the Docker container, download the pre-built container from [dockerhub](https://hub.docker.com/r/mw55/natrix).
 
 ```shell
-docker pull mw55/natrix
+docker pull dbeisser/natrix2:1.1.1
 ```
+
+---
+**Important before you continue with Docker!**
+
+Before using Docker, please create the following folders on your system: `database`, `output`, `input_docker`, `config_docker`
+
+Next, select the configuration file you want to use for your analysis (**for example: Nanopore.yaml**) and copy it to your configuration folder `config_docker`. Then open your configuration file with an editor and adjust all the parameters for your samples.
+
+You must enter the folder path for your data in your configuration file so that it can be found. **Example**: `filename: input_docker`
+
+---
 
 The Docker container has all environments pre-installed, eliminating the need to download the environments during the first-time initialization of the workflow. To connect to the shell inside the Docker container, input the following command:
 
 ```shell
-docker run -it --label natrix2_container -v </host/database>:/app/database -v </host/output>:/app/output -v </host/input_folder>:/app/input mw55/natrix2 bash
+docker run -it --label natrix2_container -v </host/database>:/app/database -v </host/output>:/app/output -v </host/input_docker>:/app/input_docker -v </host/config_docker>:/app/config_docker dbeisser/natrix2:1.1.1 bash
 ```
+**Functions of the respective folders**
 
 `/host/database` is the full path to a local folder in which you wish to install the database (**SILVA** or **NCBI**). This part is optional and only needed if you want to use BLAST for taxonomic assignment.
 
 `/host/output` is the full path to a local folder where the output of the workflow (**results folder**, **units.tsv**, **primertable**, and **demultiplexed folder**) should be stored for the container to use.
 
-`/host/input_folder` is the full path to a local folder where the input (the project folder, the **project.yaml**, and the **project.csv**) should be saved.
+`/host/input_docker` is the full path to a local folder where the input (the project folder, the **project.yaml**, and the **project.csv**) should be saved.
 
-After you connect to the container shell, you can follow the [running Natrix manually](#running-natrix-manually) tutorial.
+`/host/config_docker` is the full path to a local folder containing the configuration file you want to use to analyze your samples. Example: **Nanopore.yaml**
+
+---
+
+After you connect to the container shell, you can follow: [running Natrix manually](#running-natrix-manually)
+
+---
 
 #### Directly starting the workflow using docker-compose
 
-Alternatively, you can start the workflow using the docker-compose command in the root directory of the workflow (it will pull the latest Natrix image from Docker Hub):
+Alternatively, you can start the workflow using the docker-compose command in the root directory of the workflow. Please make sure that you have docker compose installed!
 
 ```shell
-PROJECT_NAME="<project>" docker-compose up (-d)
+# Optional: Parameter '-d' stands for “detached mode”
+PROJECT_NAME="<project>" docker compose up (-d)
 ```
 
 with **project** being the name of your project, e.g.:
 
 ```shell
-PROJECT_NAME="example_data" docker-compose up # sudo might be needed
+# 'sudo' might be needed
+sudo PROJECT_NAME="example_data" docker compose up
 ```
 
-All output folders will be available at `/srv/docker/natrix/`. Make sure to copy your `project folder`, `project.yaml`, and `project.csv` files to `/srv/docker/natrix/input/` or create a new volume mapping using the `docker-compose.yml` file. By default, the container will wait until the input files exist. On first launch, the container will download the required databases to `/srv/docker/natrix/databases/`. This process might take a while.
+All output folders will be available at `/srv/docker/natrix2_SMPL1/`. Make sure to copy your `project folder`, `project.yaml`, and `project.csv` files to `/srv/docker/natrix2_SMPL1/input/` or create a new volume mapping using the `docker-compose.yml` file. By default, the container will wait until the input files exist. On first launch, the container will download the required databases to `/srv/docker/natrix2_SMPL1/databases/`. This process might take a while.
+
+You can also create several containers at the same time. Take a look at the file: `docker-compose.yaml`
 
 #### Building the container yourself
 
-If you prefer to build the Docker container yourself from the repository (for example, if you modified the source code of Natrix), the container can be built and started directly: (**host folders** need to be changed!)
+If you prefer to build the Docker container yourself from the repository (for example, if you modified the source code of Natrix), the container can be built with the command:
 
 ```shell
 docker build . --tag natrix2
 ```
-
-```shell
-docker run -it --label natrix2_container -v </host/database>:/app/database -v </host/output>:/app/output -v </host/input_folder>:/app/input natrix2 bash 
-# -v /host/database:/app/database is optional
-```
-
-You will then be at the command prompt inside the Docker container. From there, you can follow the tutorial for [running Natrix manually](#running-natrix-manually).
-
 ---
 ### Running Natrix manually
 
@@ -536,8 +548,8 @@ Below are the explanations for the configfile `project.yaml` entries:
 | silva_ref         | database/silva_db.138.1.fasta                             | Path for Silva reference database.                                                                                                                                                                                                            |
 | pr2_ref           | database/pr2db.4.14.0.fasta                               | Path for PR2 reference database.                                                                                                                                                                                                              |
 | pr2_tax           | database/pr2db.4.14.0.tax                                 | Path for PR2 taxonomy database.                                                                                                                                                                                                               |
-| unite_ref         | database/unite_v8.3.fasta                                 | Path for UNITE reference database.                                                                                                                                                                                                            |
-| unite_tax         | database/unite_v8.3.tax                                   | Path for UNITE taxonomy database.                                                                                                                                                                                                             |
+| unite_ref         | database/unite_v10.fasta                                 | Path for UNITE reference database.                                                                                                                                                                                                            |
+| unite_tax         | database/unite_v10.tax                                   | Path for UNITE taxonomy database.                                                                                                                                                                                                             |
 | blast             | False                                                     | Boolean to indicate the use of the BLAST clustering algorithm to assign taxonomic information to the OTUs.                                                                                                                                    |
 | database          | SILVA                                                     | Database against which the BLAST should be carried out, at the moment "NCBI" and "SILVA" are supported.                                                                                                                                       |
 | drop_tax_classes  | '.\*unclassified Bacteria.\*,.\*uncultured.\*bacterium.*' | Given a comma-separated list, drops undesired classes either by id, by name, or using regex.                                                                                                                                                   |
@@ -564,5 +576,6 @@ Below are the explanations for the configfile `project.yaml` entries:
 * Martin, M. (2011). “Cutadapt removes adapter sequences from high-throughput sequencing reads.” In: *EMBnet.journal*, 17(1), p. 10.
 * Masella, Andre P. et al. (2012). “PANDAseq: paired-end assembler for *Illumina* sequences.” In: *BMC Bioinformatics*, 13(1), p. 31.
 * Pruesse, E. et al. (2007). “SILVA: a comprehensive online resource for quality checked and aligned ribosomal RNA sequence data compatible with ARB.” In: *Nucleic Acids Research*, 35(21), pp. 7188–7196.
-* Rognes, Torbjørn et al. (2016). “VSEARCH: a versatile open source tool for metagenomics.” In: *PeerJ Preprints*. doi: 10.7287/peerj.preprints.2409v1.
+* Rognes, Torbjørn et al. (2016). “VSEARCH: a versatile open source tool for metagenomics.” In: *PeerJ Preprints*. doi: "10.7287/peerj.preprints.2409v1".
 * Schmieder, Robert und Robert A. Edwards (2011). “Quality control and preprocessing of metagenomic datasets.” In: *Bioinformatics*, 27(6), pp. 863–864.
+* Abarenkov K, Nilsson RH, Larsson K-H, Taylor AFS, May TW, Frøslev TG, Pawlowska J, Lindahl B, Põldmaa K, Truong C, Vu D, Hosoya T, Niskanen T, Piirmann T, Ivanov F, Zirk A, Peterson M, Cheeke TE, Ishigami Y, Jansson AT, Jeppesen TS, Kristiansson E, Mikryukov V, Miller JT, Oono R, Ossandon FJ, Paupério J, Saar I, Schigel D, Suija A, Tedersoo L, Kõljalg U. 2023. The UNITE database for molecular identification and taxonomic communication of fungi and other eukaryotes: sequences, taxa and classifications reconsidered. *Nucleic Acids Research*, doi: "10.1093/nar/gkad1039".
