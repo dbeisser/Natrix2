@@ -65,10 +65,11 @@ Natrix comes with an example [primertable](#example-primertable) (example_data.c
 
 To try out Natrix using the example data (Illumina_data or Nanopore_data), type in the following command:
 
+Example: Using the `Illumina_swarm.yaml` configuration file.
 ```shell
 $ ./pipeline.sh
-Please enter the name of the project
-$ example_data
+Enter project name, for example Illumina_swarm:
+$ Illumina_swarm
 ```
 
 The pipeline will then start a screen session using the project name (here, **example_data**) as the session name and will begin downloading dependencies for the rules. To detach from the screen session, press **Ctrl+a, d** (first press Ctrl+a, then d). To reattach to a running screen session, type in:
