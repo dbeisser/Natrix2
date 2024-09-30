@@ -135,10 +135,11 @@ The primertable, configfile, and the folder containing the FASTQ files all have 
 
 If everything is configured correctly, you can start the pipeline by typing the following commands into your terminal emulator:
 
+Example: Using the `Illumina_swarm.yaml` configuration file.
 ```shell
 $ ./pipeline.sh
-Please enter the name of the project
-$ example_data
+Enter project name, for example Illumina_swarm:
+$ Illumina_swarm
 ```
 
 The pipeline will then start a screen session using the project name as the session name and will begin downloading dependencies for the rules. To detach from the screen session, press **Ctrl+a, d** (first press Ctrl+a, then d). To reattach to a running screen session, type:

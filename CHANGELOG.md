@@ -1,6 +1,9 @@
 # Change Log
 All significant changes to this project are documented here.
 
+## [2024-09-30]
+- Update filename for './pipeline.sh' to fix execution.
+
 ## [2024-09-24]
 - Add agreement note to the download link of the UNITE Database.
 - Add new Docker Image release: Natrix2: v1.1.1

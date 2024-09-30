@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo Please enter the name of the project
+echo Enter project name, for example Illumina_swarm:
 
 read varname
 env_loc=$(conda info --base)/etc/profile.d/conda.sh
