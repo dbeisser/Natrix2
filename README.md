@@ -565,7 +565,7 @@ Below are the explanations for the configfile `project.yaml` entries:
 
 # Use dev-branch
 
-To use the latest features and updates, it is recommended to use the software's dev-branch. The dev-branch contains the most recent developments and patches that are not yet available in the stable main-branch. Users who want to stay up to date and experiment with the newest features should regularly use the dev-branch.
+To use the latest functions and updates, it is recommended to use the dev-branch of Natrix2. The dev-branch contains the latest developments and patches that are not yet available in the main-branch. Users who want to stay up to date and experiment with the latest features should use the dev-branch regularly.
 
 # References
 
