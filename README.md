@@ -21,7 +21,8 @@ Natrix is an open-source bioinformatics pipeline for the preprocessing of long a
 7. [Steps of the Pipeline](#steps-of-the-pipeline)
 8. [Example primertable](#example-primertable)
 9. [Configfile](#configfile)
-10. [References](#references)
+10. [Use dev-branch](#use-dev-branch)
+11. [References](#references)
 
 # Dependencies
 * [Conda](https://conda.io/en/latest/index.html)
@@ -56,7 +57,7 @@ All other dependencies will be automatically installed using Conda environments 
 To install Natrix, you'll need the open-source package management system [Conda](https://conda.io/en/latest/index.html) and, if you want to try Natrix using the accompanying `pipeline.sh` script, you'll need [GNU Screen](https://www.gnu.org/software/screen/). After cloning this repository to a folder of your choice, it is recommended to **create a general Natrix Conda environment** using the accompanying `natrix.yaml` file. In the main folder of the cloned repository, execute the following command:
 
 ```shell
-conda env create -f natrix.yaml
+conda env create --file=natrix.yaml
 ```
 
 This will create a Conda environment containing all dependencies for Snakemake itself.
@@ -561,6 +562,10 @@ Below are the explanations for the configfile `project.yaml` entries:
 | evalue            | 1e-51                                                     | Highest accepted evalue.                                                                                                                                                                                                                      |
 
 <p><b>Table 4</b>: Configuration options</p>
+
+# Use dev-branch
+
+To use the latest features and updates, it is recommended to use the software's dev-branch. The dev-branch contains the most recent developments and patches that are not yet available in the stable main-branch. Users who want to stay up to date and experiment with the newest features should regularly use the dev-branch.
 
 # References
 

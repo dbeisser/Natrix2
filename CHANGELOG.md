@@ -1,32 +1,39 @@
 # Change Log
 All significant changes to this project are documented here.
 
+## [2024-10-04]
+- Add file verification: check for uncompressed files.
+- Add folder to '.gitignore'
+- README: Add new section: Use dev-branch
+- Update 'README.md'
+- Update 'natrix.yaml'
+
 ## [2024-09-30]
 - Update filename for './pipeline.sh' to fix execution.
 
 ## [2024-09-24]
 - Add agreement note to the download link of the UNITE Database.
 - Add new Docker Image release: Natrix2: v1.1.1
-- Update README.md
+- Update 'README.md'
 - Update Docker Image, Dockerfile and docker-compose.
 - Update SILVA-Database Download
 
 ## [2024-08-19]
-- Update 'README.md'.
+- Update 'README.md'
 
 ## [2024-08-12]
 - Update UNITE Database; Release date: 2024-04-04; Version: 10.0
 
 ## [2024-07-25]
-- Add file: .gitignore
+- Add file: '.gitignore'
 
 ## [2024-07-22]
 - Bug fix: Adjust the rule 'make_silva_db' to dynamically download the latest 'SILVA' database.
-- Add tool: fastq_inspector.py; see section Sequence Count
-- Add package: seqkit=2.8.2 to natrix.yaml
-- Add package: python=3.8 to filtering.yaml
-- Add package: pigz=2.8 to blast.yaml and natrix.yaml
-- Replace tool: gunzip with pigz in quality_filt.smk, demultiplexing.smk, blast.smk
+- Add tool: 'fastq_inspector.py'; see section Sequence Count
+- Add package: seqkit=2.8.2 to 'natrix.yaml'
+- Add package: python=3.8 to 'filtering.yaml'
+- Add package: pigz=2.8 to 'blast.yaml' and 'natrix.yaml'
+- Replace tool: gunzip with pigz in 'quality_filt.smk', 'demultiplexing.smk', 'blast.smk'
 - Add folders: input_data, primer_table, dag_plots, tools
 - README: Add new sections: Sequence Count and Table of Contents.
 - Organize files and folders in the root directory.
@@ -45,7 +52,7 @@ All significant changes to this project are documented here.
 - Set threads to 1 in 'vsearch_chim' rule in 'chim_rm.smk'.
 
 ## [2024-06-24]
-- Update cutadapt.py: Change the order of barcode and primer pattern processing.
+- Update 'cutadapt.py': Change the order of barcode and primer pattern processing.
 
 ## [2023-09-22]
 - Add PR2, UNITE Databases.

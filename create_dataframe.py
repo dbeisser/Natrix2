@@ -26,11 +26,11 @@ def create_dataframe(fl, fpl, config, slice):
             # second last can be unit
             unit = fl[j].split('_')[-2]
             if unit in ['A', 'B']:
-            	df.loc[i]['unit'] = unit
-            	df.loc[i]['sample'] = '_'.join(fl[j].split('_')[:-2])
+                df.loc[i]['unit'] = unit
+                df.loc[i]['sample'] = '_'.join(fl[j].split('_')[:-2])
             else:
-            	df.loc[i]['unit'] = ''
-            	df.loc[i]['sample'] = '_'.join(fl[j].split('_')[:-1])
+                df.loc[i]['unit'] = ''
+                df.loc[i]['sample'] = '_'.join(fl[j].split('_')[:-1])
             df.loc[i]['fq1'] = fpl[j][:slice]
             df.loc[i]['fq2'] = fpl[j+1][:slice]
             j += 2
@@ -59,11 +59,11 @@ def create_dataframe(fl, fpl, config, slice):
             # second last can be unit
             unit = fl[i].split('_')[-2]
             if unit in ['A', 'B']:
-            	df.loc[i]['unit'] = unit
-            	df.loc[i]['sample'] = '_'.join(fl[i].split('_')[:-2])
+                df.loc[i]['unit'] = unit
+                df.loc[i]['sample'] = '_'.join(fl[i].split('_')[:-2])
             else:
-            	df.loc[i]['unit'] = ''
-            	df.loc[i]['sample'] = '_'.join(fl[i].split('_')[:-1])
+                df.loc[i]['unit'] = ''
+                df.loc[i]['sample'] = '_'.join(fl[i].split('_')[:-1])
             df.loc[i]['fq1'] = fpl[i][:slice]
             df.loc[i]['fq2'] = np.nan
             i += 1
@@ -73,7 +73,17 @@ def create_dataframe(fl, fpl, config, slice):
 if __name__ == '__main__':
     # check config options
     if "-" in config["general"]["output_dir"]:
-    	sys.exit("Please rename output folder, do not use a dash in the folder name")
+        sys.exit("Please rename output folder, do not use a dash in the folder name")
+
+    # Check for uncompressed files
+    uncompressed_files = glob(config['general']['filename'].rstrip("/") + '/*.fastq')
+    if uncompressed_files:
+        print("\nWarning: Uncompressed file(s) found!\n" +
+            "\n".join(uncompressed_files) + 
+            "\n\nPlease compress your file(s) first.\n" +
+            "Command: {pigz -k filename.fastq}\n")
+        sys.exit()
+
     if config["classify"]["mothur"] and config["blast"]["blast"]:
         sys.exit("Please decide whether to use blast or classification with mothur. Both config options cannot be set to TRUE")
 
@@ -91,12 +101,14 @@ if __name__ == '__main__':
         file_list = sorted([file_.split('/')[-1] for file_
                     in file_path_list])
         slice = -3 # Remove the .gz extension from the file paths.
+    
     if config['dataset']['nanopore']:
         file_path_list = sorted(glob(os.path.join(config["general"]["filename"],'*R1.fastq.gz')))
 
         file_list = sorted([file_.split('/')[-1] for file_ in file_path_list])
         slice = None
         #print(file_list, file_path_list)
+
     # create dataframe
     df = create_dataframe(file_list, file_path_list, config, slice)
     print(df)
