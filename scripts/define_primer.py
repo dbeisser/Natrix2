@@ -17,17 +17,17 @@ else:
             if snakemake.params.bar_removed:
                 primertable["f_primer"] = (
                     primertable[["poly_N",
-                    "specific_forward_primer"]].sum(axis=1).str.len())
+                    "specific_forward_primer"]].sum(axis=1).astype('str').str.len())
                 primertable["r_primer"] = (
                     primertable[["poly_N_rev",
-                    "specific_reverse_primer"]].sum(axis=1).str.len())
+                    "specific_reverse_primer"]].sum(axis=1).astype('str').str.len())
             else:
                 primertable["f_primer"] = (
                     primertable[["poly_N", "Barcode_forward",
-                    "specific_forward_primer"]].sum(axis=1).str.len())
+                    "specific_forward_primer"]].sum(axis=1).astype('str').str.len())
                 primertable["r_primer"] = (
                     primertable[["poly_N_rev","Barcode_reverse",
-                    "specific_reverse_primer"]].sum(axis=1).str.len())
+                    "specific_reverse_primer"]].sum(axis=1).astype('str').str.len())
         else:
             if snakemake.params.bar_removed:
                 primertable["f_primer"] = (

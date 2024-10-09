@@ -13,8 +13,9 @@ if config["blast"]["database"] == "SILVA":
         shell:
             """
                 dir_name=$(dirname {params[0]});
-                wget -P $dir_name/ --progress=bar ftp://ftp.arb-silva.de/current/Exports/SILVA_*_SSURef_tax_silva.fasta.gz;
-                gunzip -c $dir_name/SILVA_*_SSURef_tax_silva.fasta.gz > $dir_name/silva.db.fasta;
+                latest_file=$(wget -qO- https://ftp.arb-silva.de/current/Exports/ | grep -oP 'SILVA_\d+\.\d+_SSURef_tax_silva.fasta.gz' | sort -V | tail -n 1);
+                wget -P $dir_name/ --progress=bar https://ftp.arb-silva.de/current/Exports/$latest_file;
+                pigz -d -c $dir_name/$latest_file > $dir_name/silva.db.fasta;
                 makeblastdb -in $dir_name/silva.db.fasta -dbtype nucl -parse_seqids -out $dir_name/silva.db -blastdb_version 5
             """
 
@@ -30,7 +31,7 @@ elif config["blast"]["database"] == "NCBI":
 
     rule make_ncbi_db:
         output:
-            expand(config["blast"]["db_path"] + ".00" + "{file_extension}", file_extension=[".nhd", ".nhi", ".nhr", ".nin", ".nnd", ".nni", ".nog", ".nsq"]),
+            expand(config["blast"]["db_path"] + ".000" + "{file_extension}", file_extension=[".nhd", ".nhi", ".nhr", ".nin", ".nnd", ".nni", ".nog", ".nsq"]),
             listing = temp(".listing"),
             path = config["blast"]["db_path"]
         params:

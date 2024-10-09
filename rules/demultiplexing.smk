@@ -6,7 +6,7 @@ rule demultiplex:
     params:
         filename = config["general"]["filename"].rstrip("/"),
         primertable = config["general"]["primertable"],
-        demultiplexing = config["general"]["demultiplexing"],
+        demultiplexing = config['general']['demultiplexing'],
         read_sorting = config['general']['read_sorting'],
         assembled = config['general']['already_assembled'],
         name_ext = config['merge']['name_ext'],
@@ -22,7 +22,7 @@ rule unzip:
     output:
         temp(os.path.join(config["general"]["output_dir"],"demultiplexed/{sample}_{unit}_{read}.tmp"))
     shell:
-         "gunzip -c {input} > {output}"
+         "pigz -d -c {input} > {output}"
 
 rule check_format:
     input:

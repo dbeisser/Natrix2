@@ -1,7 +1,8 @@
 name: medaka
 channels:
-  - bioconda
   - conda-forge
+  - defaults
+  - bioconda
 dependencies:
-  - python=3.8
-  - medaka=1.7.2
+  - medaka=1.1.2
+  - numpy=1.19

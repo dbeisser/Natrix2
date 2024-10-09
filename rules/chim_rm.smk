@@ -11,7 +11,7 @@ rule vsearch_chim:
         beta=config["chim"]["beta"],
         pseudo_c=config["chim"]["pseudo_count"],
         abskew=config["chim"]["abskew"]
-    threads: config["general"]["cores"]
+    threads: 1
     conda:
          "../envs/vsearch.yaml"
     log:
@@ -19,4 +19,4 @@ rule vsearch_chim:
     shell:
         "vsearch --uchime3_denovo {input} -uchimeout {output.uchime_out}"
         " -chimeras {output.chim} -nonchimeras {output.nonchim} -xn {params.beta}"
-        "  -dn {params.pseudo_c} -abskew {params.abskew} --log {log} 2>&1"
+        "  -dn {params.pseudo_c} --threads {threads} -abskew {params.abskew} --log {log} 2>&1"

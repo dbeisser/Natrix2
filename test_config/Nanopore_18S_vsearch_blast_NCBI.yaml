@@ -1,8 +1,8 @@
 # General options
 general:
-        filename: nanopore_data # The path / filename of the project folder, primertable (.csv) and configfile (.yaml). If the raw data folder is not in the root directory of Natrix, please add the path relative to the root directory (e.g. input/example_data)
+        filename: input_data/Nanopore_data # The path / filename of the project folder, primertable (.csv) and configfile (.yaml). If the raw data folder is not in the root directory of Natrix, please add the path relative to the root directory (e.g. input/example_data)
         output_dir: Nanopore_results/ # Path to custom output directory / relative to the root directory of natrix. Do not use a dash in the folder name.
-        primertable: Nanopore_18S.csv # Path to the primertable. If the primertable is not in the root directory of Natrix, please add the path relative to the root directory (e.g. input/example_data.yaml)
+        primertable: primer_table/Nanopore_18S.csv # Path to the primertable. If the primertable is not in the root directory of Natrix, please add the path relative to the root directory (e.g. input/example_data.yaml)
         units: units.tsv # Path to the sequencing unit sheet. (name will be concatenated with output_dir)
         cores: 20 # Amount of cores available for the workflow.
         memory: 4000 # Available RAM in Mb.
@@ -61,8 +61,8 @@ database_path:
         silva_ref: database/silva_db.138.1.fasta # Path for Silva reference database
         pr2_ref: database/pr2db.4.14.0.fasta # Path for PR2 reference database
         pr2_tax: database/pr2db.4.14.0.tax # Path for PR2 taxonomy database
-        unite_ref: database/unite_v8.3.fasta # Path for UNITE reference database
-        unite_tax: database/unite_v8.3.tax # Path for UNITE taxonomy database
+        unite_ref: database/unite_v10.fasta # Path for UNITE reference database
+        unite_tax: database/unite_v10.tax # Path for UNITE taxonomy database
 
 # BLAST
 blast:
@@ -89,3 +89,4 @@ pychop:
 
 # vsearch clustering
 clustering: "vsearch" # nanopore only support vsearch option
+vsearch_id: 0.97 #Percent identity for vsearch OTU clustering (1 = 100%).

@@ -26,10 +26,12 @@ if not config['dataset']['nanopore']:
             "../envs/quality_control.yaml"
         shell:
             "multiqc {params}/qc/ -o {params}/qc/"
+
+
 else:
     rule fastqc:
         input:
-            os.path.join(config["general"]["output_dir"],"pychopper/pychopper_merged/{sample}_{unit}_R{read}.fastq")
+            os.path.join(config["general"]["filename"],"{sample}_{unit}_R{read}.fastq.gz")
         output:
             os.path.join(config["general"]["output_dir"],"qc/{sample}_{unit}_R{read}_fastqc.html"),
             os.path.join(config["general"]["output_dir"],"qc/{sample}_{unit}_R{read}_fastqc.zip")

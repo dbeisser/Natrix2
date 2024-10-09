@@ -1,0 +1,7 @@
+name: quality_filtering
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - chopper
