@@ -116,7 +116,7 @@ samplename_unit_direction.fastq.gz
 
 with:
 * **samplename**: the name of the sample, without special characters.
-* **unit**: identifier for [split-samples](#ampliconduo--split-sample-approach-illumina---nanopore-variant) (**A**, **B**). If the split-sample approach is not used, the unit identifier is simply **A**, but it still needs to be present.
+* **unit**: identifier for [split-samples](#ampliconduo--split-sample-approach-illumina--and-nanopore-variant) (**A**, **B**). If the split-sample approach is not used, the unit identifier is simply **A**, but it still needs to be present.
 * **direction**: identifier for forward (**R1**) and reverse (**R2**) reads of the same sample. If the reads are single-end, the direction identifier is **R1**; it still needs to be present.
 
 A dataset should look like this (two samples, paired-end, no split-sample approach):
@@ -157,49 +157,94 @@ When the workflow has finished, you can press **Ctrl+a, k** (first press Ctrl+a,
 
 #### Pulling the image from Dockerhub
 
-Natrix can be run inside a Docker container. Therefore, Docker must be installed. Please refer to the [Docker website](https://docs.docker.com/) to learn how to install Docker and set up an environment if you have not used it before.
+Natrix2 can be run inside a Docker container. Therefore, Docker must be installed. Please refer to the [Docker website](https://docs.docker.com/engine/install/) to learn how to install Docker and set up an environment if you have not used it before.
 
-To run the Docker container, download the pre-built container from [dockerhub](https://hub.docker.com/r/mw55/natrix).
+Check whether you have installed Docker.
 
-```shell
-docker pull dbeisser/natrix2:1.1.1
+```bash
+docker --version
+```
+
+To run the Docker container, download the pre-built container from [dockerhub](https://hub.docker.com/r/dbeisser/natrix2).
+
+```bash
+docker pull dbeisser/natrix2:latest
 ```
 
 ---
 **Important before you continue with Docker!**
 
-Before using Docker, please create the following folders on your system: `database`, `output`, `input_docker`, `config_docker`
+Before using Docker, please create the following folders on your system: `input`, `output`, `database`
 
-Next, select the configuration file you want to use for your analysis (**for example: Nanopore.yaml**) and copy it to your configuration folder `config_docker`. Then open your configuration file with an editor and adjust all the parameters for your samples.
+Copy your configuration file (**project.yaml**) and the primer table (**project.csv**) that you want to use for your analysis into the `input` folder. You can also create a subfolder for your samples. Just not for your configuration file and primer table. These must be located in your `input` folder. It is important that you specify the folder path correctly in the configuration file.
 
-You must enter the folder path for your data in your configuration file so that it can be found. **Example**: `filename: input_docker`
+Now you can open your configuration file (***project.yaml**) with any editor and adjust the parameters for your samples. Important! Set the parameters for your CPU cores and your working memory (RAM) before you start the analysis.
+
+You must specify the folder path for your data in your configuration file so that it can be found. **Example**: `filename: input`. If you are using a subfolder, simply extend your folder path. `filename: input/subfolder` The same applies to your primer table.
+
+**Example: Folder structure**
+
+```bash
+./project/
+    ./project/input/
+        ./project/input/samples # Samples to be analyzed
+        ./project/input/project.yaml # Configuration file
+        ./project/input/project.csv # Primer table
+    ./project/output/
+        ./project/output/project_results # Results of your analysis
+    ./project/database/
+```
+
+**Example: Project.yaml**
+
+```yaml
+general:
+    filename: input/samples # Folder with your samples
+    output_dir: output/project_results # Results of your analysis
+    primertable: input/project.csv # Specific primer table
+    cores: 20 # Amount of cores
+    memory: 10000 # Available RAM in Megabyte (MB)
+    ...
+```
 
 ---
 
 The Docker container has all environments pre-installed, eliminating the need to download the environments during the first-time initialization of the workflow. To connect to the shell inside the Docker container, input the following command:
 
-```shell
-docker run -it --label natrix2_container -v </host/database>:/app/database -v </host/output>:/app/output -v </host/input_docker>:/app/input_docker -v </host/config_docker>:/app/config_docker dbeisser/natrix2:1.1.1 bash
+```bash
+docker run -it --label natrix2_container -v </host/input>:/app/input -v </host/output>:/app/output -v </host/database>:/app/database dbeisser/natrix2:latest bash
 ```
 **Functions of the respective folders**
 
+`/host/input` is the full path to a local folder. The input folder contains your samples, configuration file (**project.yaml**) and your primer table (**project.csv**). Use the same project name for your configuration file and your primer table.
+
+`/host/output` is the full path to a local folder where the output of the workflow should be saved so that the container can use it.
+
 `/host/database` is the full path to a local folder in which you wish to install the database (**SILVA** or **NCBI**). This part is optional and only needed if you want to use BLAST for taxonomic assignment.
-
-`/host/output` is the full path to a local folder where the output of the workflow (**results folder**, **units.tsv**, **primertable**, and **demultiplexed folder**) should be stored for the container to use.
-
-`/host/input_docker` is the full path to a local folder where the input (the project folder, the **project.yaml**, and the **project.csv**) should be saved.
-
-`/host/config_docker` is the full path to a local folder containing the configuration file you want to use to analyze your samples. Example: **Nanopore.yaml**
 
 ---
 
 After you connect to the container shell, you can follow: [running Natrix manually](#running-natrix-manually)
 
+You can also use the script `docker_pipeline.sh`. Once you have connected to the container and configured everything, you can start your analysis with the script. For example, if the configuration file `project.yaml` is in the input folder. 
+
+```bash
+./docker_pipeline.sh project # Use the file name of your config file
+```
+
 ---
 
-#### Directly starting the workflow using docker-compose
+#### Use docker-compose
 
-Alternatively, you can start the workflow using the docker-compose command in the root directory of the workflow. Please make sure that you have docker compose installed!
+Alternatively, you can start the workflow using the docker-compose command in the root directory of the workflow. Please make sure that you have docker compose installed! First, check whether you have installed docker compose.
+
+```shell
+docker-compose --version # Check the version
+```
+
+All folders will be available at `/srv/docker/natrix2_smps1/`. Make sure to copy your `project_folder`, `project.yaml`, and `project.csv` files to `/srv/docker/natrix2_smps1/input/`. By default, the container will wait until the input files exist. On first launch, the container will download the required databases to `/srv/docker/natrix2_smps1/databases/`. This process might take a while.
+
+You can also create several containers at the same time. Take a look at the file: `docker-compose.yaml`
 
 ```shell
 # Optional: Parameter '-d' stands for “detached mode”
@@ -213,16 +258,46 @@ with **project** being the name of your project, e.g.:
 sudo PROJECT_NAME="example_data" docker compose up
 ```
 
-All output folders will be available at `/srv/docker/natrix2_SMPL1/`. Make sure to copy your `project folder`, `project.yaml`, and `project.csv` files to `/srv/docker/natrix2_SMPL1/input/` or create a new volume mapping using the `docker-compose.yml` file. By default, the container will wait until the input files exist. On first launch, the container will download the required databases to `/srv/docker/natrix2_SMPL1/databases/`. This process might take a while.
+If you have defined several containers in the docker-compose file, you can start all containers with the command. It is important that you have entered everything correctly so that your analysis can run without errors.
 
-You can also create several containers at the same time. Take a look at the file: `docker-compose.yaml`
+```shell
+# 'sudo' might be needed
+sudo docker compose up
+```
+
+**Example: Folder structure for docker-compose**
+
+```bash
+# project_a; Container 1
+./srv/docker/project_a/
+    ./srv/docker/project_a/input/
+        ./srv/docker/project_a/input/samples # Samples to be analyzed
+        ./srv/docker/project_a/input/project.yaml # Configuration file
+        ./srv/docker/project_a/input/project.csv # Primer table
+    ./srv/docker/project_a/output/
+        ./srv/docker/project_a/output/project_a_results # Results of your analysis
+    ./srv/docker/project_a/database/
+
+# OPTIONAL; If you use several containers, you can add another one.
+# project_b; Container 2
+./srv/docker/project_b/
+    ./srv/docker/project_b/input/
+        ./srv/docker/project_b/input/samples
+        ./srv/docker/project_b/input/project.yaml
+        ./srv/docker/project_b/input/project.csv
+    ./srv/docker/project_b/output/
+        ./srv/docker/project_b/output/project_a_results
+    ./srv/docker/project_b/database/
+
+# Container 3, Container 4 ...
+```
 
 #### Building the container yourself
 
 If you prefer to build the Docker container yourself from the repository (for example, if you modified the source code of Natrix), the container can be built with the command:
 
-```shell
-docker build . --tag natrix2
+```bash
+docker build -t natrix2 .
 ```
 ---
 ### Running Natrix manually
@@ -279,7 +354,7 @@ The Snakemake documentation contains a tutorial for [profile creation](https://s
 
 # Output
 
-After the workflow is finished, all output files can be found under `Natrix-Pipeline/output/`.
+Once the workflow has been completed, all output files can be found in your output folder.
 
 <p align="center">
 <img src="documentation/images/output_files.png" alt="ouput" width="700"/>

@@ -1,6 +1,13 @@
 # Change Log
 All significant changes to this project are documented here.
 
+## [2024-10-16]
+- Update version: multiqc=1.25.1
+- Update 'README.md'
+- Update 'docker_pipeline.sh', 'docker-compose.yaml', 'natrix.yaml'
+- Build new Docker Image; natrix2:latest
+- Update Natrix2 version: v1.1.2
+
 ## [2024-10-04]
 - Add file verification: check for uncompressed files.
 - Add folder to '.gitignore'

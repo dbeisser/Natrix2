@@ -1,4 +1,4 @@
-name: natrix2
+name: natrix
 channels:
   - conda-forge
   - bioconda
