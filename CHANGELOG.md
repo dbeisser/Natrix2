@@ -1,6 +1,10 @@
 # Change Log
 All significant changes to this project are documented here.
 
+## [2024-10-24]
+- Add 'test_docker.yaml' for Docker container testing
+- Update 'docker_pipeline.sh' script
+
 ## [2024-10-16]
 - Update version: multiqc=1.25.1
 - Update 'README.md'
