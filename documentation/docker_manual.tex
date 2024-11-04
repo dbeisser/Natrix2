@@ -1,0 +1,186 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[a4paper, left=2.3cm, right=2.3cm, top=3.5cm, bottom=2.5cm]{geometry}
+\usepackage{mathptmx}
+\usepackage[english]{babel}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage[normalem]{ulem}
+\usepackage{hyperref}
+
+\newcommand{\vsp}{\vspace{0.2cm}}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    frame=single,
+    breaklines=true,
+    commentstyle=\color{gray},
+    stringstyle=\color{red}
+}
+
+\hypersetup{
+    linkcolor=black,
+    urlcolor=black,
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{\thepage}
+
+\title{User Manual: Docker with Natrix2}
+\author{Dustin Finke, Department of Biodiversity \\ University of Duisburg-Essen, Essen, Germany} 
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\vspace{-0.7cm}
+\begin{center}
+    \textbf{\fontsize{12}{13}\selectfont Repository: \uline{\href{https://github.com/dbeisser/Natrix2}{https://github.com/dbeisser/Natrix2}}}
+\end{center}
+
+\tableofcontents
+
+\newpage
+
+\section{Preparations}
+
+\subsection{Docker Installation}
+
+\noindent
+Ensure that a Docker version is installed before attempting installation.
+
+\begin{lstlisting}[language=bash]
+$ docker --version # Check which Docker version is installed
+\end{lstlisting}
+\vsp
+
+\noindent
+If Docker is not installed, visit the official site, select your operating system, and follow the installation instructions. Once installed, proceed to the next step.
+ \vsp
+ 
+ \noindent
+ Install Docker:
+ \textbf{\uline{\href{https://docs.docker.com/engine/install/}{https://docs.docker.com/engine/install/}}}
+
+\subsection{Pull Natrix2 Image}
+
+\noindent
+If you have installed Docker, you can download the Docker image. This takes some time until the image is downloaded. As soon as the download is finished, you can continue with the next step.
+
+\begin{lstlisting}[language=bash]
+$ docker pull dbeisser/natrix2:latest # Download Natrix2 image
+\end{lstlisting}
+\vsp
+Once the Docker image has been downloaded completely, you can check it.
+
+\begin{lstlisting}[language=bash]
+$ docker images # Check whether the image has been loaded
+\end{lstlisting}
+
+\subsection{Set up the Environment}
+Before you can use Docker, you need to create the following folders for your Docker container. These folders are important for the corresponding input and output files.
+
+\begin{lstlisting}[language=bash]
+# Folder structure for the Docker container (to be created locally)
+./natrix2/                  # Main project folder
+    input/                  # Contains files needed for analysis
+        samples/            # Input data files for analysis
+        config.yaml         # Configuration file
+        primer.csv          # Primer table
+    output/                 # Saves analysis results
+        results/            # Folder for the results
+    database/               # Saves reference databases
+\end{lstlisting}
+\vsp
+
+\noindent
+1. Copy the \texttt{config.yaml} file and the \texttt{primer.csv} file into the \texttt{input} folder. You can create a subfolder for your samples, but \textbf{the configuration file and the primer table must remain in the \texttt{input} folder}.
+
+\vsp
+\noindent
+2. Open the \texttt{config.yaml} file with any editor and \textbf{adjust the parameters for your samples}. Make sure to set the parameters for your CPU cores and your memory (RAM) before starting the analysis.
+
+\vsp
+\noindent
+3. \textbf{Specify the folder path for your data} in the \texttt{config.yaml} so it can be found. If you use a subfolder, extend the path: \texttt{input/samples}. The same applies to your primer table.
+
+\begin{lstlisting}[language=bash]
+# Example configuration from the config.yaml file
+general:
+    filename: input/samples         # Samples folder
+    output_dir: output/results      # Results folder
+    primertable: input/primer.csv   # Primer table path
+    cores: 20                       # Number of CPU cores
+    memory: 10000                   # RAM in Megabytes
+    ...
+\end{lstlisting}
+
+\newpage
+
+\section{Launch Docker}
+\subsection{Create Docker Container}
+The Docker container includes all necessary tools pre-installed, so you won’t need to download anything initially. \textbf{Replace \texttt{</your/local/>} with the path to your \texttt{natrix2} folder.} After connecting to the container, you can start your analysis. Refer to the section on \textbf{Run Natrix2} for details, and you can test your Docker container with our sample data in the section \textbf{Test Execution}.
+
+\begin{lstlisting}[language=bash]
+# Replace </your/local/> with your paths to the natrix2 folder
+# Example: /your/local/natrix2/input => /path/to/natrix2/input
+
+$ docker run -it --label natrix2_container -v /your/local/natrix2/input:/app/input -v /your/local/natrix2/output:/app/output -v /your/local/natrix2/database:/app/database dbeisser/natrix2:latest bash
+\end{lstlisting}
+
+\noindent
+\subsection{Run Natrix2}
+\noindent
+To run the preparation script and Snakemake manually, activate the Snakemake environment.
+
+\begin{lstlisting}[language=bash]
+$ conda activate natrix # Activate the Snakemake environment
+\end{lstlisting}
+
+\vsp
+\noindent
+Execute the preparation script \texttt{create\_dataframe.py} to create the dataframe for your samples. It is important to specify the name of your configuration file.
+
+\begin{lstlisting}[language=bash]
+$ python3 create_dataframe.py input/config.yaml # Create dataframe
+\end{lstlisting}
+
+\vsp
+\noindent
+Now you can start your pipeline so that your samples can be analyzed. If the pipeline stops (due to an error or intentional interruption), rerunning the command will restart it from that point.
+
+\begin{lstlisting}[language=bash]
+# Set your configuration file and specify the number of CPU cores
+$ snakemake --use-conda --configfile input/config.yaml --cores <cores>
+
+# Example: using <config.yaml> with 10 CPU cores:
+$ snakemake --use-conda --configfile input/config.yaml --cores 10
+\end{lstlisting}
+\vsp
+
+\noindent
+\textbf{If you want Natrix2 to start automatically, use the script \texttt{docker\_pipeline.sh}. This script will handle the setup and start Natrix2 for you.}
+
+\begin{lstlisting}[language=bash]
+# Replace <config> with your config file name
+$ ./docker_pipeline.sh config
+\end{lstlisting}
+
+\vsp
+\noindent
+\textbf{After your analysis, type \texttt{exit} to return to the Docker container or leave the container.}	
+
+\subsection{Test Execution}
+To test your Docker container before using your own data, you can use our test dataset, which contains Nanopore data. Simply run the container with the \texttt{test\_docker.yaml} configuration file.
+
+\begin{lstlisting}[language=bash]
+# Start a test run using our sample data
+$ ./docker_pipeline.sh test_docker
+\end{lstlisting}
+
+\end{document}

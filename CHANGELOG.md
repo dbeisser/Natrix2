@@ -1,6 +1,11 @@
 # Change Log
 All significant changes to this project are documented here.
 
+## [2024-11-04]
+- Add 'docker_manual.pdf' and 'docker_manual.tex'
+- Update 'docker-compose.yaml'
+- Update 'README.md'
+
 ## [2024-10-24]
 - Add 'test_docker.yaml' for Docker container testing
 - Update 'docker_pipeline.sh' script
