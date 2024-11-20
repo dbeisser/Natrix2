@@ -1,6 +1,12 @@
 # Change Log
 All significant changes to this project are documented here.
 
+## [2024-11-20]
+- Improve velocity with pigz in applicable rules
+- Update database versions: SILVA=138.2, PR2=5.0.0
+- Adjust MultiQC version to prevent issues
+- Adapt configuration files for new database version
+
 ## [2024-11-04]
 - Add 'docker_manual.pdf' and 'docker_manual.tex'
 - Update 'docker-compose.yaml'

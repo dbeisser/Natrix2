@@ -54,13 +54,13 @@ classify:
         method: wang # Allows you to specify classification method to use. Your options are: wang, knn and zap. The default is wang.
         database: pr2 # Database against which MOTHUR should be carried out, at the moment "pr2" , "unite" and "silva" are supported
 database_version:
-        pr2: 4.14.0
-        silva: 138.1
+        pr2: 5.0.0
+        silva: 138.2
 database_path:
-        silva_tax: database/silva_db.138.1.tax # Path for Silva taxonomy database
-        silva_ref: database/silva_db.138.1.fasta # Path for Silva reference database
-        pr2_ref: database/pr2db.4.14.0.fasta # Path for PR2 reference database
-        pr2_tax: database/pr2db.4.14.0.tax # Path for PR2 taxonomy database
+        silva_tax: database/silva_db.138.2.tax # Path for Silva taxonomy database
+        silva_ref: database/silva_db.138.2.fasta # Path for Silva reference database
+        pr2_ref: database/pr2db.5.0.0.fasta # Path for PR2 reference database
+        pr2_tax: database/pr2db.5.0.0.tax # Path for PR2 taxonomy database
         unite_ref: database/unite_v10.fasta # Path for UNITE reference database
         unite_tax: database/unite_v10.tax # Path for UNITE taxonomy database
 

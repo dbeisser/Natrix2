@@ -69,7 +69,7 @@ To try out Natrix using the example data (Illumina_data or Nanopore_data), type 
 Example: Using the `Illumina_swarm.yaml` configuration file.
 ```shell
 $ ./pipeline.sh
-Enter project name, for example Illumina_swarm:
+Enter a project name, such as Illumina_swarm:
 $ Illumina_swarm
 ```
 
@@ -219,7 +219,6 @@ The Docker container has all environments pre-installed, eliminating the need to
 ```bash
 # Replace </your/local/> with your paths to the natrix2 folder
 # Example: /your/local/natrix2/input => /path/to/natrix2/input
-
 docker run -it --label natrix2_container -v /your/local/natrix2/input:/app/input -v /your/local/natrix2/output:/app/output -v /your/local/database:/app/database dbeisser/natrix2:latest bash
 ```
 Functions of the respective folders:
