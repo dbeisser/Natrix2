@@ -1,6 +1,10 @@
 # Change Log
 All significant changes to this project are documented here.
 
+## [2024-12-05]
+- Fix clustering logic in classify.smk for ASV.
+- Update version: bioconductor-dada2=1.30.0
+
 ## [2024-11-20]
 - Improve velocity with pigz in applicable rules
 - Update database versions: SILVA=138.2, PR2=5.0.0
