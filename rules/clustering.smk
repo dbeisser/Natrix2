@@ -3,12 +3,10 @@ if not config['dataset']['nanopore'] and config['clustering']== 'swarm':
     # dada runs per sample after preprocessing and before chimera removal and AmpliconDuo
     rule DADA2:
         input:
-            fwd = expand(
-                os.path.join(config["general"]["output_dir"],"assembly/{unit.sample}_{unit.unit}/{unit.sample}_{unit.unit}_1_cut.fastq"), unit=units.reset_index().itertuples()),
-            rev = expand(
-                os.path.join(config["general"]["output_dir"],"assembly/{unit.sample}_{unit.unit}/{unit.sample}_{unit.unit}_2_cut.fastq"), unit=units.reset_index().itertuples()) if config["merge"]["paired_End"] == True else []
+            fwd=os.path.join(config["general"]["output_dir"],"assembly/{sample}_{unit}/{sample}_{unit}_1_cut.fastq"),
+            rev=os.path.join(config["general"]["output_dir"],"assembly/{sample}_{unit}/{sample}_{unit}_2_cut.fastq") if config["merge"]["paired_End"] == True else []
         output:
-            expand(os.path.join(config["general"]["output_dir"],"assembly/{unit.sample}_{unit.unit}/{unit.sample}_{unit.unit}_dada.fasta"), unit=units.reset_index().itertuples())
+            protected(os.path.join(config["general"]["output_dir"],"assembly/{sample}_{unit}/{sample}_{unit}_dada.fasta"))
         params:
             paired_end=config["merge"]["paired_End"],
             minoverlap=config["qc"]["minoverlap"],
@@ -16,7 +14,7 @@ if not config['dataset']['nanopore'] and config['clustering']== 'swarm':
         conda:
             "../envs/dada2.yaml"
         log:
-            os.path.join(config["general"]["output_dir"],"logs/dada2.log")
+            os.path.join(config["general"]["output_dir"], "logs/{sample}_{unit}_dada2.log")
         script:
             "../scripts/dada2.R"
 

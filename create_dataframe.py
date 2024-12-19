@@ -5,6 +5,7 @@ import numpy as np
 from glob import glob
 import os
 import sys
+import re
 
 # Create the datatable containing the samples, units and paths of all
 # fastq files formatted correctly. This is vital for the snakemake
@@ -14,8 +15,28 @@ import sys
 with open(sys.argv[1]) as f_:
     config = yaml.load(f_, Loader=yaml.FullLoader)
 
+def validate_sample_names(fl):
+    # Regex for valid filenames: 'sampleX_(A|B)_R(1|2).fastq.gz'
+    valid_pattern = re.compile(r'^[^_]+_(A|B)_R(1|2)\.fastq\.gz$')
+    
+    # Pre-check for disallowed patterns like "_AB_"
+    invalid_samples = [
+        file for file in fl
+        if '_AB_' in file or not valid_pattern.match(file)
+    ]
+    
+    if invalid_samples:
+        error_message = (
+            "\n\nERROR: Invalid Sample Names Detected!\n"
+            + "\n".join(f"- {name}" for name in invalid_samples) +
+            "\nREQUIREMENT: Sample names must follow the format:\n"
+            "- Allowed: [sample_(A|B)_R(1|2).fastq.gz]\n"
+            "- Not allowed: [_AB_], [_A_A_], [_A_B_], [_R3]\n"
+        )
+        raise ValueError(error_message)
 
 def create_dataframe(fl, fpl, config, slice):
+    validate_sample_names(fl) # Validate sample names before processing
     if config['merge']['paired_End'] and not config['general']['already_assembled']:
         df = pd.DataFrame(columns=['sample', 'unit', 'fq1', 'fq2'],
             index =range(int(len(fl)/2)), dtype=str)

@@ -1,38 +1,44 @@
 # Change Log
 All significant changes to this project are documented here.
 
+## [2024-12-19]
+- Enforce valid sample names with clear error message.
+- Revise DADA2 rule for efficient resource utilization.
+- Protect output files in the DADA2 rule if an error occurs.
+- Remove redundant loop in DADA2 script.
+
 ## [2024-12-05]
 - Fix clustering logic in classify.smk for ASV.
 - Update version: bioconductor-dada2=1.30.0
 
 ## [2024-11-20]
-- Improve velocity with pigz in applicable rules
+- Improve velocity with pigz in applicable rules.
 - Update database versions: SILVA=138.2, PR2=5.0.0
-- Adjust MultiQC version to prevent issues
-- Adapt configuration files for new database version
+- Adjust MultiQC version to prevent issues.
+- Adapt configuration files for new database version.
 
 ## [2024-11-04]
-- Add 'docker_manual.pdf' and 'docker_manual.tex'
-- Update 'docker-compose.yaml'
-- Update 'README.md'
+- Add 'docker_manual.pdf' and 'docker_manual.tex'.
+- Update 'docker-compose.yaml'.
+- Update 'README.md'.
 
 ## [2024-10-24]
-- Add 'test_docker.yaml' for Docker container testing
-- Update 'docker_pipeline.sh' script
+- Add 'test_docker.yaml' for Docker container testing.
+- Update 'docker_pipeline.sh' script.
 
 ## [2024-10-16]
 - Update version: multiqc=1.25.1
-- Update 'README.md'
-- Update 'docker_pipeline.sh', 'docker-compose.yaml', 'natrix.yaml'
+- Update 'README.md'.
+- Update 'docker_pipeline.sh', 'docker-compose.yaml', 'natrix.yaml'.
 - Build new Docker Image; natrix2:latest
 - Update Natrix2 version: v1.1.2
 
 ## [2024-10-04]
 - Add file verification: check for uncompressed files.
-- Add folder to '.gitignore'
-- README: Add new section: Use dev-branch
-- Update 'README.md'
-- Update 'natrix.yaml'
+- Add folder to '.gitignore'.
+- README: Add new section: Use dev-branch.
+- Update 'README.md'.
+- Update 'natrix.yaml'.
 
 ## [2024-09-30]
 - Update filename for './pipeline.sh' to fix execution.
@@ -40,12 +46,12 @@ All significant changes to this project are documented here.
 ## [2024-09-24]
 - Add agreement note to the download link of the UNITE Database.
 - Add new Docker Image release: Natrix2: v1.1.1
-- Update 'README.md'
+- Update 'README.md'.
 - Update Docker Image, Dockerfile and docker-compose.
-- Update SILVA-Database Download
+- Update SILVA-Database Download.
 
 ## [2024-08-19]
-- Update 'README.md'
+- Update 'README.md'.
 
 ## [2024-08-12]
 - Update UNITE Database; Release date: 2024-04-04; Version: 10.0
@@ -55,7 +61,7 @@ All significant changes to this project are documented here.
 
 ## [2024-07-22]
 - Bug fix: Adjust the rule 'make_silva_db' to dynamically download the latest 'SILVA' database.
-- Add tool: 'fastq_inspector.py'; see section Sequence Count
+- Add tool: 'fastq_inspector.py'; see section Sequence Count.
 - Add package: seqkit=2.8.2 to 'natrix.yaml'
 - Add package: python=3.8 to 'filtering.yaml'
 - Add package: pigz=2.8 to 'blast.yaml' and 'natrix.yaml'
