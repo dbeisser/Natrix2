@@ -1,6 +1,9 @@
 # Change Log
 All significant changes to this project are documented here.
 
+## [2024-12-27]
+- Change sample names in 'input_data/Nanopore_data' folder.
+
 ## [2024-12-19]
 - Enforce valid sample names with clear error message.
 - Revise DADA2 rule for efficient resource utilization.
