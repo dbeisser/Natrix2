@@ -13,6 +13,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 taxonomy=config['database_path']['pr2_tax'],
                 search=config['classify']['search'],
                 method=config['classify']["method"],
+                cutoff=config['classify']['cutoff'],
                 threads=config['general']['cores'],
                 output=config['general']['output_dir'],
                 input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"]["seq_rep"] == "OTU" else os.path.join(config["general"]["output_dir"],"filtering"),
@@ -22,7 +23,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 os.path.join(config["general"]["output_dir"], "logs/mothur_classify.log")
             shell:
                 """
-                    mothur "#set.logfile(name={log}); classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
+                    mothur "#set.logfile(name={log}); classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
                     # sed -i "s/([^()]*)//g" {params.input}/*.taxonomy
                     input_dir=$(dirname {input[0]});
                     mv $input_dir/*.taxonomy {output[1]};
@@ -42,6 +43,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 taxonomy=config['database_path']['unite_tax'],
                 search=config['classify']['search'],
                 method=config['classify']["method"],
+                cutoff=config['classify']['cutoff'],
                 output=config['general']['output_dir'],
                 threads=config['general']['cores'],
                 input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"]["seq_rep"] == "OTU" else os.path.join(config["general"]["output_dir"],"filtering"),
@@ -51,7 +53,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 "logs/mothur_classify.log"
             shell:
                 """
-                    mothur "#classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
+                    mothur "#classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
                     # sed -i "s/([^()]*)//g" {params.input}/*.taxonomy
                     input_dir=$(dirname {input[0]});
                     mv $input_dir/*.taxonomy {output[1]};
@@ -71,6 +73,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 taxonomy=config['database_path']['silva_tax'],
                 search=config['classify']['search'],
                 method=config['classify']["method"],
+                cutoff=config['classify']['cutoff'],
                 output=config['general']['output_dir'],
                 threads=config['general']['cores'],
                 input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"]["seq_rep"] == "OTU" else os.path.join(config["general"]["output_dir"],"filtering"),
@@ -80,7 +83,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 os.path.join(config["general"]["output_dir"],"logs/mothur_classify.log")
             shell:
                 """
-                    mothur "#classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
+                    mothur "#classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
                     # sed -i "s/([^()]*)//g" {params.input}/*.taxonomy
                     input_dir=$(dirname {input[0]});
                     mv $input_dir/*.taxonomy {output[1]};
@@ -115,6 +118,7 @@ elif config['dataset']['nanopore']:
                 taxonomy=config['database_path']['pr2_tax'],
                 search=config['classify']['search'],
                 method=config['classify']["method"],
+                cutoff=config['classify']['cutoff'],
                 threads=config['general']['cores'],
                 output=config['general']['output_dir'],
                 input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"][
@@ -126,7 +130,7 @@ elif config['dataset']['nanopore']:
                 os.path.join(config["general"]["output_dir"],"logs/mothur_classify.log")
             shell:
                 """
-                    mothur "#set.logfile(name={log}); classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
+                    mothur "#set.logfile(name={log}); classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
                     #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
                     mv {params.input}/*.taxonomy {params.output}/mothur/pr2/mothur_out.taxonomy;
                     mv {params.input}/*.summary {params.output}/mothur/pr2/mothur_out.summary;
@@ -145,6 +149,7 @@ elif config['dataset']['nanopore']:
                 taxonomy=config['database_path']['unite_tax'],
                 search=config['classify']['search'],
                 method=config['classify']["method"],
+                cutoff=config['classify']['cutoff'],
                 output=config['general']['output_dir'],
                 threads=config['general']['cores'],
                 input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"][
@@ -156,7 +161,7 @@ elif config['dataset']['nanopore']:
                 os.path.join(config["general"]["output_dir"],"logs/mothur_classify.log")
             shell:
                 """
-                    mothur "#classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
+                    mothur "#classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
                     #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
                     mv {params.input}/*.taxonomy {params.output}/mothur/unite/mothur_out.taxonomy;
                     mv {params.input}/*.summary {params.output}/mothur/unite/mothur_out.summary;
@@ -176,6 +181,7 @@ elif config['dataset']['nanopore']:
                 taxonomy=config['database_path']['silva_tax'],
                 search=config['classify']['search'],
                 method=config['classify']["method"],
+                cutoff=config['classify']['cutoff'],
                 output=config['general']['output_dir'],
                 threads=config['general']['cores'],
                 input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"][
@@ -187,7 +193,7 @@ elif config['dataset']['nanopore']:
                 os.path.join(config["general"]["output_dir"],"logs/mothur_classify.log")
             shell:
                 """
-                    mothur "#classify.seqs(fasta={input[0]}, cutoff=0, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
+                    mothur "#classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
                     #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
                     mv {params.input}/*.taxonomy {params.output}/mothur/silva/mothur_out.taxonomy;
                     mv {params.input}/*.summary {params.output}/mothur/silva/mothur_out.summary;

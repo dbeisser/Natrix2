@@ -2,12 +2,12 @@
 # General settings for the pipeline
 general:
         filename: input_data/Illumina_data # Path to raw data folder with primer table and config file; use relative path if outside Natrix2 root (e.g., input/example_data)
-        output_dir: results_illumina_swarm # Path to the custom output directory (relative to the Natrix2 root, e.g., results/my_output); avoid using dashes in folder names
+        output_dir: results_illumina_vsearch # Path to the custom output directory (relative to the Natrix2 root, e.g., results/my_output); avoid using dashes in folder names
         primertable: primer_table/Illumina.csv # Path to the primer table (.csv); use a relative path if outside the Natrix2 root (e.g., input/example_data/Illumina.csv)
         units: units.tsv # Path to the sequencing unit sheet (.tsv); the filename will be concatenated with output_dir (e.g., units.tsv)
         cores: 20 # Number of CPU cores (e.g., 20)
         memory: 10000 # Available RAM in MB (e.g., 16000 for 16 GB)
-        multiqc: FALSE # Run initial quality check with FastQC and MultiQC (only for unassembled reads, e.g., TRUE)
+        multiqc: TRUE # Run initial quality check with FastQC and MultiQC (only for unassembled reads, e.g., TRUE)
         demultiplexing: FALSE # Run demultiplexing if reads were not processed by the sequencing provider (Illumina only, slow)
         read_sorting: FALSE # Run read sorting for paired-end reads if not sorted by the sequencing provider (Illumina only, slow)
         already_assembled: FALSE # Skip quality control and assembly if reads are already assembled (Illumina only)
@@ -64,7 +64,7 @@ merge:
         name_ext: R1 # Identifier for the forward read (e.g., "R1"); reverse read must use "R2"; required for paired-end data and must appear at the end of the filename before the file extension
 
 # Clustering of OTUs using SWARM or VSEARCH
-clustering: "swarm" # OTU clustering method: "swarm" or "vsearch" (Nanopore supports only "vsearch")
+clustering: "vsearch" # OTU clustering method: "swarm" or "vsearch" (Nanopore supports only "vsearch")
 vsearch_id: 0.97 # Percent identity for VSEARCH OTU clustering (e.g., 0.97 = 97%)
 
 # Post-clustering filtering (OTU only)

@@ -11,7 +11,7 @@ general:
         demultiplexing: FALSE # Run demultiplexing if reads were not processed by the sequencing provider (Illumina only, slow)
         read_sorting: FALSE # Run read sorting for paired-end reads if not sorted by the sequencing provider (Illumina only, slow)
         already_assembled: FALSE # Skip quality control and assembly if reads are already assembled (Illumina only)
-        seq_rep: OTU # Type of sequence representative: "ASV" (via DADA2) or "OTU" (via SWARM or VSEARCH)
+        seq_rep: ASV # Type of sequence representative: "ASV" (via DADA2) or "OTU" (via SWARM or VSEARCH)
 
 # Define sequencing data type (e.g., Nanopore or Illumina)
 dataset:
@@ -69,11 +69,11 @@ vsearch_id: 0.97 # Percent identity for VSEARCH OTU clustering (e.g., 0.97 = 97%
 
 # Post-clustering filtering (OTU only)
 postcluster:
-        mumu: TRUE # Use MUMU filtering after clustering (OTU only, e.g., TRUE)
+        mumu: FALSE # Use MUMU filtering after clustering (OTU only, e.g., TRUE)
 
 # MOTHUR parameters for taxonomic classification
 classify:
-        mothur: TRUE # Use MOTHUR for taxonomic classification (e.g., TRUE)
+        mothur: FALSE # Use MOTHUR for taxonomic classification (e.g., TRUE)
         search: kmer # Method to find the most similar reference: "suffix", "kmer", "blast", "align", or "distance" (default: "kmer")
         method: wang # Classification method: "wang", "knn", or "zap" (default: "wang")
         database: pr2 # Reference database to use with MOTHUR: "pr2", "unite", or "silva" (e.g., "pr2")
@@ -93,9 +93,9 @@ database_path:
 
 # BLAST classification
 blast:
-        blast: FALSE # Use BLAST for taxonomic classification (e.g., TRUE or FALSE)
+        blast: TRUE # Use BLAST for taxonomic classification (e.g., TRUE or FALSE)
         database: NCBI # Reference database for BLAST: "NCBI" or "SILVA"
-        drop_tax_classes: '' # Comma-separated list of taxonomic classes to exclude (by ID, name, or regex)
+        drop_tax_classes: '.*unclassified Bacteria.*,.*uncultured.*bacterium.*' # Comma-separated list of taxonomic classes to exclude (by ID, name, or regex)
         db_path: database/ncbi/nt # Path to BLAST database (e.g., SILVA: database/silva/silva.db or NCBI: database/ncbi/nt); downloaded automatically
         max_target_seqs: 10 # Number of NCBI BLAST hits saved per sequence or OTU (e.g., 10)
         ident: 90.0 # Minimum identity required between query and target sequence (e.g., 90.0); lower values may require manual filtering afterward

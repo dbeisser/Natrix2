@@ -1,6 +1,14 @@
 # Change Log
 All significant changes to this project are documented here.
 
+## [2025-04-08]
+- Update main config structure.
+- Create folder (config_presets/) for pre-set configs.
+- Move and update test configs to config_presets/.
+- Remove outdated test configs.
+- Update Docker dummy files.
+- Add Mothur CutOff parameter to config.
+
 ## [2024-12-27]
 - Change sample names in 'input_data/Nanopore_data' folder.
 
