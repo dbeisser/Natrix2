@@ -66,11 +66,13 @@ Natrix comes with an example [primertable](#example-primertable) (example_data.c
 
 To try out Natrix using the example data (Illumina_data or Nanopore_data), type in the following command:
 
-Example: Using the `Illumina_swarm.yaml` configuration file.
+Example: Using the `illumina_swarm.yaml` configuration file.
 ```shell
 $ ./pipeline.sh
-Enter a project name, such as Illumina_swarm:
-$ Illumina_swarm
+
+Natrix2 Pipeline Script
+Enter project name (e.g. illumina_swarm):
+$ illumina_swarm
 ```
 
 The pipeline will then start a screen session using the project name (here, **example_data**) as the session name and will begin downloading dependencies for the rules. To detach from the screen session, press **Ctrl+a, d** (first press Ctrl+a, then d). To reattach to a running screen session, type in:
@@ -137,11 +139,13 @@ The primertable, configfile, and the folder containing the FASTQ files all have 
 
 If everything is configured correctly, you can start the pipeline by typing the following commands into your terminal emulator:
 
-Example: Using the `Illumina_swarm.yaml` configuration file.
+Example: Using the `illumina_swarm.yaml` configuration file.
 ```shell
 $ ./pipeline.sh
-Enter project name, for example Illumina_swarm:
-$ Illumina_swarm
+
+Natrix2 Pipeline Script
+Enter project name (e.g. illumina_swarm):
+$ illumina_swarm
 ```
 
 The pipeline will then start a screen session using the project name as the session name and will begin downloading dependencies for the rules. To detach from the screen session, press **Ctrl+a, d** (first press Ctrl+a, then d). To reattach to a running screen session, type:

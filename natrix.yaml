@@ -8,3 +8,4 @@ dependencies:
   - dinopy=2.0.1
   - seqkit=2.8.2
   - pigz=2.8
+  - screen
