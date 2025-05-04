@@ -85,18 +85,18 @@ When the workflow has finished, you can press **Ctrl+a, k** (first press Ctrl+a,
 
 # Sequence Count
 
-Before starting the workflow, you should check the number of sequences in your input files `*.fastq`, `*.fastq.gz`. If there are too few sequences, the workflow may abort. Experience has shown that the workflow aborts if the number of sequences is less than 150. To avoid this, you should analyze your data using the `tools/fastq_inspector.py` tool.
+Before starting the workflow, you should check the number of sequences in your input files `*.fastq`, `*.fastq.gz`. If there are too few sequences, the workflow may abort. Experience has shown that the workflow aborts if the number of sequences is less than 150. To avoid this, you should analyze your data using the `fastq_inspector.py` tool.
 
-- Recommended threshold value: `150`
+**If you use the tool, the recommended threshold is `150`.**
 
 The tool compares your specified threshold value with the number of sequences in your files. If the number of sequences falls below the threshold value, a warning is issued. You should then move the affected files out of the folder to prevent errors.
 
 ### Instruction manual
 
-First, go to the `tools` folder in your `main directory`. Then use the following command:
+First, go to your `main directory`. Then, run the following command:
 
 ```shell
-python3 fastq_inspector.py <folder_path> <threshold>
+python3 natrixlib/fastq_inspector.py <folder_path> <threshold>
 ```
 
 **Once you have checked your data with the tool, you can start the workflow as usual.**

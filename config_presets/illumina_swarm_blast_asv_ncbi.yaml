@@ -8,7 +8,6 @@ general:
         cores: 20 # Number of CPU cores (e.g., 20)
         memory: 10000 # Available RAM in MB (e.g., 16000 for 16 GB)
         multiqc: FALSE # Run initial quality check with FastQC and MultiQC (only for unassembled reads, e.g., TRUE)
-        demultiplexing: FALSE # Run demultiplexing if reads were not processed by the sequencing provider (Illumina only, slow)
         read_sorting: FALSE # Run read sorting for paired-end reads if not sorted by the sequencing provider (Illumina only, slow)
         already_assembled: FALSE # Skip quality control and assembly if reads are already assembled (Illumina only)
         seq_rep: ASV # Type of sequence representative: "ASV" (via DADA2) or "OTU" (via SWARM or VSEARCH)

@@ -1,5 +1,13 @@
+#### Natrix2; Bioinformatics
 # Changelog
-This document records all notable changes to the Natrix2 project.
+This document records all notable changes to Natrix2 project.
+
+## [2025-05-04]
+- Remove demultiplexing option for illumina datatype
+- Update config files
+- Add syntax comments to 'Snakefile'
+- Rename folder tools/ to natrixlib/
+- Update 'README.md'
 
 ## [2025-04-22]
 - Update 'pipeline.sh'; improve overall script structure
