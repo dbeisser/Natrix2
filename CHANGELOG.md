@@ -2,6 +2,9 @@
 # Changelog
 This document records all notable changes to Natrix2 project.
 
+## [2025-05-13]
+- Fix OTU merge bug in 'merge_results.py'
+
 ## [2025-05-04]
 - Remove demultiplexing option for illumina datatype
 - Update config files
