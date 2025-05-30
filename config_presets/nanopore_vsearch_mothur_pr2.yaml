@@ -1,9 +1,9 @@
 # Natrix2; Config File
 # General settings for the pipeline
 general:
-        filename: input_data/Illumina_data # Path to raw data folder with primer table and config file; use relative path if outside Natrix2 root (e.g., input/example_data)
-        output_dir: results_illumina_swarm # Path to the custom output directory (relative to the Natrix2 root, e.g., results/my_output); avoid using dashes in folder names
-        primertable: primer_table/Illumina.csv # Path to the primer table (.csv); use a relative path if outside the Natrix2 root (e.g., input/example_data/Illumina.csv)
+        filename: input_data/Nanopore_data # Path to raw data folder with primer table and config file; use relative path if outside Natrix2 root (e.g., input/example_data)
+        output_dir: results_nanopore_vsearch # Path to the custom output directory (relative to the Natrix2 root, e.g., results/my_output); avoid using dashes in folder names
+        primertable: primer_table/Nanopore.csv # Path to the primer table (.csv); use a relative path if outside the Natrix2 root (e.g., input/example_data/Illumina.csv)
         units: units.tsv # Path to the sequencing unit sheet (.tsv); the filename will be concatenated with output_dir (e.g., units.tsv)
         cores: 20 # Number of CPU cores (e.g., 20)
         memory: 10000 # Available RAM in MB (e.g., 16000 for 16 GB)
@@ -14,7 +14,7 @@ general:
 
 # Define sequencing data type (e.g., Nanopore or Illumina)
 dataset:
-        nanopore: FALSE # Set to TRUE for long reads (e.g., Nanopore) or FALSE for short reads (e.g., Illumina)
+        nanopore: TRUE # Set to TRUE for long reads (e.g., Nanopore) or FALSE for short reads (e.g., Illumina)
 
 # Quality check and primer removal for Nanopore reads
 nanopore:
@@ -33,7 +33,7 @@ qc:
         minoverlap: 15 # Minimum required overlap between forward and reverse reads (e.g., 15)
         minqual: 1 # Minimum base quality in an assembled read for PANDAseq acceptance (e.g., 1)
         minlen: 100 # Minimum sequence length after primer removal accepted by PANDAseq or Cutadapt (e.g., 100)
-        maxlen: 600 # Maximum sequence length after primer removal accepted by PANDAseq or Cutadapt (e.g., 600)
+        maxlen: 10000 # Maximum sequence length after primer removal accepted by PANDAseq or Cutadapt (e.g., 600)
         primer_offset: FALSE # PANDAseq to remove primers by length offset instead of sequence identity (OTU only, e.g., FALSE)
         mq: 25 # Minimum average quality score for pre-assembly filtering with prinseq (PHRED score, e.g., 25)
         barcode_removed: TRUE # Set to TRUE if sequences are barcode-free (e.g., TRUE)
@@ -53,22 +53,22 @@ chim:
 
 # Merging and filtering settings
 merge:
-        filter_method: split_sample # Split-sample mode: "split_sample" if used, otherwise "not_split" (not recommended for Nanopore; use "cutoff" instead)
+        filter_method: not_split # Split-sample mode: "split_sample" if used, otherwise "not_split" (not recommended for Nanopore; use "cutoff" instead)
         ampliconduo: FALSE # Use AmpliconDuo for statistical validation (e.g., FALSE)
         cutoff: 2 # Minimum total abundance across samples to keep a read if not using split-sample approach (e.g., 2)
         ampli_corr: fdr # Correction method for Fisher’s exact test (e.g., "fdr")
         save_format: png # File format for the frequency-frequency plot (e.g., "png")
         plot_AmpDuo: TRUE # Save frequency-frequency plot (e.g., TRUE)
-        paired_End: TRUE # Set to TRUE for paired-end data (e.g., TRUE)
+        paired_End: FALSE # Set to TRUE for paired-end data (e.g., TRUE)
         name_ext: R1 # Identifier for the forward read (e.g., "R1"); reverse read must use "R2"; required for paired-end data and must appear at the end of the filename before the file extension
 
 # Clustering of OTUs using SWARM or VSEARCH
-clustering: "swarm" # OTU clustering method: "swarm" or "vsearch" (Nanopore supports only "vsearch")
+clustering: "vsearch" # OTU clustering method: "swarm" or "vsearch" (Nanopore supports only "vsearch")
 vsearch_id: 0.97 # Percent identity for VSEARCH OTU clustering (e.g., 0.97 = 97%)
 
 # Post-clustering filtering (OTU only)
 postcluster:
-        mumu: TRUE # Use MUMU filtering after clustering (OTU only, e.g., TRUE)
+        mumu: FALSE # Use MUMU filtering after clustering (OTU only, e.g., TRUE)
 
 # MOTHUR parameters for taxonomic classification
 classify:
@@ -94,7 +94,7 @@ database_path:
 blast:
         blast: FALSE # Use BLAST for taxonomic classification (e.g., TRUE or FALSE)
         database: NCBI # Reference database for BLAST: "NCBI" or "SILVA"
-        drop_tax_classes: '' # Comma-separated list of taxonomic classes to exclude (by ID, name, or regex)
+        drop_tax_classes: '.*unclassified Bacteria.*,.*uncultured.*bacterium.*' # Comma-separated list of taxonomic classes to exclude (by ID, name, or regex)
         db_path: database/ncbi/nt # Path to BLAST database (e.g., SILVA: database/silva/silva.db or NCBI: database/ncbi/nt); downloaded automatically
         max_target_seqs: 10 # Number of NCBI BLAST hits saved per sequence or OTU (e.g., 10)
         ident: 90.0 # Minimum identity required between query and target sequence (e.g., 90.0); lower values may require manual filtering afterward

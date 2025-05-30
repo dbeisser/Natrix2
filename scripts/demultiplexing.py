@@ -79,6 +79,7 @@ check_for_match_sort_rev = define_direction_sort('specific_reverse_primer')
 # Create a dict of Dinopy writer instances and write the sequences
 # according to their barcode and primer sequence in the corresponding
 # files defined in the primertable.
+# IMPORTANT(DEMULTIPLEXER): THE FUNCTION HAS BEEN DEACTIVATED!
 def demultiplexer(file_path_list):
     samples = []
     output_filepaths = []
@@ -178,10 +179,11 @@ def already_assembled(primertable, file_path_list):
 
 
 # Run the demultiplexing / read sorting script.
-if snakemake.params.demultiplexing:
-    print('1')
-    demultiplexer(file_path_list)
-elif snakemake.params.read_sorting:
+# IMPORTANT(DEMULTIPLEXER): THE FUNCTION HAS BEEN DEACTIVATED!
+#if snakemake.params.demultiplexing:
+    #print('1')
+    #demultiplexer(file_path_list)
+if snakemake.params.read_sorting:
     read_sorter(primertable)
     print('2')
 elif snakemake.params.assembled:

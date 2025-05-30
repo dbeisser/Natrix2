@@ -21,14 +21,18 @@ env_loc=$(conda info --base)/etc/profile.d/conda.sh
 source $env_loc
 conda activate natrix
 
-# Wait until the YAML file is found in the input directory
-while [ ! -f "input/$varname.yaml" ]
-do
-    echo "File input/$varname.yaml does not exist. Waiting 5 seconds."
-    sleep 5
-done
-
-yaml_file="input/$varname.yaml"
+# Check if the project name is 'test_docker' to modify the path
+if [ "$varname" == "test_docker" ]; then
+    yaml_file="test_docker.yaml"  # Use root directory for 'test_docker'
+else
+    # Wait until the YAML file is found in the input directory
+    while [ ! -f "input/$varname.yaml" ]
+    do
+        echo "File input/$varname.yaml does not exist. Waiting 5 seconds."
+        sleep 5
+    done
+    yaml_file="input/$varname.yaml"  # Default path for other projects
+fi
 
 # Extract the number of cores from the YAML file
 cores=$(grep "cores:" $yaml_file | awk '{print $2}')

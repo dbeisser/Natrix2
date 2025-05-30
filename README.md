@@ -14,7 +14,7 @@ Natrix is an open-source bioinformatics pipeline for the preprocessing of long a
 # Table of contents
 1. [Dependencies](#dependencies)
 2. [Getting Started](#getting-started)
-3. [Sequence Count](#sequence-count)
+3. [Sequence count with nseqc](#sequence-count)
 4. [Tutorial](#tutorial)
 5. [Cluster execution](#cluster-execution)
 6. [Output](#output)
@@ -66,11 +66,13 @@ Natrix comes with an example [primertable](#example-primertable) (example_data.c
 
 To try out Natrix using the example data (Illumina_data or Nanopore_data), type in the following command:
 
-Example: Using the `Illumina_swarm.yaml` configuration file.
+Example: Using the `illumina_swarm.yaml` configuration file.
 ```shell
 $ ./pipeline.sh
-Enter project name, for example Illumina_swarm:
-$ Illumina_swarm
+
+Natrix2 Pipeline Script
+Enter project name (e.g. illumina_swarm):
+$ illumina_swarm
 ```
 
 The pipeline will then start a screen session using the project name (here, **example_data**) as the session name and will begin downloading dependencies for the rules. To detach from the screen session, press **Ctrl+a, d** (first press Ctrl+a, then d). To reattach to a running screen session, type in:
@@ -83,18 +85,18 @@ When the workflow has finished, you can press **Ctrl+a, k** (first press Ctrl+a,
 
 # Sequence Count
 
-Before starting the workflow, you should check the number of sequences in your input files `*.fastq`, `*.fastq.gz`. If there are too few sequences, the workflow may abort. Experience has shown that the workflow aborts if the number of sequences is less than 150. To avoid this, you should analyze your data using the `tools/fastq_inspector.py` tool.
+Before starting the workflow, you should check the number of sequences in your input files `*.fastq`, `*.fastq.gz`. If there are too few sequences, the workflow may abort. Experience has shown that the workflow aborts if the number of sequences is less than 150. To avoid this, you should analyze your data using the `nseqc.py` tool.
 
-- Recommended threshold value: `150`
+**If you use the tool, the recommended threshold is `150`.**
 
 The tool compares your specified threshold value with the number of sequences in your files. If the number of sequences falls below the threshold value, a warning is issued. You should then move the affected files out of the folder to prevent errors.
 
 ### Instruction manual
 
-First, go to the `tools` folder in your `main directory`. Then use the following command:
+First, go to your `main directory`. Then, run the following command:
 
 ```shell
-python3 fastq_inspector.py <folder_path> <threshold>
+python3 natrixlib/nseqc.py <folder_path> <threshold>
 ```
 
 **Once you have checked your data with the tool, you can start the workflow as usual.**
@@ -137,11 +139,13 @@ The primertable, configfile, and the folder containing the FASTQ files all have 
 
 If everything is configured correctly, you can start the pipeline by typing the following commands into your terminal emulator:
 
-Example: Using the `Illumina_swarm.yaml` configuration file.
+Example: Using the `illumina_swarm.yaml` configuration file.
 ```shell
 $ ./pipeline.sh
-Enter project name, for example Illumina_swarm:
-$ Illumina_swarm
+
+Natrix2 Pipeline Script
+Enter project name (e.g. illumina_swarm):
+$ illumina_swarm
 ```
 
 The pipeline will then start a screen session using the project name as the session name and will begin downloading dependencies for the rules. To detach from the screen session, press **Ctrl+a, d** (first press Ctrl+a, then d). To reattach to a running screen session, type:
@@ -152,84 +156,100 @@ screen -r
 
 When the workflow has finished, you can press **Ctrl+a, k** (first press Ctrl+a, then k). This will end the screen session and any processes that are still running.
 
----
 ### Running Natrix with Docker or docker-compose
 
-#### Pulling the image from Dockerhub
+---
+Download our [User Guide](documentation/docker_manual.pdf) as a PDF to set up your Docker container.
+
+#### Docker Install and Natrix2 Image Pull
 
 Natrix2 can be run inside a Docker container. Therefore, Docker must be installed. Please refer to the [Docker website](https://docs.docker.com/engine/install/) to learn how to install Docker and set up an environment if you have not used it before.
 
 Check whether you have installed Docker.
 
 ```bash
-docker --version
+docker --version # Check Docker version
 ```
 
 To run the Docker container, download the pre-built container from [dockerhub](https://hub.docker.com/r/dbeisser/natrix2).
 
 ```bash
-docker pull dbeisser/natrix2:latest
+docker pull dbeisser/natrix2:latest # Download Natrix2 image
 ```
 
----
-**Important before you continue with Docker!**
 
-Before using Docker, please create the following folders on your system: `input`, `output`, `database`
+#### Set up the Environment
 
-Copy your configuration file (**project.yaml**) and the primer table (**project.csv**) that you want to use for your analysis into the `input` folder. You can also create a subfolder for your samples. Just not for your configuration file and primer table. These must be located in your `input` folder. It is important that you specify the folder path correctly in the configuration file.
+**Step 1**:
+Before using Docker, please create the following folders on your system: `input`, `output`, `database`. You may also review the folder structure.
 
-Now you can open your configuration file (***project.yaml**) with any editor and adjust the parameters for your samples. Important! Set the parameters for your CPU cores and your working memory (RAM) before you start the analysis.
+**Step 2**: Copy your configuration file (**config.yaml**) and the primer table (**primer.csv**) that you want to use for your analysis into the `input` folder. You can also create a subfolder for your samples. Just not for your configuration file and primer table. These must be located in your `input` folder. It is important that you specify the folder path correctly in the configuration file.
 
-You must specify the folder path for your data in your configuration file so that it can be found. **Example**: `filename: input`. If you are using a subfolder, simply extend your folder path. `filename: input/subfolder` The same applies to your primer table.
+**Step 3**: Now you can open your configuration file (***config.yaml**) with any editor and adjust the parameters for your samples. Important! Set the parameters for your CPU cores and your working memory (RAM) before you start the analysis.
+
+**Step 4**: You must specify the folder path for your data in your configuration file so that it can be found. **Example**: `filename: input`. If you are using a subfolder, simply extend your folder path. `filename: input/samples` The same applies to your primer table.
 
 **Example: Folder structure**
 
 ```bash
-./project/
-    ./project/input/
-        ./project/input/samples # Samples to be analyzed
-        ./project/input/project.yaml # Configuration file
-        ./project/input/project.csv # Primer table
-    ./project/output/
-        ./project/output/project_results # Results of your analysis
-    ./project/database/
+# Folder structure for the Docker container (to be created locally)
+./natrix2/              # Main project folder
+    input/              # Contains files needed for analysis
+        samples/        # Input data files for analysis
+        config.yaml     # Configuration file
+        primer.csv      # Primer table
+    output/             # Saves analysis results
+        results/        # Folder for the results
+    database/           # Saves reference database
 ```
 
-**Example: Project.yaml**
+#### Example: config.yaml
 
 ```yaml
+# Example configuration from the config.yaml file
 general:
-    filename: input/samples # Folder with your samples
-    output_dir: output/project_results # Results of your analysis
-    primertable: input/project.csv # Specific primer table
-    cores: 20 # Amount of cores
-    memory: 10000 # Available RAM in Megabyte (MB)
+    filename: input/samples         # Samples folder
+    output_dir: output/results      # Results folder
+    primertable: input/primer.csv   # Primer table path
+    cores: 20                       # Number of CPU cores
+    memory: 10000                   # RAM in Megabytes
     ...
 ```
 
----
+#### Create Docker Container
 
 The Docker container has all environments pre-installed, eliminating the need to download the environments during the first-time initialization of the workflow. To connect to the shell inside the Docker container, input the following command:
 
 ```bash
-docker run -it --label natrix2_container -v </host/input>:/app/input -v </host/output>:/app/output -v </host/database>:/app/database dbeisser/natrix2:latest bash
+# Replace </your/local/> with your paths to the natrix2 folder
+# Example: /your/local/natrix2/input => /path/to/natrix2/input
+docker run -it --label natrix2_container -v /your/local/natrix2/input:/app/input -v /your/local/natrix2/output:/app/output -v /your/local/database:/app/database dbeisser/natrix2:latest bash
 ```
-**Functions of the respective folders**
+Functions of the respective folders:
 
-`/host/input` is the full path to a local folder. The input folder contains your samples, configuration file (**project.yaml**) and your primer table (**project.csv**). Use the same project name for your configuration file and your primer table.
+`/host/input` is the full path to a local folder. The input folder contains your samples, configuration file (**config.yaml**) and your primer table (**primer.csv**). Use the same project name for your configuration file and your primer table.
 
 `/host/output` is the full path to a local folder where the output of the workflow should be saved so that the container can use it.
 
 `/host/database` is the full path to a local folder in which you wish to install the database (**SILVA** or **NCBI**). This part is optional and only needed if you want to use BLAST for taxonomic assignment.
 
 ---
+#### Run Natrix2 in configured Docker container
 
 After you connect to the container shell, you can follow: [running Natrix manually](#running-natrix-manually)
 
-You can also use the script `docker_pipeline.sh`. Once you have connected to the container and configured everything, you can start your analysis with the script. For example, if the configuration file `project.yaml` is in the input folder. 
+You can also use the script `docker_pipeline.sh`. Once you have connected to the container and configured everything, you can start your analysis with the script. For example, if the configuration file `config.yaml` is in the input folder. 
 
 ```bash
-./docker_pipeline.sh project # Use the file name of your config file
+# Replace <config> with your config file name
+./docker_pipeline.sh config
+```
+
+To test your Docker container before using your own data, you can use our test dataset, which contains Nanopore data. Simply run the container with the `test_docker.yaml` configuration file.
+
+```bash
+# Start a test run using our sample data
+./docker_pipeline.sh test_docker
 ```
 
 ---
@@ -242,54 +262,49 @@ Alternatively, you can start the workflow using the docker-compose command in th
 docker-compose --version # Check the version
 ```
 
-All folders will be available at `/srv/docker/natrix2_smps1/`. Make sure to copy your `project_folder`, `project.yaml`, and `project.csv` files to `/srv/docker/natrix2_smps1/input/`. By default, the container will wait until the input files exist. On first launch, the container will download the required databases to `/srv/docker/natrix2_smps1/databases/`. This process might take a while.
+All container folders will be located in `/srv/docker/`. 
 
-You can also create several containers at the same time. Take a look at the file: `docker-compose.yaml`
+**Step 1**: Copy your `samples/` folder, `config.yaml`, and `primer.csv` files to `/srv/docker/natrix2_cont_1/input/`. If the `natrix2_cont_1/` folder doesn’t exist yet, you’ll need to create the container folder structure. You can see the recommended [Docker Compose folder structure](#example-folder-structure-for-docker-compose) below. By default, the container will wait until the input files are available.
+
+#### Example: Folder structure for docker-compose
+
+```bash
+# Check the docker-compose.yaml file for more configuration details.
+
+# natrix2_cont_1; Container 1
+./srv/docker/natrix2_cont_1/
+    input/
+        samples/       # Samples to be analyzed
+        config.yaml    # Configuration file
+        primer.csv     # Primer table
+    output/            
+        results/       # Results of your analysis
+    database/
+
+# If you use several containers, you can add another one.
+# natrix2_cont_2, natrix2_cont_3 ...
+```
+
+**Step 2**: Open your configuration file in an editor and specify all important folders and file paths. Then, set the parameters for your samples. Take a look at the [example configuration](#example-configyaml).
+
+**Step 3**: Assign a project name to your configuration file `config.yaml`, which will be used at startup. To run multiple containers, specify each project name in the docker-compose.yaml file for the respective container. 
+
+**For example: rename config.yaml to project_name.yaml.**
+
+**Step 4**: Once everything is set up correctly, you can start your container with the commands listed below. On first launch, the container will download necessary databases to `natrix2_cont_1/databases/`, which may take some time.
+
+**Note:** Set up multiple container folders at once; see `docker-compose.yaml`.
+
 
 ```shell
 # Optional: Parameter '-d' stands for “detached mode”
-PROJECT_NAME="<project>" docker compose up (-d)
-```
-
-with **project** being the name of your project, e.g.:
-
-```shell
-# 'sudo' might be needed
-sudo PROJECT_NAME="example_data" docker compose up
+sudo PROJECT_NAME="project_name" docker compose up (-d)
 ```
 
 If you have defined several containers in the docker-compose file, you can start all containers with the command. It is important that you have entered everything correctly so that your analysis can run without errors.
 
 ```shell
-# 'sudo' might be needed
 sudo docker compose up
-```
-
-**Example: Folder structure for docker-compose**
-
-```bash
-# project_a; Container 1
-./srv/docker/project_a/
-    ./srv/docker/project_a/input/
-        ./srv/docker/project_a/input/samples # Samples to be analyzed
-        ./srv/docker/project_a/input/project.yaml # Configuration file
-        ./srv/docker/project_a/input/project.csv # Primer table
-    ./srv/docker/project_a/output/
-        ./srv/docker/project_a/output/project_a_results # Results of your analysis
-    ./srv/docker/project_a/database/
-
-# OPTIONAL; If you use several containers, you can add another one.
-# project_b; Container 2
-./srv/docker/project_b/
-    ./srv/docker/project_b/input/
-        ./srv/docker/project_b/input/samples
-        ./srv/docker/project_b/input/project.yaml
-        ./srv/docker/project_b/input/project.csv
-    ./srv/docker/project_b/output/
-        ./srv/docker/project_b/output/project_a_results
-    ./srv/docker/project_b/database/
-
-# Container 3, Container 4 ...
 ```
 
 #### Building the container yourself

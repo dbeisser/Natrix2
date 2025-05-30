@@ -9,8 +9,8 @@ if config["classify"]["database"] == "pr2":
             """
                 wget -P ./ --progress=bar https://github.com/pr2database/pr2database/releases/download/v{params.db_version}/pr2_version_{params.db_version}_SSU_mothur.fasta.gz;
                 wget -P ./ --progress=bar https://github.com/pr2database/pr2database/releases/download/v{params.db_version}/pr2_version_{params.db_version}_SSU_mothur.tax.gz;
-                gunzip -c ./pr2_version_{params.db_version}_SSU_mothur.fasta.gz > database/pr2db.{params.db_version}.fasta;
-                gunzip -c ./pr2_version_{params.db_version}_SSU_mothur.tax.gz > database/pr2db.{params.db_version}.tax;
+                pigz -dc ./pr2_version_{params.db_version}_SSU_mothur.fasta.gz > database/pr2db.{params.db_version}.fasta;
+                pigz -dc ./pr2_version_{params.db_version}_SSU_mothur.tax.gz > database/pr2db.{params.db_version}.tax;
                 rm ./pr2_version_{params.db_version}_SSU_mothur.tax.gz ./pr2_version_{params.db_version}_SSU_mothur.fasta.gz;
             """
 
@@ -43,10 +43,10 @@ elif config["classify"]["database"] == "silva":
                 db_version=config["database_version"]["silva"]
             shell:
                 """
-                wget -P ./ --progress=bar -O database/silva_{params.db_version}.fasta.gz https://www.arb-silva.de/fileadmin/silva_databases/release_138.1/Exports/SILVA_{params.db_version}_SSURef_tax_silva.fasta.gz;
-                gunzip -c database/silva_{params.db_version}.fasta.gz > database/silva_db.{params.db_version}.fasta;
-                wget -P ./ --progress=bar -O database/silva_{params.db_version}.tax.gz https://www.arb-silva.de/fileadmin/silva_databases/release_138.1/Exports/taxonomy/taxmap_slv_ssu_ref_{params.db_version}.txt.gz
-                gunzip -c database/silva_{params.db_version}.tax.gz > database/silva_db.{params.db_version}.tax.temp;
+                wget -P ./ --progress=bar -O database/silva_{params.db_version}.fasta.gz https://www.arb-silva.de/fileadmin/silva_databases/release_138.2/Exports/SILVA_{params.db_version}_SSURef_tax_silva.fasta.gz;
+                pigz -dc database/silva_{params.db_version}.fasta.gz > database/silva_db.{params.db_version}.fasta;
+                wget -P ./ --progress=bar -O database/silva_{params.db_version}.tax.gz https://www.arb-silva.de/fileadmin/silva_databases/release_138.2/Exports/taxonomy/taxmap_slv_ssu_ref_{params.db_version}.txt.gz
+                pigz -dc database/silva_{params.db_version}.tax.gz > database/silva_db.{params.db_version}.tax.temp;
                 """
 
         rule edit_silva:

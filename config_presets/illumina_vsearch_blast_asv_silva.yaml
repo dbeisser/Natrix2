@@ -2,7 +2,7 @@
 # General settings for the pipeline
 general:
         filename: input_data/Illumina_data # Path to raw data folder with primer table and config file; use relative path if outside Natrix2 root (e.g., input/example_data)
-        output_dir: results_illumina_swarm # Path to the custom output directory (relative to the Natrix2 root, e.g., results/my_output); avoid using dashes in folder names
+        output_dir: results_illumina_vsearch # Path to the custom output directory (relative to the Natrix2 root, e.g., results/my_output); avoid using dashes in folder names
         primertable: primer_table/Illumina.csv # Path to the primer table (.csv); use a relative path if outside the Natrix2 root (e.g., input/example_data/Illumina.csv)
         units: units.tsv # Path to the sequencing unit sheet (.tsv); the filename will be concatenated with output_dir (e.g., units.tsv)
         cores: 20 # Number of CPU cores (e.g., 20)
@@ -10,7 +10,7 @@ general:
         multiqc: FALSE # Run initial quality check with FastQC and MultiQC (only for unassembled reads, e.g., TRUE)
         read_sorting: FALSE # Run read sorting for paired-end reads if not sorted by the sequencing provider (Illumina only, slow)
         already_assembled: FALSE # Skip quality control and assembly if reads are already assembled (Illumina only)
-        seq_rep: OTU # Type of sequence representative: "ASV" (via DADA2) or "OTU" (via SWARM or VSEARCH)
+        seq_rep: ASV # Type of sequence representative: "ASV" (via DADA2) or "OTU" (via SWARM or VSEARCH)
 
 # Define sequencing data type (e.g., Nanopore or Illumina)
 dataset:
@@ -63,16 +63,16 @@ merge:
         name_ext: R1 # Identifier for the forward read (e.g., "R1"); reverse read must use "R2"; required for paired-end data and must appear at the end of the filename before the file extension
 
 # Clustering of OTUs using SWARM or VSEARCH
-clustering: "swarm" # OTU clustering method: "swarm" or "vsearch" (Nanopore supports only "vsearch")
+clustering: "vsearch" # OTU clustering method: "swarm" or "vsearch" (Nanopore supports only "vsearch")
 vsearch_id: 0.97 # Percent identity for VSEARCH OTU clustering (e.g., 0.97 = 97%)
 
 # Post-clustering filtering (OTU only)
 postcluster:
-        mumu: TRUE # Use MUMU filtering after clustering (OTU only, e.g., TRUE)
+        mumu: FALSE # Use MUMU filtering after clustering (OTU only, e.g., TRUE)
 
 # MOTHUR parameters for taxonomic classification
 classify:
-        mothur: TRUE # Use MOTHUR for taxonomic classification (e.g., TRUE)
+        mothur: FALSE # Use MOTHUR for taxonomic classification (e.g., TRUE)
         search: kmer # Method to find the most similar reference: "suffix", "kmer", "blast", "align", or "distance" (default: "kmer")
         method: wang # Classification method: "wang", "knn", or "zap" (default: "wang")
         database: pr2 # Reference database to use with MOTHUR: "pr2", "unite", or "silva" (e.g., "pr2")
@@ -92,10 +92,10 @@ database_path:
 
 # BLAST classification
 blast:
-        blast: FALSE # Use BLAST for taxonomic classification (e.g., TRUE or FALSE)
-        database: NCBI # Reference database for BLAST: "NCBI" or "SILVA"
-        drop_tax_classes: '' # Comma-separated list of taxonomic classes to exclude (by ID, name, or regex)
-        db_path: database/ncbi/nt # Path to BLAST database (e.g., SILVA: database/silva/silva.db or NCBI: database/ncbi/nt); downloaded automatically
+        blast: TRUE # Use BLAST for taxonomic classification (e.g., TRUE or FALSE)
+        database: SILVA # Reference database for BLAST: "NCBI" or "SILVA"
+        drop_tax_classes: '.*unclassified Bacteria.*,.*uncultured.*bacterium.*' # Comma-separated list of taxonomic classes to exclude (by ID, name, or regex)
+        db_path: database/silva/silva.db # Path to BLAST database (e.g., SILVA: database/silva/silva.db or NCBI: database/ncbi/nt); downloaded automatically
         max_target_seqs: 10 # Number of NCBI BLAST hits saved per sequence or OTU (e.g., 10)
         ident: 90.0 # Minimum identity required between query and target sequence (e.g., 90.0); lower values may require manual filtering afterward
         evalue: 1e-20 # Maximum accepted e-value (e.g., 1e-20); higher values may require manual filtering afterward

@@ -1,31 +1,29 @@
 services:
-  natrix2_cont1:
+  natrix2_cont1: # Container 1
     image: dbeisser/natrix2:latest # Docker image
     # build: . Create your own Docker image
     restart: on-failure # Restarts the container if an error occurs
     environment:
-      PROJECT_NAME: ${PROJECT_NAME} # Set the environment variable
+      PROJECT_NAME: ${PROJECT_NAME} # Must match config file in input folder
     volumes:
-      - /srv/docker/natrix2_smps1/input:/app/input # Mount: directory for input data
-      - /srv/docker/natrix2_smps1/output:/app/output # Mount: directory for results
-      - /srv/docker/natrix2_smps1/database:/app/database # Mount: directory for the database
-      - /srv/docker/natrix2_smps1/demultiplexed:/app/demultiplexed # Mount: directory for demultiplexed data
+      - /srv/docker/natrix2_cont_1/input:/app/input # Mount: directory for input data
+      - /srv/docker/natrix2_cont_1/output:/app/output # Mount: directory for results
+      - /srv/docker/natrix2_cont_1/database:/app/database # Mount: directory for the database
+      - /srv/docker/natrix2_cont_1/demultiplexed:/app/demultiplexed # Mount: directory for demultiplexed data
 
-
-# You can use multiple containers (natrix2_cont1, natrix2_cont2).
-# It is important that you use different project names and folders.
-# You replace ${PROJECT_NAME} with a fixed name. For all containers!
-# Then start with the command: sudo docker compose up
-
-
-#  natrix2_cont2:
+# Important: Running Multiple Containers
+# To run multiple containers (e.g., natrix2_cont1, natrix2_cont2), use unique project names and folders.
+# Replace ${PROJECT_NAME} with a fixed name that matches each config file.
+# Start all containers with: sudo docker compose up
+ 
+#  natrix2_cont2: # Container 2
 #    image: dbeisser/natrix2:latest # Docker image
 #    # build: . Create your own Docker image
 #    restart: on-failure # Restarts the container if an error occurs
 #    environment:
-#      PROJECT_NAME: project_name # Set the environment variable
+#      PROJECT_NAME: project_name # Must match config file in input folder
 #    volumes:
-#      - /srv/docker/natrix2_smps2/input:/app/input # Mount: directory for input data
-#      - /srv/docker/natrix2_smps2/output:/app/output # Mount: directory for results
-#      - /srv/docker/natrix2_smps2/database:/app/database # Mount: directory for the database
-#      - /srv/docker/natrix2_smps2/demultiplexed:/app/demultiplexed # Mount: directory for demultiplexed data
+#      - /srv/docker/natrix2_cont_2/input:/app/input # Mount: directory for input data
+#      - /srv/docker/natrix2_cont_2/output:/app/output # Mount: directory for results
+#      - /srv/docker/natrix2_cont_2/database:/app/database # Mount: directory for the database
+#      - /srv/docker/natrix2_cont_2/demultiplexed:/app/demultiplexed # Mount: directory for demultiplexed data

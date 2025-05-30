@@ -68,7 +68,7 @@ vsearch_id: 0.97 # Percent identity for VSEARCH OTU clustering (e.g., 0.97 = 97%
 
 # Post-clustering filtering (OTU only)
 postcluster:
-        mumu: TRUE # Use MUMU filtering after clustering (OTU only, e.g., TRUE)
+        mumu: FALSE # Use MUMU filtering after clustering (OTU only, e.g., TRUE)
 
 # MOTHUR parameters for taxonomic classification
 classify:
@@ -94,7 +94,7 @@ database_path:
 blast:
         blast: FALSE # Use BLAST for taxonomic classification (e.g., TRUE or FALSE)
         database: NCBI # Reference database for BLAST: "NCBI" or "SILVA"
-        drop_tax_classes: '' # Comma-separated list of taxonomic classes to exclude (by ID, name, or regex)
+        drop_tax_classes: '.*unclassified Bacteria.*,.*uncultured.*bacterium.*' # Comma-separated list of taxonomic classes to exclude (by ID, name, or regex)
         db_path: database/ncbi/nt # Path to BLAST database (e.g., SILVA: database/silva/silva.db or NCBI: database/ncbi/nt); downloaded automatically
         max_target_seqs: 10 # Number of NCBI BLAST hits saved per sequence or OTU (e.g., 10)
         ident: 90.0 # Minimum identity required between query and target sequence (e.g., 90.0); lower values may require manual filtering afterward
