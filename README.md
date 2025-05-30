@@ -14,7 +14,7 @@ Natrix is an open-source bioinformatics pipeline for the preprocessing of long a
 # Table of contents
 1. [Dependencies](#dependencies)
 2. [Getting Started](#getting-started)
-3. [Sequence Count](#sequence-count)
+3. [Sequence count with nseqc](#sequence-count)
 4. [Tutorial](#tutorial)
 5. [Cluster execution](#cluster-execution)
 6. [Output](#output)
@@ -85,7 +85,7 @@ When the workflow has finished, you can press **Ctrl+a, k** (first press Ctrl+a,
 
 # Sequence Count
 
-Before starting the workflow, you should check the number of sequences in your input files `*.fastq`, `*.fastq.gz`. If there are too few sequences, the workflow may abort. Experience has shown that the workflow aborts if the number of sequences is less than 150. To avoid this, you should analyze your data using the `fastq_inspector.py` tool.
+Before starting the workflow, you should check the number of sequences in your input files `*.fastq`, `*.fastq.gz`. If there are too few sequences, the workflow may abort. Experience has shown that the workflow aborts if the number of sequences is less than 150. To avoid this, you should analyze your data using the `nseqc.py` tool.
 
 **If you use the tool, the recommended threshold is `150`.**
 
@@ -96,7 +96,7 @@ The tool compares your specified threshold value with the number of sequences in
 First, go to your `main directory`. Then, run the following command:
 
 ```shell
-python3 natrixlib/fastq_inspector.py <folder_path> <threshold>
+python3 natrixlib/nseqc.py <folder_path> <threshold>
 ```
 
 **Once you have checked your data with the tool, you can start the workflow as usual.**

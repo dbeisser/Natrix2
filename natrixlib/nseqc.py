@@ -1,8 +1,11 @@
+# nseqc: nucleotide sequence counter for counting sequences in FASTQ files
+# Import required modules
 import os
 import subprocess
 import glob
 import sys
 
+# Check if seqkit is installed and callable
 def check_seqkit_installed():
     try:
         result = subprocess.run(["seqkit"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -13,17 +16,20 @@ def check_seqkit_installed():
         print("ERROR: seqkit is not installed. Please install seqkit first.")
         sys.exit(1)
 
+# Get the number of sequences in a FASTQ or FASTQ.GZ file
 def get_seqkit_sequence_count(file_path):
     result = subprocess.run(f"seqkit stats {file_path} | awk 'NR==2 {{print $4}}'", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True)
     if result.returncode != 0:
         print(f"ERROR: Processing file {file_path}: {result.stdout}")
         return 0
     try:
-        return int(result.stdout.strip().replace(',', ''))
+        return int(result.stdout.strip().replace(',', '')) # Remove commas, then convert to int
     except ValueError as e:
         print(f"ERROR: Parsing output for {file_path}: {result.stdout} - {e}")
         return 0
 
+# Check all FASTQ files in a folder
+# Print sequence counts and warn if any file is below threshold
 def check_sequences_in_folder(folder_path, threshold=150):
     fastq_files = glob.glob(os.path.join(folder_path, '*.fastq')) + glob.glob(os.path.join(folder_path, '*.fastq.gz'))
 
@@ -33,7 +39,7 @@ def check_sequences_in_folder(folder_path, threshold=150):
 
     files_below_threshold = []
 
-    print("\nANALYZE: files(*.fastq, *.fastq.gz)...")
+    print("\nRUN nseqc ANALYZE: files (*.fastq, *.fastq.gz)...\n")
     for file_path in fastq_files:
         sequence_count = get_seqkit_sequence_count(file_path)
         print(f"{os.path.basename(file_path)}: {sequence_count} sequences")
@@ -48,6 +54,7 @@ def check_sequences_in_folder(folder_path, threshold=150):
         print(f"\nNOTE: All files have sequence counts above the threshold of {threshold}.")
     print("")
 
+# Main script logic
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         script_name = os.path.basename(__file__)

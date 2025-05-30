@@ -8,8 +8,10 @@ COPY . /app
 WORKDIR /app
 # Update and clean the system packages
 RUN apt update && apt-get install -y libltdl7 && apt upgrade -y && apt-get purge -y && apt-get clean
+# Update Miniconda
+RUN conda update -n base -c defaults conda
 # Create the environment
-RUN conda env create -f natrix.yaml
+RUN conda env create --file=natrix.yaml
 # Makes the docker_pipeline.sh script executable
 RUN chmod +x docker_pipeline.sh
 
