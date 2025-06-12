@@ -1,6 +1,19 @@
 #### Natrix2; Bioinformatics
 # Changelog
-This document records all notable changes to Natrix2 project.
+
+This document records all notable changes to Natrix2 project.  
+**Note**: Use the **dev** branch for the latest updates and features.
+
+## [2025-06-12]
+- Add output file multi_hits_blast_mumu.csv to log all duplicate OTUs
+- Allow no_filter as a valid option for drop_tax_classes in the config file
+- Update merge script merge_mumu_output_2.py:
+  - Retain only duplicate entries with pident ≥ 90
+  - Select the best hit per OTU based on highest pident
+  - Export all duplicates to multi_hits_blast_mumu.csv for traceability
+- Update all pre-set config files
+- Update README.md with the latest usage instructions and options
+- Improve image backgrounds for better visual clarity
 
 ## [2025-05-30]
 - Update CHANGELOG.md and README.md

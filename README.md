@@ -1,5 +1,5 @@
 <p align="center">
-<img src="documentation/images/logo.png" alt="logo" width="500"/>
+<img src="documentation/images/lightmode/logo.png" alt="logo" width="500"/>
 </p>
 
 ---
@@ -108,7 +108,7 @@ python3 natrixlib/nseqc.py <folder_path> <threshold>
 The FASTQ files need to follow a specific naming convention:
 
 <p align="center">
-<img src="documentation/images/filename.png" alt="naming" width="400"/>
+<img src="documentation/images/lightmode/filename.png" alt="naming" width="400"/>
 </p>
 <p><b>Fig. 3</b>: Specific naming for the FASTQ files</p>
 
@@ -372,7 +372,7 @@ The Snakemake documentation contains a tutorial for [profile creation](https://s
 Once the workflow has been completed, all output files can be found in your output folder.
 
 <p align="center">
-<img src="documentation/images/output_files.png" alt="ouput" width="700"/>
+<img src="documentation/images/lightmode/output_files.png" alt="ouput" width="700"/>
 </p>
 
 **Fig. 4**: The output file hierarchy: Blue nodes represent folders, orange nodes represent files that are created in both variants of the workflow, green nodes represent files exclusive to the OTU variant, and purple nodes represent files exclusive to the ASV variant of the workflow.
