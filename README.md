@@ -159,7 +159,7 @@ When the workflow has finished, you can press **Ctrl+a, k** (first press Ctrl+a,
 ### Running Natrix with Docker or docker-compose
 
 ---
-Download our [User Guide](documentation/docker_manual.pdf) as a PDF to set up your Docker container.
+Download our [User Guide](documentation/manuals/docker_manual.pdf) as a PDF to set up your Docker container.
 
 #### Docker Install and Natrix2 Image Pull
 

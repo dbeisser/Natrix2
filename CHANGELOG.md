@@ -4,6 +4,10 @@
 This document records all notable changes to Natrix2 project.  
 **Note**: Use the **dev** branch for the latest updates and features.
 
+## [2025-06-13]
+- Update README.md with the latest usage instructions and options
+- Update docker_manual.tex and docker_manual.pdf
+
 ## [2025-06-12]
 - Add output file multi_hits_blast_mumu.csv to log all duplicate OTUs
 - Allow no_filter as a valid option for drop_tax_classes in the config file
