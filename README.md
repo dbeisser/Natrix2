@@ -680,14 +680,10 @@ Below are the explanations for the configfile `project.yaml` entries:
 
 **Natrix2 is based on the original [Natrix](https://github.com/MW55/Natrix) pipeline — if you use this workflow, please cite**:
 
-**Natrix2**  
-Natrix2 – Improved amplicon workflow with novel Oxford Nanopore Technologies support and enhancements in clustering, classification and taxonomic databases.  
-Deep, A.; Bludau, D.; Welzel, M.; Clemens, S.; Heider, D.; Boenigk, J.; and Beisser, D.  
-Metabarcoding and Metagenomics, 7: e109389. Oct 2023.  
-[https://mbmg.pensoft.net/article/109389/](https://mbmg.pensoft.net/article/109389/)
+**Natrix2**
 
-**Natrix**  
-Natrix: a Snakemake-based workflow for processing, clustering, and taxonomically assigning amplicon sequencing reads.  
-Welzel, M.; Lange, A.; Heider, D.; Schwarz, M.; Freisleben, B.; Jensen, M.; Boenigk, J.; and Beisser, D.  
-BMC Bioinformatics, 21(1). Nov 2020.  
-[https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-03852-4](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-03852-4)
+Natrix2 – Improved amplicon workflow with novel Oxford Nanopore Technologies support and enhancements in clustering, classification and taxonomic databases. Deep, A.; Bludau, D.; Welzel, M.; Clemens, S.; Heider, D.; Boenigk, J.; and Beisser, D. Metabarcoding and Metagenomics, 7: e109389. Oct 2023. [https://mbmg.pensoft.net/article/109389/](https://mbmg.pensoft.net/article/109389/)
+
+**Natrix**
+  
+Natrix: a Snakemake-based workflow for processing, clustering, and taxonomically assigning amplicon sequencing reads. Welzel, M.; Lange, A.; Heider, D.; Schwarz, M.; Freisleben, B.; Jensen, M.; Boenigk, J.; and Beisser, D. BMC Bioinformatics, 21(1). Nov 2020. [https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-03852-4](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-03852-4)
