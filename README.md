@@ -5,6 +5,9 @@
 ---
 Natrix is an open-source bioinformatics pipeline for the preprocessing of long and short raw sequencing data. The need for a scalable, reproducible workflow for the processing of environmental amplicon data led to the development of Natrix. It is divided into quality assessment, dereplication, chimera detection, split-sample merging, ASV or OTU generation, and taxonomic assessment. The pipeline is written in [Snakemake](https://snakemake.readthedocs.io) (Köster and Rahmann 2018), a workflow management engine for the development of data analysis workflows. Snakemake ensures the reproducibility of a workflow by automatically deploying dependencies of workflow steps (rules) and scales seamlessly to different computing environments such as servers, computer clusters, or cloud services. While Natrix was only tested with 16S and 18S amplicon data, it should also work for other kinds of sequencing data. The pipeline contains separate rules for each step of the pipeline, and each rule that has additional dependencies has a separate [Conda](https://conda.io/) environment that will be automatically created when starting the pipeline for the first time. The encapsulation of rules and their dependencies allows for hassle-free sharing of rules between workflows.
 
+---
+**To use the latest functions and updates, it is recommended to use the dev-branch of Natrix2**. The dev-branch contains the latest developments and patches that are not yet available in the main-branch. Users who want to stay up to date and experiment with the latest features should use the dev-branch regularly.
+
 ![DAG of an example workflow](documentation/images/natrix_and_update_1.png)
 **Fig. 1**: DAG of the Natrix2 workflow: Schematic representation of the Natrix2 workflow. The processing of two split samples using AmpliconDuo is depicted. The color scheme represents the main steps, dashed lines outline the OTU variant, and dotted lines outline the ASV variant of the workflow. Stars depict updates to the original Natrix workflow. Details on the ONT part are depicted in Fig. 2.
 
@@ -21,8 +24,8 @@ Natrix is an open-source bioinformatics pipeline for the preprocessing of long a
 7. [Steps of the Pipeline](#steps-of-the-pipeline)
 8. [Example primertable](#example-primertable)
 9. [Configfile](#configfile)
-10. [Use dev-branch](#use-dev-branch)
-11. [References](#references)
+10. [References](#references)
+11. [Citation](#citation)
 
 # Dependencies
 * [Conda](https://conda.io/en/latest/index.html)
@@ -653,10 +656,6 @@ Below are the explanations for the configfile `project.yaml` entries:
 
 <p><b>Table 4</b>: Configuration options</p>
 
-# Use dev-branch
-
-To use the latest functions and updates, it is recommended to use the dev-branch of Natrix2. The dev-branch contains the latest developments and patches that are not yet available in the main-branch. Users who want to stay up to date and experiment with the latest features should use the dev-branch regularly.
-
 # References
 
 * Altschul, Stephen F. et al. (1990). “Basic local alignment search tool”. In: *Journal of Molecular Biology 215(3)*, pp. 403–410.
@@ -676,3 +675,19 @@ To use the latest functions and updates, it is recommended to use the dev-branch
 * Rognes, Torbjørn et al. (2016). “VSEARCH: a versatile open source tool for metagenomics.” In: *PeerJ Preprints*. doi: "10.7287/peerj.preprints.2409v1".
 * Schmieder, Robert und Robert A. Edwards (2011). “Quality control and preprocessing of metagenomic datasets.” In: *Bioinformatics*, 27(6), pp. 863–864.
 * Abarenkov K, Nilsson RH, Larsson K-H, Taylor AFS, May TW, Frøslev TG, Pawlowska J, Lindahl B, Põldmaa K, Truong C, Vu D, Hosoya T, Niskanen T, Piirmann T, Ivanov F, Zirk A, Peterson M, Cheeke TE, Ishigami Y, Jansson AT, Jeppesen TS, Kristiansson E, Mikryukov V, Miller JT, Oono R, Ossandon FJ, Paupério J, Saar I, Schigel D, Suija A, Tedersoo L, Kõljalg U. 2023. The UNITE database for molecular identification and taxonomic communication of fungi and other eukaryotes: sequences, taxa and classifications reconsidered. *Nucleic Acids Research*, doi: "10.1093/nar/gkad1039".
+
+# Citation
+
+**Natrix2 is based on the original [Natrix](https://github.com/MW55/Natrix) pipeline — if you use this workflow, please cite**:
+
+**Natrix2**  
+Natrix2 – Improved amplicon workflow with novel Oxford Nanopore Technologies support and enhancements in clustering, classification and taxonomic databases.  
+Deep, A.; Bludau, D.; Welzel, M.; Clemens, S.; Heider, D.; Boenigk, J.; and Beisser, D.  
+Metabarcoding and Metagenomics, 7: e109389. Oct 2023.  
+[https://mbmg.pensoft.net/article/109389/](https://mbmg.pensoft.net/article/109389/)
+
+**Natrix**  
+Natrix: a Snakemake-based workflow for processing, clustering, and taxonomically assigning amplicon sequencing reads.  
+Welzel, M.; Lange, A.; Heider, D.; Schwarz, M.; Freisleben, B.; Jensen, M.; Boenigk, J.; and Beisser, D.  
+BMC Bioinformatics, 21(1). Nov 2020.  
+[https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-03852-4](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-03852-4)

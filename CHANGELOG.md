@@ -4,6 +4,11 @@
 This document records all notable changes to Natrix2 project.  
 **Note**: Use the **dev** branch for the latest updates and features.
 
+## [2025-07-14]
+- Update text color in filename.png to improve readability
+- Add citation section to README.md
+- Add CITATION.cff file for GitHub citation support
+
 ## [2025-06-13]
 - Update README.md with the latest usage instructions and options
 - Update docker_manual.tex and docker_manual.pdf
