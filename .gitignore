@@ -1,6 +1,9 @@
+# Snakemake working directory (contains metadata and temp files)
 .snakemake
 .snakemake/**
+# macOS system file (not relevant for version control)
 .DS_Store
+# Pipeline results (any workflow outputs)
 results_illumina_swarm/**
 results_illumina_vsearch/**
 results_nanopore/**

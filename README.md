@@ -3,9 +3,11 @@
 </p>
 
 ---
+
 Natrix is an open-source bioinformatics pipeline for the preprocessing of long and short raw sequencing data. The need for a scalable, reproducible workflow for the processing of environmental amplicon data led to the development of Natrix. It is divided into quality assessment, dereplication, chimera detection, split-sample merging, ASV or OTU generation, and taxonomic assessment. The pipeline is written in [Snakemake](https://snakemake.readthedocs.io) (Köster and Rahmann 2018), a workflow management engine for the development of data analysis workflows. Snakemake ensures the reproducibility of a workflow by automatically deploying dependencies of workflow steps (rules) and scales seamlessly to different computing environments such as servers, computer clusters, or cloud services. While Natrix was only tested with 16S and 18S amplicon data, it should also work for other kinds of sequencing data. The pipeline contains separate rules for each step of the pipeline, and each rule that has additional dependencies has a separate [Conda](https://conda.io/) environment that will be automatically created when starting the pipeline for the first time. The encapsulation of rules and their dependencies allows for hassle-free sharing of rules between workflows.
 
 ---
+
 **To use the latest functions and updates, it is recommended to use the dev-branch of Natrix2**. The dev-branch contains the latest developments and patches that are not yet available in the main-branch. Users who want to stay up to date and experiment with the latest features should use the dev-branch regularly.
 
 ![DAG of an example workflow](documentation/images/natrix_and_update_1.png)
@@ -14,18 +16,23 @@ Natrix is an open-source bioinformatics pipeline for the preprocessing of long a
 ![DAG of an example workflow](documentation/images/Natrix2_workflow.png)
 **Fig. 2**: Schematic diagram of processing nanopore reads with Natrix2 for OTU generation and taxonomic assignment. The color scheme represents the main steps of this variant of the workflow.
 
+---
+
 # Table of contents
 1. [Dependencies](#dependencies)
 2. [Getting Started](#getting-started)
-3. [Sequence count with nseqc](#sequence-count)
+3. [Sequence count](#sequence-count)
 4. [Tutorial](#tutorial)
 5. [Cluster execution](#cluster-execution)
 6. [Output](#output)
-7. [Steps of the Pipeline](#steps-of-the-pipeline)
-8. [Example primertable](#example-primertable)
+7. [Pipeline steps](#pipeline-steps)
+8. [Primertable example](#primertable-example)
 9. [Configfile](#configfile)
 10. [References](#references)
 11. [Citation](#citation)
+12. [Common issues](#common-issues)
+
+---
 
 # Dependencies
 * [Conda](https://conda.io/en/latest/index.html)
@@ -52,11 +59,12 @@ GNU Screen can be found in the repositories of most Linux distributions:
 
 All other dependencies will be automatically installed using Conda environments and can be found in the corresponding `environment.yaml` files in the **envs folder** and the `natrix.yaml` file in the root directory of the pipeline.
 
+---
+
 # Getting Started
 
 **Important**, after you have set up your `natrix.yaml` environment, make sure you check the [Sequence Count](#sequence-count) section before you start the workflow.
 
----
 To install Natrix, you'll need the open-source package management system [Conda](https://conda.io/en/latest/index.html) and, if you want to try Natrix using the accompanying `pipeline.sh` script, you'll need [GNU Screen](https://www.gnu.org/software/screen/). After cloning this repository to a folder of your choice, it is recommended to **create a general Natrix Conda environment** using the accompanying `natrix.yaml` file. In the main folder of the cloned repository, execute the following command:
 
 ```shell
@@ -86,6 +94,8 @@ screen -r
 
 When the workflow has finished, you can press **Ctrl+a, k** (first press Ctrl+a, then k). This will end the screen session and any processes that are still running.
 
+---
+
 # Sequence Count
 
 Before starting the workflow, you should check the number of sequences in your input files `*.fastq`, `*.fastq.gz`. If there are too few sequences, the workflow may abort. Experience has shown that the workflow aborts if the number of sequences is less than 150. To avoid this, you should analyze your data using the `nseqc.py` tool.
@@ -103,6 +113,8 @@ python3 natrixlib/nseqc.py <folder_path> <threshold>
 ```
 
 **Once you have checked your data with the tool, you can start the workflow as usual.**
+
+---
 
 # Tutorial
 
@@ -137,7 +149,6 @@ Besides the FASTQ data from the sequencing process, Natrix needs a [primertable]
 
 The primertable, configfile, and the folder containing the FASTQ files all have to be in the root directory of the pipeline and have the same name (with their corresponding file extensions: `project.yaml`, `project.csv`, and the project folder containing the FASTQ files). The first [configfile](#configfile) entry `filename` also needs to be the name of the project.
 
----
 ### Running Natrix with the `pipeline.sh` script
 
 If everything is configured correctly, you can start the pipeline by typing the following commands into your terminal emulator:
@@ -161,7 +172,6 @@ When the workflow has finished, you can press **Ctrl+a, k** (first press Ctrl+a,
 
 ### Running Natrix with Docker or docker-compose
 
----
 Download our [User Guide](documentation/manuals/docker_manual.pdf) as a PDF to set up your Docker container.
 
 #### Docker Install and Natrix2 Image Pull
@@ -237,6 +247,7 @@ Functions of the respective folders:
 `/host/database` is the full path to a local folder in which you wish to install the database (**SILVA** or **NCBI**). This part is optional and only needed if you want to use BLAST for taxonomic assignment.
 
 ---
+
 #### Run Natrix2 in configured Docker container
 
 After you connect to the container shell, you can follow: [running Natrix manually](#running-natrix-manually)
@@ -317,7 +328,9 @@ If you prefer to build the Docker container yourself from the repository (for ex
 ```bash
 docker build -t natrix2 .
 ```
+
 ---
+
 ### Running Natrix manually
 
 If you prefer to run the preparation script and Snakemake manually, you need to start by activating the Snakemake environment:
@@ -344,6 +357,8 @@ with **project** being the name of your project and **cores** being the number o
 
 If the pipeline prematurely terminates (either because of an error or by deliberately stopping it), running the command above again will restart the pipeline from the point it was terminated.
 
+---
+
 # Cluster execution
 
 Natrix can be easily run on a cluster system using either Conda or the Docker container. Adding `--cluster` to the start command of Natrix, together with a command to submit jobs (e.g., qsub), is sufficient for most cluster computing environments. An example command would be:
@@ -369,6 +384,8 @@ snakemake -s <path/to/Snakefile> --profile myprofile
 ```
 
 The Snakemake documentation contains a tutorial for [profile creation](https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles), and the [Snakemake profiles GitHub page](https://github.com/snakemake-profiles/doc) contains example profiles for different cluster systems.
+
+---
 
 # Output
 
@@ -419,7 +436,9 @@ Once the workflow has been completed, all output files can be found in your outp
 |                                       | racon                      | Racon polished sequences for error correction.                                                                           |
 <p><b>Table 1</b>: Output files from Natrix2</p>
 
-# Steps of the Pipeline
+---
+
+# Pipeline steps
 
 ## Initial demultiplexing (Illumina-Variant)
 
@@ -572,7 +591,9 @@ The assignment of taxonomic information to an OTU/ASV is an important part of th
 
 The output data from the write_fasta, swarm, and blast rules are merged into a single comma-separated table in the merge_results rule. This table contains, for each representative sequence, the sequence identification number, the nucleotide sequence, the abundance of the sequence in each sample, the sum of abundances, and, if the blast rule found a similar sequence, all information provided in the table shown in the previous section.
 
-# Example Primertable
+---
+
+# Primertable example
 
 The primertable should be a CSV file `project.csv` in the following format:
 
@@ -582,6 +603,8 @@ The primertable should be a CSV file `project.csv` in the following format:
 | S2016RU_A | NNNN   |                 | GTACACACCGCCCGTC        | NN         |                 | GCTGCGYYCTTCATCGDTR     |
 
 <p><b>Table 3</b>: Example Primertable</p>
+
+---
 
 # Configfile
 
@@ -656,6 +679,8 @@ Below are the explanations for the configfile `project.yaml` entries:
 
 <p><b>Table 4</b>: Configuration options</p>
 
+---
+
 # References
 
 * Altschul, Stephen F. et al. (1990). “Basic local alignment search tool”. In: *Journal of Molecular Biology 215(3)*, pp. 403–410.
@@ -676,6 +701,8 @@ Below are the explanations for the configfile `project.yaml` entries:
 * Schmieder, Robert und Robert A. Edwards (2011). “Quality control and preprocessing of metagenomic datasets.” In: *Bioinformatics*, 27(6), pp. 863–864.
 * Abarenkov K, Nilsson RH, Larsson K-H, Taylor AFS, May TW, Frøslev TG, Pawlowska J, Lindahl B, Põldmaa K, Truong C, Vu D, Hosoya T, Niskanen T, Piirmann T, Ivanov F, Zirk A, Peterson M, Cheeke TE, Ishigami Y, Jansson AT, Jeppesen TS, Kristiansson E, Mikryukov V, Miller JT, Oono R, Ossandon FJ, Paupério J, Saar I, Schigel D, Suija A, Tedersoo L, Kõljalg U. 2023. The UNITE database for molecular identification and taxonomic communication of fungi and other eukaryotes: sequences, taxa and classifications reconsidered. *Nucleic Acids Research*, doi: "10.1093/nar/gkad1039".
 
+---
+
 # Citation
 
 **Natrix2 is based on the [Natrix](https://github.com/MW55/Natrix) pipeline — if you use this workflow, please cite**:
@@ -683,3 +710,25 @@ Below are the explanations for the configfile `project.yaml` entries:
 **Natrix2** – Improved amplicon workflow with novel Oxford Nanopore Technologies support and enhancements in clustering, classification and taxonomic databases. Deep, A.; Bludau, D.; Welzel, M.; Clemens, S.; Heider, D.; Boenigk, J.; and Beisser, D. Metabarcoding and Metagenomics, 7: e109389. Oct 2023. [https://mbmg.pensoft.net/article/109389/](https://mbmg.pensoft.net/article/109389/)
 
 **Natrix**: a Snakemake-based workflow for processing, clustering, and taxonomically assigning amplicon sequencing reads. Welzel, M.; Lange, A.; Heider, D.; Schwarz, M.; Freisleben, B.; Jensen, M.; Boenigk, J.; and Beisser, D. BMC Bioinformatics, 21(1). Nov 2020. [https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-03852-4](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-03852-4)
+
+---
+
+# Common issues
+
+## Causes of pipeline aborts
+
+- Negative controls or samples with very few reads. No sequences are generated, output files are missing.  
+- Empty or corrupted input files. These prevent the pipeline from generating expected results.  
+- Sample naming inconsistencies. Sample names in `units.tsv` or `Primertable` must exactly match the filenames.  
+- Insufficient computational resources. Jobs may fail if memory, disk space, or CPU are exhausted.  
+- Interrupted execution. If the workflow is stopped or a cluster job ends unexpectedly, outputs may be incomplete.  
+- Conda environment or dependency issues. Missing or broken environments can cause certain rules to fail.  
+- File permission errors. Missing read/write permissions may prevent output files from being created.  
+
+## Problems with installation
+
+- Conda must be correctly installed and available in the PATH.  
+- The pipeline requires a clean environment without leftovers from previous installations.  
+- Snakemake environments must be valid; if broken, delete `.snakemake/conda/` and rerun.  
+- The Snakemake version should match the one recommended in this repository.  
+- Conflicts with other Python environments or package managers (pip, mamba) may cause errors.
