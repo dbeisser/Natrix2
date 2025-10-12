@@ -4,6 +4,9 @@
 This document records all notable changes to Natrix2 project.  
 **Note**: Use the **dev** branch for the latest updates and features.
 
+## [2025-10-12]
+- Update README.md; revise Troubleshooting section.
+
 ## [2025-09-26]
 - Add new section "Common issues" to README  
   - Add "Causes of pipeline aborts"  

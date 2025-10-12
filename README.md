@@ -30,7 +30,7 @@ Natrix is an open-source bioinformatics pipeline for the preprocessing of long a
 9. [Configfile](#configfile)
 10. [References](#references)
 11. [Citation](#citation)
-12. [Common issues](#common-issues)
+12. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -713,17 +713,19 @@ Below are the explanations for the configfile `project.yaml` entries:
 
 ---
 
-# Common issues
+# Troubleshooting
 
-## Causes of pipeline aborts
+Running complex bioinformatics workflows can sometimes lead to unexpected behavior or failed executions. Below is a collection of common issues that may occur during installation or pipeline runs, along with typical causes and hints for troubleshooting.
 
-- Negative controls or samples with very few reads. No sequences are generated, output files are missing.  
+## Pipeline failure causes
+
+- Negative controls or low-read samples. No sequences generated, missing outputs.  
 - Empty or corrupted input files. These prevent the pipeline from generating expected results.  
-- Sample naming inconsistencies. Sample names in `units.tsv` or `Primertable` must exactly match the filenames.  
+- Sample names in `units.tsv` and `Primertable` must exactly match filenames.  
 - Insufficient computational resources. Jobs may fail if memory, disk space, or CPU are exhausted.  
-- Interrupted execution. If the workflow is stopped or a cluster job ends unexpectedly, outputs may be incomplete.  
-- Conda environment or dependency issues. Missing or broken environments can cause certain rules to fail.  
-- File permission errors. Missing read/write permissions may prevent output files from being created.  
+- Interrupted execution. Stopped workflows or failed jobs can lead to incomplete outputs.  
+- Conda or dependency issues. Broken environments may cause rule failures.  
+- File permission errors. Missing read/write access may prevent file creation.  
 
 ## Problems with installation
 
@@ -731,4 +733,11 @@ Below are the explanations for the configfile `project.yaml` entries:
 - The pipeline requires a clean environment without leftovers from previous installations.  
 - Snakemake environments must be valid; if broken, delete `.snakemake/conda/` and rerun.  
 - The Snakemake version should match the one recommended in this repository.  
-- Conflicts with other Python environments or package managers (pip, mamba) may cause errors.
+- Conflicts with other Python setups or package managers (pip, mamba) may cause errors.  
+
+## Runtime or output issues
+ 
+- Configuration mismatches. Incorrect settings in the config file can affect processing steps.
+- Missing reference data. Ensure databases and indices are downloaded and correctly referenced.  
+- Unexpected runtime errors. Crashes or empty outputs may indicate a bug or broken dependency.  
+- Inconsistent results. Check log files and Snakemake reports for warnings or failed rules.  
