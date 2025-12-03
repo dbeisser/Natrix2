@@ -93,6 +93,6 @@ else:
             os.path.join(config["general"]["output_dir"],"finalData/blast_{database}/full_table_mumu.csv"),
             os.path.join(config["general"]["output_dir"],"finalData/blast_{database}/OTU_table_mumu.csv"),
             os.path.join(config["general"]["output_dir"],"finalData/blast_{database}/metadata_table_mumu.csv"),
-            os.path.join(config["general"]["output_dir"],"finalData/blast_{database}/multi_hits_blast_mumu.csv")
+            os.path.join(config["general"]["output_dir"],"finalData/blast_{database}/unmerged_seqids.csv")
         script:
             "../scripts/merge_mumu_output_2.py"

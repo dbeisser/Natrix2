@@ -7,6 +7,17 @@ This document records all notable changes to the **Natrix2** project.
 
 ---
 
+### [2025-12-03]
+- Rewrite `merge_mumu_output_2.py` with new merge-key logic
+- Add handling of empty/missing mumu OTUs
+- Preserve all BLAST OTUs (right-join)
+- Generate new OTU identifiers from merge key and size
+- Add `unmerged_seqids.csv` output
+- Standardize outputs to use `seqid` as index label
+- Clean up script and update Snakemake rule
+
+---
+
 ### [2025-11-17]
 - Fix download issue of the NCBI database for BLAST
 - Add packages to `blast.yaml`
