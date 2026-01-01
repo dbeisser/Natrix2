@@ -3,7 +3,20 @@
 # Changelog
 
 This document records all notable changes to the **Natrix2** project.  
-**Note**: Use the **dev** branch for the latest updates and features.
+Use the **dev** branch for the latest updates and features.
+
+---
+
+### [2026-01-01]
+- Update README structure and content
+- Update CHANGELOG
+- Bump MultiQC to v1.33 and fix Conda environment issue
+- Refine `filter_unclassified.py` unclassified handling
+- Apply `filter_unclassified` to Illumina Mothur outputs
+- Fix logical operator in `classify.smk` rule for vsearch
+- Reorder channels in `natrix.yaml`
+- Fix Mothur `_unclassified` taxonomy repetition
+- Release Natrix2 v2.0.1
 
 ---
 

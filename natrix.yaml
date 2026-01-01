@@ -1,7 +1,7 @@
 name: natrix
 channels:
-  - conda-forge
   - bioconda
+  - conda-forge
   - defaults
 dependencies:
   - snakemake=5.32.2

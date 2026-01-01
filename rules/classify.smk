@@ -3,11 +3,11 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
     if config["classify"]["database"] == "pr2":
         rule mothur_classify:
             input:
-                os.path.join(config["general"]["output_dir"],"clustering/representatives_mod.fasta") if config["general"]["seq_rep"] == "OTU" or config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
+                os.path.join(config["general"]["output_dir"],"clustering/representatives_mod.fasta") if config["general"]["seq_rep"] == "OTU" and config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
                 expand("database/pr2db.{pr2_db_version}.fasta", pr2_db_version=config["database_version"]["pr2"])
             output:
-                os.path.join(config["general"]["output_dir"], "mothur/pr2/mothur_out.summary"),
-                os.path.join(config["general"]["output_dir"],"mothur/pr2/mothur_out.taxonomy")
+                os.path.join(config["general"]["output_dir"], "mothur/pr2/mothur_out_raw.summary"),
+                os.path.join(config["general"]["output_dir"],"mothur/pr2/mothur_out_raw.taxonomy")
             params:
                 template=config['database_path']['pr2_ref'],
                 taxonomy=config['database_path']['pr2_tax'],
@@ -33,11 +33,11 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
     elif config["classify"]["database"] == "unite":
         rule mothur_classify:
             input:
-                os.path.join(config["general"]["output_dir"],"clustering/representatives_mod.fasta") if config["general"]["seq_rep"] == "OTU" or config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
+                os.path.join(config["general"]["output_dir"],"clustering/representatives_mod.fasta") if config["general"]["seq_rep"] == "OTU" and config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
                 "database/unite_v10.fasta"
             output:
-                os.path.join(config["general"]["output_dir"],"mothur/unite/mothur_out.summary"),
-                os.path.join(config["general"]["output_dir"],"mothur/unite/mothur_out.taxonomy")
+                os.path.join(config["general"]["output_dir"],"mothur/unite/mothur_out_raw.summary"),
+                os.path.join(config["general"]["output_dir"],"mothur/unite/mothur_out_raw.taxonomy")
             params:
                 template=config['database_path']['unite_ref'],
                 taxonomy=config['database_path']['unite_tax'],
@@ -63,7 +63,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
     elif config["classify"]["database"] == "silva":
         rule mothur_classify:
             input:
-                os.path.join(config["general"]["output_dir"],"clustering/representatives_mod.fasta") if config["general"]["seq_rep"] == "OTU" or config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
+                os.path.join(config["general"]["output_dir"],"clustering/representatives_mod.fasta") if config["general"]["seq_rep"] == "OTU" and config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
                 expand(["database/silva_db.{silva_db_version}.fasta", "database/silva_db.{silva_db_version}.tax"], silva_db_version=config["database_version"]["silva"])
             output:
                 os.path.join(config["general"]["output_dir"],"mothur/silva/mothur_out_raw.summary"),
@@ -90,16 +90,16 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                     mv $input_dir/*.summary {output[0]};
                 """
         
-        # Removes redundant 'unclassified' entries from the taxonomy file (/mothur_out_raw.taxonomy)
-        rule filter_unclassified:
-            input:
-                raw_taxonomy=os.path.join(config["general"]["output_dir"], "mothur/silva/mothur_out_raw.taxonomy"),
-                raw_summary=os.path.join(config["general"]["output_dir"], "mothur/silva/mothur_out_raw.summary")
-            output:
-                cleaned_taxonomy=os.path.join(config["general"]["output_dir"], "mothur/silva/mothur_out.taxonomy"),
-                cleaned_summary=os.path.join(config["general"]["output_dir"], "mothur/silva/mothur_out.summary")
-            script:
-                "../scripts/filter_unclassified.py"
+    # Removes redundant 'unclassified' entries from the taxonomy file (/mothur_out_raw.taxonomy)
+    rule filter_unclassified:
+        input:
+            raw_taxonomy=os.path.join(config["general"]["output_dir"], "mothur/{database}/mothur_out_raw.taxonomy"),
+            raw_summary=os.path.join(config["general"]["output_dir"], "mothur/{database}/mothur_out_raw.summary")
+        output:
+            cleaned_taxonomy=os.path.join(config["general"]["output_dir"], "mothur/{database}/mothur_out.taxonomy"),
+            cleaned_summary=os.path.join(config["general"]["output_dir"], "mothur/{database}/mothur_out.summary")
+        script:
+            "../scripts/filter_unclassified.py"
 
     ##
     rule merge_output:
@@ -223,5 +223,3 @@ elif config['dataset']['nanopore']:
             clustering=config['clustering']
         script:
             "../scripts/merge_results2.py"
-
-
