@@ -94,7 +94,7 @@ database_path:
 blast:
         blast: TRUE # Use BLAST for taxonomic classification (e.g., TRUE or FALSE)
         database: NCBI # Reference database for BLAST: "NCBI" or "SILVA"
-        drop_tax_classes: '.*unclassified Bacteria.*,.*uncultured.*bacterium.*' # Comma-separated list of taxonomic classes to exclude (by ID, name, or regex)
+        drop_tax_classes: '.*unclassified Bacteria.*,.*uncultured.*bacterium.*' # 'no_filter' skips filtering unless matched; comma-separated regex (e.g. 'uncultured', '.*unclassified.*')
         db_path: database/ncbi/nt # Path to BLAST database (e.g., SILVA: database/silva/silva.db or NCBI: database/ncbi/nt); downloaded automatically
         max_target_seqs: 10 # Number of NCBI BLAST hits saved per sequence or OTU (e.g., 10)
         ident: 90.0 # Minimum identity required between query and target sequence (e.g., 90.0); lower values may require manual filtering afterward

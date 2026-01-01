@@ -32,7 +32,6 @@ elif config["blast"]["database"] == "NCBI":
     rule make_ncbi_db:
         output:
             expand(config["blast"]["db_path"] + ".000" + "{file_extension}", file_extension=[".nhd", ".nhi", ".nhr", ".nin", ".nnd", ".nni", ".nog", ".nsq"]),
-            listing = temp(".listing"),
             path = config["blast"]["db_path"]
         params:
             db_path=config["blast"]["db_path"]
@@ -40,14 +39,14 @@ elif config["blast"]["database"] == "NCBI":
             "../envs/blast.yaml"
         shell:
             """
-                dir_name=$(dirname {params[0]});
-                wget --spider --no-remove-listing ftp://ftp.ncbi.nlm.nih.gov/blast/db/
-                number=$(awk '$9 ~ /^nt.[0-9]*.tar.gz[^.]/ {{print substr($9,4,3)}}' {output.listing} | tail -n 1)
-                for i in `seq -w 00 $number`;
-                    do wget -N -P $dir_name/ --progress=bar ftp://ftp.ncbi.nlm.nih.gov/blast/db/nt.${{i}}.tar.gz;
-                tar xvzf $dir_name/nt.${{i}}.tar.gz -C $dir_name;
-                done;
-                touch {output.path}
+                dir_name=$(dirname {params.db_path})
+                mkdir -p $dir_name
+                cd $dir_name
+                echo "Downloading NCBI nt BLAST database into $dir_name using update_blastdb.pl"
+                update_blastdb.pl --decompress nt
+                sleep 10
+                touch nt
+                echo "NCBI nt BLAST database successfully downloaded and extracted."
             """
 
     rule download_taxonomy:

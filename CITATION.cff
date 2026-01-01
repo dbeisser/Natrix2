@@ -1,0 +1,45 @@
+cff-version: 1.2.0
+message: "If you use this workflow, please cite it."
+title: Natrix2
+type: software
+authors:
+  - given-names: A.
+    family-names: Deep
+  - given-names: D.
+    family-names: Bludau
+  - given-names: M.
+    family-names: Welzel
+  - given-names: S.
+    family-names: Clemens
+  - given-names: D.
+    family-names: Heider
+  - given-names: J.
+    family-names: Boenigk
+  - given-names: D.
+    family-names: Beisser
+repository-code: "https://github.com/dbeisser/Natrix2"
+license: MIT
+preferred-citation:
+  type: article
+  title: Natrix2 – Improved amplicon workflow with novel Oxford Nanopore Technologies support and enhancements in clustering, classification and taxonomic databases.
+  authors:
+    - given-names: A.
+      family-names: Deep
+    - given-names: D.
+      family-names: Bludau
+    - given-names: M.
+      family-names: Welzel
+    - given-names: S.
+      family-names: Clemens
+    - given-names: D.
+      family-names: Heider
+    - given-names: J.
+      family-names: Boenigk
+    - given-names: D.
+      family-names: Beisser
+  journal: Metabarcoding and Metagenomics
+  volume: 7
+  article-number: e109389
+  date: 2023-10
+  doi: 10.3897/mbmg.7.109389
+  url: https://mbmg.pensoft.net/article/109389/
