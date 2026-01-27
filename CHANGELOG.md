@@ -7,6 +7,13 @@ Use the **dev** branch for the latest updates and features.
 
 ---
 
+### [2026-01-27]
+- Apply `filter_unclassified` to Nanopore Mothur outputs
+- Update `classify.smk`
+- Complete test run for nanopore data
+
+---
+
 ### [2026-01-01]
 - Update README structure and content
 - Update CHANGELOG
