@@ -7,6 +7,14 @@ Use the **dev** branch for the latest updates and features.
 
 ---
 
+### [2026-02-11]
+- Add 18S Illumina Testdata; 18SV9_Illumina_NextSeq500
+- Revise Testdata folder structure
+- Rename primer_table files for Testdata
+- Revise preset configfiles for Testdata
+
+---
+
 ### [2026-01-27]
 - Apply `filter_unclassified` to Nanopore Mothur outputs
 - Update `classify.smk`

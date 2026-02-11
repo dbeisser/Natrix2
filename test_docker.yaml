@@ -1,9 +1,9 @@
 # Natrix2; Config File
 # General settings for the pipeline
 general:
-        filename: input_data/Nanopore_data # Path to raw data folder with primer table and config file; use relative path if outside Natrix2 root (e.g., input/example_data)
+        filename: input_data/Nanopore_data/18S_Euk_Samples # Path to raw data folder with primer table and config file; use relative path if outside Natrix2 root (e.g., input/example_data)
         output_dir: output/results_docker_test # Path to the custom output directory (relative to the Natrix2 root, e.g., results/my_output); avoid using dashes in folder names
-        primertable: primer_table/Nanopore.csv # Path to the primer table (.csv); use a relative path if outside the Natrix2 root (e.g., input/example_data/Illumina.csv)
+        primertable: primer_table/C3S5_T3S7_18S_Nanopore.csv # Path to the primer table (.csv); use a relative path if outside the Natrix2 root (e.g., input/example_data/Illumina.csv)
         units: units.tsv # Path to the sequencing unit sheet (.tsv); the filename will be concatenated with output_dir (e.g., units.tsv)
         cores: 10 # Number of CPU cores (e.g., 20)
         memory: 10000 # Available RAM in MB (e.g., 16000 for 16 GB)
