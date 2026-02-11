@@ -9,6 +9,7 @@ Use the **dev** branch for the latest updates and features.
 
 ### [2026-02-11]
 - Add 18S Illumina Testdata; 18SV9_Illumina_NextSeq500
+- Add 16S Nanopore Testdata; 16S_Cyprus_Nanopore
 - Revise Testdata folder structure
 - Rename primer_table files for Testdata
 - Revise preset configfiles for Testdata
