@@ -31,44 +31,44 @@ elif config["blast"]["database"] == "NCBI":
 
     rule make_ncbi_db:
         output:
-            expand(config["blast"]["db_path"] + ".000" + "{file_extension}", file_extension=[".nhd", ".nhi", ".nhr", ".nin", ".nnd", ".nni", ".nog", ".nsq"]),
-            path = config["blast"]["db_path"]
+            marker=config["blast"]["db_path"] + config["blast"]["db_type"] + ".downloaded.ok"
         params:
-            db_path=config["blast"]["db_path"]
+            db_dir=config["blast"]["db_path"],
+            db_type=config["blast"]["db_type"]
+        log:
+            config["blast"]["db_path"] + config["blast"]["db_type"] + ".download.log"
         conda:
             "../envs/blast.yaml"
         shell:
             """
-                dir_name=$(dirname {params.db_path})
-                mkdir -p $dir_name
-                cd $dir_name
-                echo "Downloading NCBI nt BLAST database into $dir_name using update_blastdb.pl"
-                update_blastdb.pl --decompress nt
+                mkdir -p {params.db_dir}
+                echo "[{params.db_type}] Downloading into: {params.db_dir}" > {log}
+                ( cd {params.db_dir} && update_blastdb.pl --source aws --decompress --verbose --verbose {params.db_type} ) >> {log} 2>&1
+                echo "[{params.db_type}] Done." >> {log}
+                touch {output.marker}
                 sleep 10
-                touch nt
-                echo "NCBI nt BLAST database successfully downloaded and extracted."
             """
 
     rule download_taxonomy:
         output:
-            os.path.join(os.path.dirname(config["blast"]["db_path"]), "fullnamelineage.dmp")
+            os.path.join(config["blast"]["db_path"], "fullnamelineage.dmp")
         params:
             db_path=config["blast"]["db_path"]
         conda:
             "../envs/blast.yaml"
         shell:
             """
-                dir_name=$(dirname {params[0]});
-                wget -N -P $dir_name/ --progress=bar ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz;
-                wget -N -P $dir_name/ --progress=bar ftp://ftp.ncbi.nlm.nih.gov/blast/db/taxdb.tar.gz;
-                tar xvzf $dir_name/new_taxdump.tar.gz -C $dir_name;
+                dir_name={params.db_path}
+                wget -N -P $dir_name/ --progress=bar ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz
+                wget -N -P $dir_name/ --progress=bar ftp://ftp.ncbi.nlm.nih.gov/blast/db/taxdb.tar.gz
+                tar xvzf $dir_name/new_taxdump.tar.gz -C $dir_name
             """
 
     rule create_blast_taxonomy:
         input:
-            os.path.join(os.path.dirname(config["blast"]["db_path"]), "fullnamelineage.dmp")
+            os.path.join(config["blast"]["db_path"], "fullnamelineage.dmp")
         output:
-            os.path.join(os.path.dirname(config["blast"]["db_path"]), "tax_lineage.h5")
+            os.path.join(config["blast"]["db_path"], "tax_lineage.h5")
         conda:
             "../envs/blast.yaml"
         log:
@@ -79,13 +79,30 @@ elif config["blast"]["database"] == "NCBI":
 
 rule blast:
     input:
-        os.path.join(config["general"]["output_dir"],"clustering/representatives.fasta") if config["general"]["seq_rep"] == "OTU" and not config['dataset']['nanopore'] else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
-        expand(config["blast"]["db_path"] + "{file_extension}", file_extension=[".ndb", ".nhr", ".nin", ".nog", ".nos", ".not", ".nsq", ".ntf", ".nto"] if config["blast"]["database"] == "SILVA" else "")
+        query = os.path.join(config["general"]["output_dir"],"clustering/representatives.fasta") \
+            if config["general"]["seq_rep"] == "OTU" and not config['dataset']['nanopore'] \
+            else os.path.join(config["general"]["output_dir"],"filtering/filtered_table.csv"),
+
+        db_ready = (
+            config["blast"]["db_path"] + config["blast"]["db_type"] + ".downloaded.ok"
+            if config["blast"]["database"] == "NCBI"
+            else expand(config["blast"]["db_path"] + "{ext}",
+                        ext=[".ndb", ".nhr", ".nin", ".nog", ".nos", ".not", ".nsq", ".ntf", ".nto"])
+            if config["blast"]["database"] == "SILVA"
+            else []
+        )
     output:
-        os.path.join(config["general"]["output_dir"],"blast/blast_taxonomy.tsv") #temp
-    threads: config["general"]["cores"]
+        os.path.join(config["general"]["output_dir"],"blast/blast_taxonomy.tsv")
+    log:
+        os.path.join(config["general"]["output_dir"],"blast/blast.log")
+    threads: 
+        config["general"]["cores"]
     params:
-        db_path=config["blast"]["db_path"],
+        db_path = (
+            config["blast"]["db_path"] + config["blast"]["db_type"]
+            if config["blast"]["database"] == "NCBI"
+            else config["blast"]["db_path"]
+        ),
         max_target_seqs=str(config["blast"]["max_target_seqs"]) if config["blast"]["database"] == "NCBI" else "1",
         ident=str(config["blast"]["ident"]),
         evalue=str(config["blast"]["evalue"]),
@@ -93,18 +110,31 @@ rule blast:
     conda:
         "../envs/blast.yaml"
     shell:
-        "blastn -num_threads {threads} -query {input[0]} -db {params.db_path}"
-        " -max_target_seqs {params.max_target_seqs}"
-        " -perc_identity {params.ident} -evalue {params.evalue}"
-        " -outfmt {params.out6} -out {output}"
+        """
+            echo "Running BLAST with database: {params.db_path}" > {log}
+            echo "Query file: {input.query}" >> {log}
+            echo "Threads: {threads}" >> {log}
+            echo "Database info:" >> {log}
+            blastdbcmd -db {params.db_path} -info >> {log} 2>&1
 
-if  config['blast']['blast']:
-	if config["blast"]["database"] == "NCBI":
+            blastn -num_threads {threads} \
+                -query {input.query} \
+                -db {params.db_path} \
+                -max_target_seqs {params.max_target_seqs} \
+                -perc_identity {params.ident} \
+                -evalue {params.evalue} \
+                -outfmt {params.out6} \
+                -out {output} \
+                2>> {log}
+        """
+
+if config['blast']['blast']:
+	if config["blast"]["database"]=="NCBI":
 
 		rule ncbi_taxonomy:
 			input:
 				blast_result = os.path.join(config["general"]["output_dir"],"blast/blast_taxonomy.tsv"),
-				lineage = os.path.join(os.path.dirname(config["blast"]["db_path"]), "tax_lineage.h5")
+                lineage = os.path.join(config["blast"]["db_path"], "tax_lineage.h5")
 			output:
 				tax_lineage = temp(os.path.join(config["general"]["output_dir"],"blast/blast_taxonomic_lineage.tsv")),
 				all_tax = os.path.join(config["general"]["output_dir"],"blast/blast_taxonomy_all.tsv")

@@ -7,6 +7,20 @@ Use the **dev** branch for the latest updates and features.
 
 ---
 
+### [2026-03-05]
+- Fix BLAST rule for NCBI database
+- Add selection of specific NCBI databases:
+  - core_nt (default), nt (entire database)
+  - nt_euk, nt_prok, nt_viruses, nt_others
+- Add `db_type` parameter for NCBI DB in configfiles
+- Improve download speed for the NCBI database
+- Update BLAST to v2.17.0
+- Update rules `make_ncbi_db` and `blast`
+- Update specific rules for NCBI files
+- Update `blast.yaml` environment
+
+---
+
 ### [2026-02-11]
 - Add 18S Illumina Testdata; 18SV9_Illumina_NextSeq500
 - Add 16S Nanopore Testdata; 16S_Cyprus_Nanopore
