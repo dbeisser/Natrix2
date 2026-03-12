@@ -7,6 +7,15 @@ Use the **dev** branch for the latest updates and features.
 
 ---
 
+### [2026-03-12]
+- Update BLAST rule for specific input data
+- Update `merge_results` rule in `blast.smk`
+- Update conditional input selection for OTU tables
+- Add merge script for VSEARCH with BLAST
+- Run tests and benchmarks with different config files
+
+---
+
 ### [2026-03-05]
 - Fix BLAST rule for NCBI database
 - Add selection of specific NCBI databases:

@@ -80,8 +80,10 @@ elif config["blast"]["database"] == "NCBI":
 rule blast:
     input:
         query = os.path.join(config["general"]["output_dir"],"clustering/representatives.fasta") \
-            if config["general"]["seq_rep"] == "OTU" and not config['dataset']['nanopore'] \
-            else os.path.join(config["general"]["output_dir"],"filtering/filtered_table.csv"),
+            if config["general"]["seq_rep"] == "OTU" and not config["dataset"]["nanopore"] \
+            else os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta") \
+            if config["clustering"]== "vsearch" and config["dataset"]["nanopore"] \
+            else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
 
         db_ready = (
             config["blast"]["db_path"] + config["blast"]["db_type"] + ".downloaded.ok"
@@ -150,8 +152,13 @@ if config['blast']['blast']:
 
 		rule merge_results:
 			input:
-				merged=os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") if config["general"]["seq_rep"] == "OTU" and not config['dataset']['nanopore'] else os.path.join(config["general"]["output_dir"],"filtering/filtered_table.csv"),
-				blast_result=os.path.join(config["general"]["output_dir"],"blast/blast_taxonomic_lineage.tsv")
+				merged=os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") \
+                if config["general"]["seq_rep"] == "OTU" and not config["dataset"]["nanopore"] \
+                else os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv") \
+                if config["clustering"]== "vsearch" and config["dataset"]["nanopore"] \
+                else os.path.join(config["general"]["output_dir"],"filtering/filtered_table.csv"),
+                
+                blast_result=os.path.join(config["general"]["output_dir"],"blast/blast_taxonomic_lineage.tsv")
 			output:
 				complete=os.path.join(config["general"]["output_dir"],"finalData/blast_ncbi/full_table.csv"),
 				filtered=os.path.join(config["general"]["output_dir"],"finalData/blast_ncbi/filtered_full_table.csv"),
@@ -164,7 +171,9 @@ if config['blast']['blast']:
 			log:
 				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
-				"../scripts/merge_results.py"
+				"../scripts/merge_results_vsearch_blast.py" \
+                if config["clustering"]== "vsearch" and config["dataset"]["nanopore"] \
+                else "../scripts/merge_results.py"
 
 
 	elif config["blast"]["database"] == "SILVA":
