@@ -1,9 +1,22 @@
-#### Natrix2; bioinformatics
+[Natrix2 – Bioinformatics Pipeline](https://github.com/dbeisser/Natrix2)
 
 # Changelog
+This document summarizes all notable changes to **Natrix2**, including updates, fixes, and improvements across releases. It is intended to provide a clear overview of the project's development history. For the most recent updates, ongoing changes, and experimental features, please refer to the [dev branch](https://github.com/dbeisser/Natrix2/tree/dev).
 
-This document records all notable changes to the **Natrix2** project.  
-Use the **dev** branch for the latest updates and features.
+---
+
+### [2026-04-16]
+- Update configuration files for unified output naming
+- Update `README.md` and `CHANGELOG.md`
+- Update `.gitignore` file
+- Fix SILVA database version issue in `pr2_unite_silva.smk`
+- Clean up and restructure root directory
+- Rename `natrixlib` directory and `nsceq` tool
+- Update `natrix2.yaml` environment file
+- Revise and update Docker section
+- Refactor `Dockerfile` and `docker_pipeline.sh`
+- Create and update Docker image
+- Refactor `pipeline.sh` script
 
 ---
 

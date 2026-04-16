@@ -1,9 +1,35 @@
-# Snakemake working directory (contains metadata and temp files)
-.snakemake
-.snakemake/**
-# macOS system file (not relevant for version control)
+# Snakemake working directory (metadata, logs, temp files)
+.snakemake/
+
+# Different Databases (SILVA, PR2, NCBI)
+database/
+
+# macOS system file
 .DS_Store
-# Pipeline results (any workflow outputs)
-results_illumina_swarm/**
-results_illumina_vsearch/**
-results_nanopore/**
+
+# Pipeline results (all result folders)
+results_*/
+
+# Logs and temporary files
+*.log
+logs/
+tmp/
+temp/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Jupyter notebook checkpoints (if used)
+.ipynb_checkpoints/
+
+# Conda environments (optional, if created locally)
+env/
+.env/
+.conda/
+
+# Large intermediate files (optional, depending on workflow)
+*.bam
+*.sam
+*.tmp
+*.intermediate

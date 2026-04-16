@@ -43,9 +43,9 @@ elif config["classify"]["database"] == "silva":
                 db_version=config["database_version"]["silva"]
             shell:
                 """
-                wget -P ./ --progress=bar -O database/silva_{params.db_version}.fasta.gz https://www.arb-silva.de/fileadmin/silva_databases/release_138.2/Exports/SILVA_{params.db_version}_SSURef_tax_silva.fasta.gz;
+                wget -P ./ --progress=bar -O database/silva_{params.db_version}.fasta.gz https://www.arb-silva.de/fileadmin/silva_databases/release_{params.db_version}/Exports/SILVA_{params.db_version}_SSURef_tax_silva.fasta.gz;
                 pigz -dc database/silva_{params.db_version}.fasta.gz > database/silva_db.{params.db_version}.fasta;
-                wget -P ./ --progress=bar -O database/silva_{params.db_version}.tax.gz https://www.arb-silva.de/fileadmin/silva_databases/release_138.2/Exports/taxonomy/taxmap_slv_ssu_ref_{params.db_version}.txt.gz
+                wget -P ./ --progress=bar -O database/silva_{params.db_version}.tax.gz https://www.arb-silva.de/fileadmin/silva_databases/release_{params.db_version}/Exports/taxonomy/taxmap_slv_ssu_ref_{params.db_version}.txt.gz
                 pigz -dc database/silva_{params.db_version}.tax.gz > database/silva_db.{params.db_version}.tax.temp;
                 """
 

@@ -4,11 +4,10 @@ channels:
   - conda-forge
 dependencies:
   - blast=2.17.0
-  - python=3.7
-  - dinopy=2.0.3
-  - pandas=1.2.3
-  - pytables=3.6.1
+  - dinopy=3.0.0
+  - pandas=3.0.2
+  - pytables=3.11.1
   - pigz=2.8
-  - perl
-  - wget
-  - tar
+  - perl=5.32.1
+  - wget=1.25.0
+  - tar=1.35

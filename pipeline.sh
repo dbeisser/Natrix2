@@ -8,13 +8,10 @@ echo "Enter project name (e.g. illumina_swarm):"
 # Read user input file
 read varname
 
-# Activate conda env
-env_loc=$(conda info --base)/etc/profile.d/conda.sh
-source $env_loc
-conda activate natrix
-
-# Append .yaml to the project name
-varname+=".yaml"
+# Append .yaml only if needed
+if [[ "$varname" != *.yaml ]]; then
+    varname="${varname}.yaml"
+fi
 
 # Check if the config file exists
 if [[ ! -f "$varname" ]]; then
@@ -23,10 +20,26 @@ if [[ ! -f "$varname" ]]; then
     exit 1
 fi
 
-# Extract number of cores from config file
-cores=$(grep "cores : " $varname | awk '{print $3}')
+# Activate conda env
+env_loc="$(conda info --base)/etc/profile.d/conda.sh"
+source "$env_loc"
+conda activate natrix2
 
-# Run Python pre-step and start pipeline in screen
+# Extract number of cores from config file
+cores=$(python -c "
+import yaml
+data = yaml.safe_load(open('$varname'))
+print(data['general']['cores'])
+" 2>/dev/null)
+
+# Abort if cores not found
+if [ -z "$cores" ]; then
+    echo "ERROR: No 'general.cores' entry found in '$varname'."
+    exit 1
+fi
+
+# Create dataframe and start pipeline in screen
 if python create_dataframe.py "$varname"; then
-    screen -S $varname bash -c "source $env_loc;conda activate natrix;snakemake --use-conda --cores $cores --configfile $varname -p -r  ; exec sh"
+    session_name="${varname%.yaml}"
+    screen -S "$session_name" bash -c "source \"$env_loc\"; conda activate natrix2; snakemake --use-conda --cores \"$cores\" --configfile \"$varname\" -p -r; exec sh"
 fi
