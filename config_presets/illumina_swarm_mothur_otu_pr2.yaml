@@ -64,6 +64,7 @@ merge:
 
 # Clustering of OTUs using SWARM or VSEARCH
 clustering: "swarm" # OTU clustering method: "swarm" or "vsearch" (Nanopore supports only "vsearch")
+# ID used when clustering = "vsearch"
 vsearch_id: 0.97 # Percent identity for VSEARCH OTU clustering (e.g., 0.97 = 97%)
 
 # Post-clustering filtering (OTU only)

@@ -5,6 +5,12 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
 
 ---
 
+### [2026-05-28]
+- Add documentation comments to `pychop.smk` and `read_correction.smk`
+- Add `vsearch_id` comment to all preset configs
+
+---
+
 ### [2026-04-16]
 - Update configuration files for unified output naming
 - Update `README.md` and `CHANGELOG.md`
