@@ -5,6 +5,15 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
 
 ---
 
+### [2026-06-09]
+- Rename all preset configuration files and output directories
+- Fix taxonomy merge issue in `merge_results2.py`
+- Add robust sequence ID normalization for ASV and OTU workflows
+- Add documentation comments to `merge_results2.py`
+- Validate merge functionality with multiple configuration files
+
+---
+
 ### [2026-05-28]
 - Add documentation comments to `pychop.smk` and `read_correction.smk`
 - Add `vsearch_id` comment to all preset configs

@@ -2,7 +2,7 @@
 # General settings for the pipeline
 general:
         filename: input_data/Illumina_data/16S_Prok_Samples/A071SE # Path to raw data folder with primer table and config file; use relative path if outside Natrix2 root (e.g., input/example_data)
-        output_dir: results_Illumina_VSearch_16S_Prok # Path to the custom output directory (relative to the Natrix2 root, e.g., results/my_output); avoid using dashes in folder names
+        output_dir: results_16S_illumina_vsearch_mothur_otu_pr2 # Path to the custom output directory (relative to the Natrix2 root, e.g., results/my_output); avoid using dashes in folder names
         primertable: primer_table/A071SE_16S_Illumina.csv # Path to the primer table (.csv); use a relative path if outside the Natrix2 root (e.g., input/example_data/Illumina.csv)
         units: units.tsv # Path to the sequencing unit sheet (.tsv); the filename will be concatenated with output_dir (e.g., units.tsv)
         cores: 20 # Number of CPU cores (e.g., 20)
