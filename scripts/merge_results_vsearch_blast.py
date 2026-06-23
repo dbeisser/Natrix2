@@ -41,6 +41,14 @@ merged = pd.read_csv(snakemake.input["merged"], sep=",")
 blast = new_index(blast)
 merged = new_index(merged)
 
+# Keep only the best BLAST hit per seqid
+blast = blast.sort_values(
+    by=["evalue", "pident", "length"],
+    ascending=[True, False, False]
+)
+
+blast = blast[~blast.index.duplicated(keep="first")]
+
 # Merge both tables by seqid
 result = merged.join(blast, how="outer")
 

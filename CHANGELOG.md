@@ -5,6 +5,29 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
 
 ---
 
+### [2026-06-23]
+- Add `Eukaryome` and `ROD` reference databases
+- Add preset configuration files for Eukaryome and ROD databases
+- Fix ROD database download and cleanup in `blast.smk`
+- Fix SILVA database merge handling for VSEARCH
+- Validate `Eukaryome` and `ROD` databases with test datasets
+- Standardize database name handling
+- Update configuration files for new database support
+- Improve database configuration comments and documentation
+- Fix VSEARCH ID handling in `merge_results_vsearch_blast.py`
+  - Fix VSEARCH sequence ID parsing
+  - Fix duplicate BLAST assignments in `full_table.csv`
+  - Select best hit by e-value, identity, and alignment length
+- Rename workflow rule files for consistency
+- Add workflow descriptions to Snakefile rule imports
+- Improve workflow structure and rule organization
+- Refactor `blast.smk`, `classify.smk`, and `databases.smk`
+- Rename environment files for consistency
+- Remove unused `merging.yaml` environment file
+- Fix pipeline inconsistencies
+
+---
+
 ### [2026-06-09]
 - Rename all preset configuration files and output directories
 - Fix taxonomy merge issue in `merge_results2.py`

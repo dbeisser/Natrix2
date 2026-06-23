@@ -95,6 +95,68 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                     mv $input_dir/*.summary {output[0]};
                 """
 
+    # DATABASE: ROD
+    elif config["classify"]["database"] == "rod":
+        rule mothur_classify:
+            input:
+                os.path.join(config["general"]["output_dir"],"clustering/representatives_mod.fasta") if config["general"]["seq_rep"] == "OTU" or config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
+                expand(["database/RODdb.{ROD_db_version}_reference_sequences.fasta", "database/RODdb.{ROD_db_version}_reference_sequences.tax"], ROD_db_version=config["database_version"]["rod"]),
+            output:
+                os.path.join(config["general"]["output_dir"], "mothur/rod/mothur_out.summary"),
+                os.path.join(config["general"]["output_dir"], "mothur/rod/mothur_out.taxonomy")
+            params:
+                template=config['database_path']['rod_ref'],
+                taxonomy=config['database_path']['rod_tax'],
+                search=config['classify']['search'],
+                method=config['classify']["method"],
+                cutoff=config['classify']['cutoff'],
+                threads=config['general']['cores'],
+                output=config['general']['output_dir'],
+                input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"]["seq_rep"] == "OTU" or config["general"]["seq_rep"] == "ASV" else os.path.join(config["general"]["output_dir"],"filtering"),
+            conda:
+                "../envs/mothur.yaml"
+            log:
+                os.path.join(config["general"]["output_dir"], "logs/mothur_classify.log")
+            shell:
+                """
+                    mothur "#set.logfile(name={log}); classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
+                    # sed -i "s/([^()]*)//g" {params.input}/*.taxonomy
+                    input_dir=$(dirname {input[0]});
+                    mv $input_dir/*.taxonomy {output[1]};
+                    mv $input_dir/*.summary {output[0]};
+                """
+
+    # DATABASE: Eukaryome
+    elif config["classify"]["database"] == "eukaryome":
+        rule mothur_classify:
+            input:
+                os.path.join(config["general"]["output_dir"],"clustering/representatives_mod.fasta") if config["general"]["seq_rep"] == "OTU" or config['clustering'] == "swarm" else ( os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta") if config['clustering']== "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta")),
+                expand(["database/EUK.{eukaryome_db_version}.fasta"], eukaryome_db_version=config["database_version"]["eukaryome"])
+            output:
+                os.path.join(config["general"]["output_dir"],"mothur/eukaryome/mothur_out.summary"),
+                os.path.join(config["general"]["output_dir"],"mothur/eukaryome/mothur_out.taxonomy")
+            params:
+                template=config['database_path']['eukaryome_ref'],
+                taxonomy=config['database_path']['eukaryome_tax'],
+                search=config['classify']['search'],
+                method=config['classify']["method"],
+                cutoff=config['classify']['cutoff'],
+                output=config['general']['output_dir'],
+                threads=config['general']['cores'],
+                input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"]["seq_rep"] == "OTU"   or config["general"]["seq_rep"] == "ASV" else os.path.join(config["general"]["output_dir"],"filtering"),
+            conda:
+                "../envs/mothur.yaml"
+            log:
+                "logs/mothur_classify.log"
+            shell:
+                """
+                    mothur "#classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
+                    # sed -i "s/([^()]*)//g" {params.input}/*.taxonomy
+                    input_dir=$(dirname {input[0]});
+                    mv $input_dir/*.taxonomy {output[1]};
+                    mv $input_dir/*.summary {output[0]};
+                """
+
     # Removes redundant 'unclassified' entries from the taxonomy file (/mothur_out_raw.taxonomy)
     rule filter_unclassified:
         input:
@@ -219,6 +281,69 @@ elif config['dataset']['nanopore']:
                     #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
                     mv {params.input}/*.taxonomy {params.output}/mothur/silva/mothur_out_raw.taxonomy;
                     mv {params.input}/*.summary {params.output}/mothur/silva/mothur_out_raw.summary;
+                """
+
+    # DATABASE: ROD
+    elif config["classify"]["database"] == "rod":
+        rule mothur_classify:
+            input:
+                expand(os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta")) if config['clustering'] == "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
+                expand(["database/RODdb.{ROD_db_version}_reference_sequences.fasta", "database/RODdb.{ROD_db_version}_reference_sequences.tax"], ROD_db_version=config["database_version"]["rod"]),
+            output:
+                os.path.join(config["general"]["output_dir"],"mothur/rod/mothur_out.summary"),
+                os.path.join(config["general"]["output_dir"],"mothur/rod/mothur_out.taxonomy")
+            params:
+                template=config['database_path']['rod_ref'],
+                taxonomy=config['database_path']['rod_tax'],
+                search=config['classify']['search'],
+                method=config['classify']["method"],
+                cutoff=config['classify']['cutoff'],
+                threads=config['general']['cores'],
+                output=config['general']['output_dir'],
+                input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"]["seq_rep"] == "OTU" and config ["dataset"]["nanopore"] == "FALSE" 
+                   else ( os.path.join(config["general"]["output_dir"],"clustering") if config["clustering"]=="vsearch" else os.path.join(config["general"]["output_dir"],"filtering")),
+            conda:
+                "../envs/mothur.yaml" 
+            log:
+                os.path.join(config["general"]["output_dir"],"logs/mothur_classify.log")
+            shell:
+                """
+                    mothur "#set.logfile(name={log}); classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
+                    #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
+                    mv {params.input}/*.taxonomy {params.output}/mothur/rod/mothur_out.taxonomy;
+                    mv {params.input}/*.summary {params.output}/mothur/rod/mothur_out.summary;
+                """
+
+    # DATABASE: Eukaryome
+    elif config["classify"]["database"] == "eukaryome":
+        rule mothur_classify:
+            input:
+                expand(os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta")) if config['clustering'] == "vsearch" else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
+                expand(["database/EUK.{eukaryome_db_version}.fasta"], eukaryome_db_version=config["database_version"]["eukaryome"])
+            output:
+                os.path.join(config["general"]["output_dir"],"mothur/eukaryome/mothur_out.summary"),
+                os.path.join(config["general"]["output_dir"],"mothur/eukaryome/mothur_out.taxonomy")
+            params:
+                template=config['database_path']['eukaryome_ref'],
+                taxonomy=config['database_path']['eukaryome_tax'],
+                search=config['classify']['search'],
+                method=config['classify']["method"],
+                cutoff=config['classify']['cutoff'],
+                output=config['general']['output_dir'],
+                threads=config['general']['cores'],
+                input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"][
+                                                                                        "seq_rep"] == "OTU" and config ["dataset"]["nanopore"] == "FALSE" 
+                   else ( os.path.join(config["general"]["output_dir"],"clustering") if config["clustering"]=="vsearch" else os.path.join(config["general"]["output_dir"],"filtering")),
+            conda:
+                "../envs/mothur.yaml"
+            log:
+                os.path.join(config["general"]["output_dir"],"logs/mothur_classify.log")
+            shell:
+                """
+                    mothur "#classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
+                    #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
+                    mv {params.input}/*.taxonomy {params.output}/mothur/eukaryome/mothur_out.taxonomy;
+                    mv {params.input}/*.summary {params.output}/mothur/eukaryome/mothur_out.summary;
                 """
 
     # Removes redundant 'unclassified' entries from the taxonomy file (/mothur_out_raw.taxonomy)

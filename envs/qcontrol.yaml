@@ -1,4 +1,4 @@
-name: quality_control
+name: qcontrol
 channels:
   - bioconda
   - defaults

@@ -58,3 +58,55 @@ elif config["classify"]["database"] == "silva":
               "../envs/blast.yaml"
            script:
               "../scripts/edit_silva_mothur.py"
+
+elif config["classify"]["database"] == "rod":
+    rule download_ROD:
+        output:
+            expand(["database/RODdb.{ROD_db_version}_reference_sequences.fasta"], ROD_db_version=config["database_version"]["rod"]), 
+            temp(expand(["database/RODdb.{ROD_db_version}_reference_sequences.tab.temp"], ROD_db_version=config["database_version"]["rod"]))
+        params:
+            db_version=config["database_version"]["rod"]
+        shell:
+            """
+                wget -P ./ --progress=bar https://github.com/krabberod/ROD/archive/refs/tags/v{params.db_version}-goldenrod.zip;
+
+                unzip -o ./v{params.db_version}-goldenrod.zip -d ./database/;
+
+                gunzip -c database/ROD-{params.db_version}-goldenrod/ROD_v{params.db_version}_reference_sequences.fasta.gz > database/RODdb.{params.db_version}_reference_sequences.fasta
+                gunzip -c database/ROD-{params.db_version}-goldenrod/ROD_v{params.db_version}_reference_sequences.tab.gz > database/RODdb.{params.db_version}_reference_sequences.tab.temp
+
+                rm ./v{params.db_version}-goldenrod.zip;
+                rm -rf database/ROD-{params.db_version}-goldenrod
+            """
+
+    rule edit_ROD:
+        input:
+            expand("database/RODdb.{ROD_db_version}_reference_sequences.tab.temp", ROD_db_version=config["database_version"]["rod"])
+        output:
+            expand("database/RODdb.{ROD_db_version}_reference_sequences.tax", ROD_db_version=config["database_version"]["rod"])
+        conda:
+            "../envs/blast.yaml"
+        script:
+            "../scripts/edit_ROD_mothur.py"
+
+elif config["classify"]["database"] == "eukaryome":
+
+    rule download_eukaryome:
+        output:
+            expand(["database/EUK.{eukaryome_db_version}.tax", "database/EUK.{eukaryome_db_version}.fasta"], eukaryome_db_version=config["database_version"]["eukaryome"])
+        params:
+            db_version=config["database_version"]["eukaryome"],
+            eukaryome_version=config["database_path"]["eukaryome_version"]
+        shell:
+            """
+                wget -P ./database/ --progress=bar https://sisu.ut.ee/wp-content/uploads/sites/643/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.zip
+
+                python3 -m zipfile -e database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.zip database/
+
+                cat database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.fasta > database/EUK.{params.db_version}.fasta
+                cat database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.tax > database/EUK.{params.db_version}.tax
+
+                rm database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.zip
+                rm database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.fasta
+                rm database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.tax
+            """

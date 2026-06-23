@@ -1,4 +1,4 @@
-name: amplicon_duo
+name: ampliconduo
 channels:
   - conda-forge
   - bioconda

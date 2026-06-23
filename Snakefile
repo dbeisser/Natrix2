@@ -2,32 +2,31 @@ import pandas as pd
 import os
 from snakemake.utils import validate
 
-# Validate config file
+# Validate configuration against schema
 validate(config, "schema/config.schema.yaml")
 
-# Load units/sample metadata
+# Load sample metadata
 units = pd.read_table(os.path.join(config["general"]["output_dir"],config["general"]["units"]), 
     index_col=["sample", "unit"],
     dtype=str)
-#print(units) Debug: show units table
 
-# Make index strings
+# Convert index levels to strings
 units.index = units.index.set_levels([i.astype(str) for i in units.index.levels])
-# Trim name suffix
+
+# Remove read suffix (e.g. R1/R2)
 name_ext = config["merge"]["name_ext"][:-1]
-#print(units.index) Debug: show index levels
 
 # Check if reads are single-end
 def is_single_end(sample, unit):
     return pd.isnull(units.loc[(sample,unit), "fq2"])
 
-# Set read type
+# Define read layout
 if config["merge"]["paired_End"]:
     reads = [1,2]
 else:
     reads = 1
 
-# FINAL OUTPUT FILES
+# Final workflow targets
 rule all:
     input:
         os.path.join(config["general"]["output_dir"],"qc/multiqc_report.html") if config["general"]["multiqc"] else [],
@@ -42,22 +41,38 @@ rule all:
         expand(os.path.join(config["general"]["output_dir"],"finalData/blast_{database}/OTU_table.csv"), database=config['blast']['database'].lower()) if config["blast"]["blast"]  else [],
         expand(os.path.join(config["general"]["output_dir"],"finalData/blast_{database}/OTU_table_mumu.csv"), database=config['blast']['database'].lower()) if config["general"]["seq_rep"] == "OTU" and  config["blast"]["blast"] and config['postcluster']['mumu'] else [],
 
+# Prefer assembly when multiple rules can generate the same output
 if not config['dataset']['nanopore']:
     ruleorder: assembly > prinseq
 
-# IMPORT RULES
+# Import workflow rules
+# Download and prepare reference databases
+include: "rules/databases.smk"
+# Demultiplex raw sequencing reads by sample
 include: "rules/demultiplexing.smk"
-include: "rules/quality_control.smk"
-include: "rules/read_assembly.smk"
+# Generate FastQC and MultiQC quality reports
+include: "rules/qcontrol.smk"
+# Trim primers and assemble Illumina reads
+include: "rules/assembly.smk"
+# Detect, orient, and trim full-length Nanopore reads
+include: "rules/pychopper.smk"
+# Correct Nanopore sequencing errors and generate consensus reads
+include: "rules/rcorrection.smk"
+# Filter reads by quality and length
+include: "rules/qfiltering.smk"
+# Dereplicate sequences using CD-HIT
 include: "rules/dereplication.smk"
-include: "rules/chim_rm.smk"
+# Detect and remove chimeric sequences
+include: "rules/chimera.smk"
+# Merge samples and apply abundance filtering
 include: "rules/merging.smk"
+# Generate OTUs or ASVs using Swarm, DADA2, or VSEARCH
 include: "rules/clustering.smk"
-include: "rules/blast.smk"
-include: "rules/pr2_unite_silva.smk"
-include: "rules/classify.smk"
+# Cluster sequences with VSEARCH
+include: "rules/vsearch.smk"
+# Merge highly similar OTUs using MUMU
 include: "rules/mumu.smk"
-include: "rules/pychop.smk"
-include: "rules/read_correction.smk"
-include: "rules/quality_filt.smk"
-include: "rules/vsearch_clust.smk"
+# Assign taxonomy using MOTHUR reference databases
+include: "rules/classify.smk"
+# Assign taxonomy using BLAST reference databases
+include: "rules/blast.smk"

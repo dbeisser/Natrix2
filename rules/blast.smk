@@ -1,6 +1,6 @@
 import os
 
-if config["blast"]["database"] == "SILVA":
+if config["blast"]["database"] == "silva":
 
     rule make_silva_db:
         output:
@@ -27,7 +27,8 @@ if config["blast"]["database"] == "SILVA":
         script:
             "../scripts/create_silva_taxonomy.py"
 
-elif config["blast"]["database"] == "NCBI":
+
+elif config["blast"]["database"] == "ncbi":
 
     rule make_ncbi_db:
         output:
@@ -77,6 +78,80 @@ elif config["blast"]["database"] == "NCBI":
             "../scripts/create_blast_taxonomy.py"
 
 
+elif config["blast"]["database"] == "rod":
+
+    rule make_ROD_db:
+        output:
+            expand(config["blast"]["db_path"] + "{file_extension}", file_extension=[".ndb", ".nhr", ".nin", ".nog", ".nos", ".not", ".nsq", ".ntf", ".nto"]),
+            config["blast"]["db_path"] + ".fasta"
+        params:
+            db_path=config["blast"]["db_path"],
+            db_version=config["database_version"]["rod"],
+        conda:
+            "../envs/blast.yaml"
+        shell:
+            """
+                wget -O database/v{params.db_version}-goldenrod.zip --progress=bar https://github.com/krabberod/ROD/archive/refs/tags/v{params.db_version}-goldenrod.zip;
+
+                unzip -o database/v{params.db_version}-goldenrod.zip -d database/;
+
+                gunzip -c database/ROD-{params.db_version}-goldenrod/ROD_v{params.db_version}_reference_sequences.fasta.gz > {params.db_path}.{params.db_version}_reference_sequences_lang.fasta
+                sed 's/|/ /g' {params.db_path}.{params.db_version}_reference_sequences_lang.fasta > {params.db_path}.{params.db_version}_reference_sequences.fasta
+
+                makeblastdb -in {params.db_path}.{params.db_version}_reference_sequences.fasta -dbtype nucl -parse_seqids -out {params.db_path} -blastdb_version 5
+
+                mv {params.db_path}.{params.db_version}_reference_sequences.fasta {params.db_path}.fasta
+
+                rm database/v{params.db_version}-goldenrod.zip
+                rm -r database/ROD-{params.db_version}-goldenrod
+            """
+
+    rule create_ROD_taxonomy:
+        input: config["blast"]["db_path"] + ".fasta"
+        output: os.path.join(os.path.dirname(config["blast"]["db_path"]), "tax_lineage.h5")
+        conda:
+            "../envs/blast.yaml"
+        script:
+            "../scripts/create_rod_taxonomy.py"
+
+
+elif config["blast"]["database"] == "eukaryome":
+
+    rule make_Eukaryome_db:
+        output:
+            expand(config["blast"]["db_path"] + "{file_extension}", file_extension=[".ndb", ".nhr", ".nin", ".nog", ".nos", ".not", ".nsq", ".ntf", ".nto"]),
+            config["blast"]["db_path"] + ".fasta",
+            config["blast"]["db_path"] + ".tax"
+        params:
+            db_path=config["blast"]["db_path"],
+            eukaryome_version=config["database_path"]["eukaryome_version"],
+            db_version=config["database_version"]["eukaryome"],
+        conda:
+            "../envs/blast.yaml"
+        shell:
+            """
+                wget -P ./database/ --progress=bar https://sisu.ut.ee/wp-content/uploads/sites/643/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.zip
+                python3 -m zipfile -e database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.zip database/
+                cat database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.fasta > {params.db_path}.{params.db_version}.fasta
+                cat database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.tax > {params.db_path}.tax
+                makeblastdb -in {params.db_path}.{params.db_version}.fasta -dbtype nucl -parse_seqids -out {params.db_path} -blastdb_version 5
+
+                rm database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.zip
+                rm database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.fasta
+                rm database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.tax
+
+		        mv {params.db_path}.{params.db_version}.fasta {params.db_path}.fasta
+            """
+
+    rule create_Eukaryome_taxonomy:
+        input: config["blast"]["db_path"] + ".tax"
+        output: os.path.join(os.path.dirname(config["blast"]["db_path"]), "tax_lineage.h5")
+        conda:
+            "../envs/blast.yaml"
+        script:
+            "../scripts/create_eukaryome_taxonomy.py"
+
+
 rule blast:
     input:
         query = os.path.join(config["general"]["output_dir"],"clustering/representatives.fasta") \
@@ -87,10 +162,10 @@ rule blast:
 
         db_ready = (
             config["blast"]["db_path"] + config["blast"]["db_type"] + ".downloaded.ok"
-            if config["blast"]["database"] == "NCBI"
+            if config["blast"]["database"] == "ncbi"
             else expand(config["blast"]["db_path"] + "{ext}",
                         ext=[".ndb", ".nhr", ".nin", ".nog", ".nos", ".not", ".nsq", ".ntf", ".nto"])
-            if config["blast"]["database"] == "SILVA"
+            if config["blast"]["database"] in ["silva", "rod", "eukaryome"]
             else []
         )
     output:
@@ -102,10 +177,10 @@ rule blast:
     params:
         db_path = (
             config["blast"]["db_path"] + config["blast"]["db_type"]
-            if config["blast"]["database"] == "NCBI"
+            if config["blast"]["database"] == "ncbi"
             else config["blast"]["db_path"]
         ),
-        max_target_seqs=str(config["blast"]["max_target_seqs"]) if config["blast"]["database"] == "NCBI" else "1",
+        max_target_seqs=str(config["blast"]["max_target_seqs"]) if config["blast"]["database"] == "ncbi" else "1",
         ident=str(config["blast"]["ident"]),
         evalue=str(config["blast"]["evalue"]),
         out6='"6 qseqid qlen length pident mismatch qstart qend sstart send gaps evalue staxid sseqid"'
@@ -130,8 +205,9 @@ rule blast:
                 2>> {log}
         """
 
+
 if config['blast']['blast']:
-	if config["blast"]["database"]=="NCBI":
+	if config["blast"]["database"]=="ncbi":
 
 		rule ncbi_taxonomy:
 			input:
@@ -176,7 +252,7 @@ if config['blast']['blast']:
                 else "../scripts/merge_results.py"
 
 
-	elif config["blast"]["database"] == "SILVA":
+	elif config["blast"]["database"] == "silva":
 
 		rule silva_taxonomy:
 			input:
@@ -195,7 +271,11 @@ if config['blast']['blast']:
 
 		rule merge_results:
 			input:
-				merged=os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") if config["general"]["seq_rep"] == "OTU" and not config['dataset']['nanopore']  else os.path.join(config["general"]["output_dir"],"filtering/filtered_table.csv"),
+				merged=os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv") \
+                if config["clustering"] == "vsearch" and config["dataset"]["nanopore"] \
+                else os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") \
+                if config["general"]["seq_rep"] == "OTU" and not config["dataset"]["nanopore"] and config["clustering"] == "swarm" \
+                else os.path.join(config["general"]["output_dir"],"filtering/filtered_table.csv"),
 				blast_result=os.path.join(config["general"]["output_dir"],"blast/blast_taxonomic_lineage.tsv")
 			output:
 				complete=os.path.join(config["general"]["output_dir"],"finalData/blast_silva/full_table.csv"),
@@ -209,4 +289,90 @@ if config['blast']['blast']:
 			log:
 				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
-				"../scripts/merge_results.py"
+				"../scripts/merge_results_vsearch_blast.py" \
+                if config["clustering"]== "vsearch" and config["dataset"]["nanopore"] \
+                else "../scripts/merge_results.py"
+
+
+	elif config["blast"]["database"] == "eukaryome":
+
+		rule Eukaryome_taxonomy:
+			input:
+				blast_result = os.path.join(config["general"]["output_dir"],"blast/blast_taxonomy.tsv"),
+				lineage = os.path.join(os.path.dirname(config["blast"]["db_path"]), "tax_lineage.h5")
+			output:
+				temp(os.path.join(config["general"]["output_dir"],"blast/blast_taxonomic_lineage.tsv"))
+			params:
+				drop_tax_classes=str(config["blast"]["drop_tax_classes"])
+			conda:
+				"../envs/blast.yaml"
+			log:
+				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
+			script:
+				"../scripts/eukaryome_taxonomy.py"
+
+		rule merge_results:
+			input:
+				merged=os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv") \
+                if config["clustering"] == "vsearch" and config["dataset"]["nanopore"] \
+                else os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") \
+                if config["general"]["seq_rep"] == "OTU" and not config["dataset"]["nanopore"] and config["clustering"] == "swarm" \
+                else os.path.join(config["general"]["output_dir"],"filtering/filtered_table.csv"),
+				blast_result=os.path.join(config["general"]["output_dir"],"blast/blast_taxonomic_lineage.tsv")
+			output:
+				complete=os.path.join(config["general"]["output_dir"],"finalData/blast_eukaryome/full_table.csv"),
+				filtered=os.path.join(config["general"]["output_dir"],"finalData/blast_eukaryome/filtered_full_table.csv"),
+				otus=os.path.join(config["general"]["output_dir"],"finalData/blast_eukaryome/OTU_table.csv"),
+				metadata=os.path.join(config["general"]["output_dir"],"finalData/blast_eukaryome/metadata_table.csv"),
+			params:
+				seq_rep=str(config["general"]["seq_rep"]),
+			conda:
+				"../envs/merge_results.yaml"
+			log:
+				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
+			script:
+				"../scripts/merge_results_vsearch_blast.py" \
+                if config["clustering"]== "vsearch" and config["dataset"]["nanopore"] \
+                else "../scripts/merge_results.py"
+
+
+	elif config["blast"]["database"] == "rod":
+
+		rule ROD_taxonomy:
+			input:
+				blast_result = os.path.join(config["general"]["output_dir"],"blast/blast_taxonomy.tsv"),
+				lineage = os.path.join(os.path.dirname(config["blast"]["db_path"]), "tax_lineage.h5")
+			output:
+				temp(os.path.join(config["general"]["output_dir"],"blast/blast_taxonomic_lineage.tsv"))
+			params:
+				drop_tax_classes=str(config["blast"]["drop_tax_classes"])
+			conda:
+				"../envs/blast.yaml"
+			log:
+				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
+			script:
+				"../scripts/silva_taxonomy.py"
+
+		rule merge_results:
+			input:
+                merged=os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv") \
+                if config["clustering"] == "vsearch" and config["dataset"]["nanopore"] \
+                else os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") \
+                if config["general"]["seq_rep"] == "OTU" and not config["dataset"]["nanopore"] and config["clustering"] == "swarm" \
+                else os.path.join(config["general"]["output_dir"],"filtering/filtered_table.csv"),
+                blast_result=os.path.join(config["general"]["output_dir"],"blast/blast_taxonomic_lineage.tsv")
+			output:
+				complete=os.path.join(config["general"]["output_dir"],"finalData/blast_rod/full_table.csv"),
+				filtered=os.path.join(config["general"]["output_dir"],"finalData/blast_rod/filtered_full_table.csv"),
+				otus=os.path.join(config["general"]["output_dir"],"finalData/blast_rod/OTU_table.csv"),
+				metadata=os.path.join(config["general"]["output_dir"],"finalData/blast_rod/metadata_table.csv"),
+			params:
+				seq_rep=str(config["general"]["seq_rep"]),
+			conda:
+				"../envs/merge_results.yaml"
+			log:
+				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
+			script:
+				"../scripts/merge_results_vsearch_blast.py" \
+                if config["clustering"]== "vsearch" and config["dataset"]["nanopore"] \
+                else "../scripts/merge_results.py"

@@ -50,7 +50,7 @@ if config['dataset']['nanopore']:
         params:
             memory=config["general"]["memory"],
             length=config["nanopore"]["min_length"]
-        conda: "../envs/read_correction.yaml"
+        conda: "../envs/rcorrection.yaml"
         shell:
             "cd-hit-est -i {input} -o {output} -l {params.length} -c 0.8 -d 0 -M {params.memory} -T {threads}"
 
@@ -82,7 +82,7 @@ if config['dataset']['nanopore']:
             expand(os.path.join(config["general"]["output_dir"],"read_correction/minimap/{{sample}}_{{unit}}_R{read}_align_1.sam"),read=reads)
         threads: config["general"]["cores"]
         conda:
-            "../envs/read_correction.yaml"
+            "../envs/rcorrection.yaml"
         shell:
             "minimap2 -ax map-ont -t {threads} {input[0]}  {input[1]} > {output}"
 
@@ -101,7 +101,7 @@ if config['dataset']['nanopore']:
             final = expand(os.path.join(config["general"]["output_dir"],"read_correction/racon/{{sample}}_{{unit}}_R{read}_racon_1.fasta"),read=reads)
         threads: config["general"]["cores"]
         conda:
-            "../envs/read_correction.yaml"
+            "../envs/rcorrection.yaml"
         shell:
             """
                 racon  -m 8 -x -6 -g -8 -w 500 -t {threads} {input[0]} {input[1]} {input[2]} > {output.tmp};
@@ -119,7 +119,7 @@ if config['dataset']['nanopore']:
             expand(os.path.join(config["general"]["output_dir"],"read_correction/minimap/{{sample}}_{{unit}}_R{read}_align_2.sam"),read=reads)
         threads: config["general"]["cores"]
         conda:
-            "../envs/read_correction.yaml"
+            "../envs/rcorrection.yaml"
         shell:
             "minimap2 -ax map-ont -t {threads} {input[0]}  {input[1]} > {output}"
 
@@ -138,7 +138,7 @@ if config['dataset']['nanopore']:
             final = expand(os.path.join(config["general"]["output_dir"],"read_correction/racon/{{sample}}_{{unit}}_R{read}_racon_2.fasta"),read=reads)
         threads: config["general"]["cores"]
         conda:
-            "../envs/read_correction.yaml"
+            "../envs/rcorrection.yaml"
         shell:
             """
                 racon  -m 8 -x -6 -g -8 -w 500 -t {threads} {input[0]} {input[1]} {input[2]} > {output.tmp};
@@ -156,7 +156,7 @@ if config['dataset']['nanopore']:
             expand(os.path.join(config["general"]["output_dir"],"read_correction/minimap/{{sample}}_{{unit}}_R{read}_align_3.sam"),read=reads)
         threads: config["general"]["cores"]
         conda:
-            "../envs/read_correction.yaml"
+            "../envs/rcorrection.yaml"
         shell:
             "minimap2 -ax map-ont -t {threads} {input[0]}  {input[1]} > {output}"
 
@@ -175,7 +175,7 @@ if config['dataset']['nanopore']:
             final = expand(os.path.join(config["general"]["output_dir"],"read_correction/racon/{{sample}}_{{unit}}_R{read}_racon_3.fasta"),read=reads)
         threads: config["general"]["cores"]
         conda:
-            "../envs/read_correction.yaml"
+            "../envs/rcorrection.yaml"
         shell:
             """
                 racon  -m 8 -x -6 -g -8 -w 500 -t {threads} {input[0]} {input[1]} {input[2]} > {output.tmp};
@@ -193,7 +193,7 @@ if config['dataset']['nanopore']:
             expand(os.path.join(config["general"]["output_dir"],"read_correction/minimap/{{sample}}_{{unit}}_R{read}_align_4.sam"),read=reads)
         threads: config["general"]["cores"]
         conda:
-            "../envs/read_correction.yaml"
+            "../envs/rcorrection.yaml"
         shell:
             "minimap2 -ax map-ont -t {threads} {input[0]}  {input[1]} > {output}"
 
@@ -212,7 +212,7 @@ if config['dataset']['nanopore']:
             final = expand(os.path.join(config["general"]["output_dir"],"read_correction/racon/{{sample}}_{{unit}}_R{read}_racon_4.fasta"),read=reads)
         threads: config["general"]["cores"]
         conda:
-            "../envs/read_correction.yaml"
+            "../envs/rcorrection.yaml"
         shell:
             """
                 racon  -m 8 -x -6 -g -8 -w 500 -t {threads} {input[0]} {input[1]} {input[2]} > {output.tmp};
@@ -230,7 +230,7 @@ if config['dataset']['nanopore']:
             expand(os.path.join(config["general"]["output_dir"],"read_correction/minimap/{{sample}}_{{unit}}_R{read}_align_5.sam"),read=reads)
         threads: config["general"]["cores"]
         conda:
-            "../envs/read_correction.yaml"
+            "../envs/rcorrection.yaml"
         shell:
             "minimap2 -ax map-ont -t {threads} {input[0]}  {input[1]} > {output}"
 
@@ -249,7 +249,7 @@ if config['dataset']['nanopore']:
             final = expand(os.path.join(config["general"]["output_dir"],"read_correction/racon/{{sample}}_{{unit}}_R{read}_racon_5.fasta"),read=reads)
         threads: config["general"]["cores"]
         conda:
-            "../envs/read_correction.yaml"
+            "../envs/rcorrection.yaml"
         shell:
             """
                 racon  -m 8 -x -6 -g -8 -w 500 -t {threads} {input[0]} {input[1]} {input[2]} > {output.tmp};
@@ -307,7 +307,7 @@ if config['dataset']['nanopore']:
             expand(os.path.join(config["general"]["output_dir"],"read_correction/counts_mapping/{{sample}}_{{unit}}_R{read}_align.sam"),read=reads)
         threads: config["general"]["cores"]
         conda:
-            "../envs/read_correction.yaml"
+            "../envs/rcorrection.yaml"
         shell:
             """
             minimap2 -ax map-ont -t {threads} {input[0]} {input[1]} > {output}

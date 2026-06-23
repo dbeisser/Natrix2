@@ -1,20 +1,20 @@
 # Natrix2; Config File
 # General settings for the pipeline
 general:
-        filename: input_data/Nanopore_data/18S_Euk_Samples # Path to raw data folder with primer table and config file; use relative path if outside Natrix2 root (e.g., input/example_data)
-        output_dir: results_18S_nanopore_vsearch_blast_ncbi # Path to the custom output directory (relative to the Natrix2 root, e.g., results/my_output); avoid using dashes in folder names
-        primertable: primer_table/C3S5_T3S7_18S_Nanopore.csv # Path to the primer table (.csv); use a relative path if outside the Natrix2 root (e.g., input/example_data/Illumina.csv)
+        filename: input_data/illumina/18S_Euk_Samples/18SV9_Illumina_NextSeq500 # Path to raw data folder with primer table and config file; use relative path if outside Natrix2 root (e.g., input/example_data)
+        output_dir: results_illumina_18SV9_NextSeq500 # Path to the custom output directory (relative to the Natrix2 root, e.g., results/my_output); avoid using dashes in folder names
+        primertable: primer_table/18SV9_Illumina_NextSeq500.csv # Path to the primer table (.csv); use a relative path if outside the Natrix2 root (e.g., input/example_data/Illumina.csv)
         units: units.tsv # Path to the sequencing unit sheet (.tsv); the filename will be concatenated with output_dir (e.g., units.tsv)
         cores: 20 # Number of CPU cores (e.g., 20)
         memory: 10000 # Available RAM in MB (e.g., 16000 for 16 GB)
-        multiqc: FALSE # Run initial quality check with FastQC and MultiQC (only for unassembled reads, e.g., TRUE)
+        multiqc: TRUE # Run initial quality check with FastQC and MultiQC (only for unassembled reads, e.g., TRUE)
         read_sorting: FALSE # Run read sorting for paired-end reads if not sorted by the sequencing provider (Illumina only, slow)
         already_assembled: FALSE # Skip quality control and assembly if reads are already assembled (Illumina only)
         seq_rep: OTU # Type of sequence representative: "ASV" (via DADA2) or "OTU" (via SWARM or VSEARCH)
 
 # Define sequencing data type (e.g., Nanopore or Illumina)
 dataset:
-        nanopore: TRUE # Set to TRUE for long reads (e.g., Nanopore) or FALSE for short reads (e.g., Illumina)
+        nanopore: FALSE # Set to TRUE for long reads (e.g., Nanopore) or FALSE for short reads (e.g., Illumina)
 
 # Quality check and primer removal for Nanopore reads
 nanopore:
@@ -33,11 +33,11 @@ qc:
         minoverlap: 15 # Minimum required overlap between forward and reverse reads (e.g., 15)
         minqual: 1 # Minimum base quality in an assembled read for PANDAseq acceptance (e.g., 1)
         minlen: 100 # Minimum sequence length after primer removal accepted by PANDAseq or Cutadapt (e.g., 100)
-        maxlen: 10000 # Maximum sequence length after primer removal accepted by PANDAseq or Cutadapt (e.g., 600)
+        maxlen: 600 # Maximum sequence length after primer removal accepted by PANDAseq or Cutadapt (e.g., 600)
         primer_offset: FALSE # PANDAseq to remove primers by length offset instead of sequence identity (OTU only, e.g., FALSE)
         mq: 25 # Minimum average quality score for pre-assembly filtering with prinseq (PHRED score, e.g., 25)
         barcode_removed: TRUE # Set to TRUE if sequences are barcode-free (e.g., TRUE)
-        all_primer: TRUE # Set to TRUE if sequences are free of primers, barcodes, or other additional subsequences (e.g., TRUE)
+        all_primer: FALSE # Set to TRUE if sequences are free of primers, barcodes, or other additional subsequences (e.g., TRUE)
 
 # Dereplication of sequences using CD-HIT
 derep:
@@ -53,49 +53,61 @@ chim:
 
 # Merging and filtering settings
 merge:
-        filter_method: not_split # Split-sample mode: "split_sample" if used, otherwise "not_split" (not recommended for Nanopore; use "cutoff" instead)
+        filter_method: split_sample # Split-sample mode: "split_sample" if used, otherwise "not_split" (not recommended for Nanopore; use "cutoff" instead)
         ampliconduo: FALSE # Use AmpliconDuo for statistical validation (e.g., FALSE)
         cutoff: 2 # Minimum total abundance across samples to keep a read if not using split-sample approach (e.g., 2)
         ampli_corr: fdr # Correction method for Fisher’s exact test (e.g., "fdr")
         save_format: png # File format for the frequency-frequency plot (e.g., "png")
         plot_AmpDuo: TRUE # Save frequency-frequency plot (e.g., TRUE)
-        paired_End: FALSE # Set to TRUE for paired-end data (e.g., TRUE)
+        paired_End: TRUE # Set to TRUE for paired-end data (e.g., TRUE)
         name_ext: R1 # Identifier for the forward read (e.g., "R1"); reverse read must use "R2"; required for paired-end data and must appear at the end of the filename before the file extension
 
 # Clustering of OTUs using SWARM or VSEARCH
-clustering: "vsearch" # OTU clustering method: "swarm" or "vsearch" (Nanopore supports only "vsearch")
+clustering: "swarm" # OTU clustering method: "swarm" or "vsearch" (Nanopore supports only "vsearch")
 # ID used when clustering = "vsearch"
 vsearch_id: 0.97 # Percent identity for VSEARCH OTU clustering (e.g., 0.97 = 97%)
 
 # Post-clustering filtering (OTU only)
 postcluster:
-        mumu: FALSE # Use MUMU filtering after clustering (OTU only, e.g., TRUE)
+        mumu: TRUE # Use MUMU filtering after clustering (OTU only, e.g., TRUE)
 
 # MOTHUR parameters for taxonomic classification
 classify:
-        mothur: FALSE # Use MOTHUR for taxonomic classification (e.g., TRUE)
+        mothur: TRUE # Use MOTHUR for taxonomic classification (e.g., TRUE)
         search: kmer # Method to find the most similar reference: "suffix", "kmer", "blast", "align", or "distance" (default: "kmer")
         method: wang # Classification method: "wang", "knn", or "zap" (default: "wang")
-        database: pr2 # Reference database to use with MOTHUR: "pr2", "unite", or "silva" (e.g., "pr2")
+        database: pr2 # MOTHUR DB: pr2 (18S), eukaryome (18S), rod (18S), silva (16S/18S), unite (ITS)
         cutoff: 0 # Min. confidence (0–100), 0 = no filter (default: 0)
 # Reference database versions
 database_version:
-        pr2: 5.0.0 # Version number of the PR2 reference database
-        silva: 138.2 # Version number of the SILVA reference database
+        pr2: 5.0.0 # PR2 database version
+        eukaryome: 2.0 # Eukaryome database version
+        rod: 1.2 # ROD database version
+        silva: 138.2 # SILVA database version
 # Paths to reference and taxonomy files for each database
 database_path:
-        silva_tax: database/silva_db.138.2.tax # Path to SILVA taxonomy file
-        silva_ref: database/silva_db.138.2.fasta # Path to SILVA reference FASTA
+        # PR2: Protist Ribosomal Reference Database
         pr2_ref: database/pr2db.5.0.0.fasta # Path to PR2 reference FASTA
         pr2_tax: database/pr2db.5.0.0.tax # Path to PR2 taxonomy file
+        # Eukaryome Database
+        eukaryome_ref: database/EUK.2.0.fasta # Path to Eukaryome reference FASTA
+        eukaryome_tax: database/EUK.2.0.tax # Path to Eukaryome taxonomy file
+        eukaryome_version: SSU # Eukaryome database type: SSU, LSU, longread, or ITS
+        # ROD: Ribosomal Operon Database
+        rod_ref: database/RODdb.1.2_reference_sequences.fasta # Path to ROD reference FASTA
+        rod_tax: database/RODdb.1.2_reference_sequences.tax # Path to ROD taxonomy file
+        # SILVA rRNA Database
+        silva_ref: database/silva_db.138.2.fasta # Path to SILVA reference FASTA
+        silva_tax: database/silva_db.138.2.tax # Path to SILVA taxonomy file
+        # UNITE Fungal ITS Database
         unite_ref: database/unite_v10.fasta # Path to UNITE reference FASTA
         unite_tax: database/unite_v10.tax # Path to UNITE taxonomy file
 
 # BLAST classification
 blast:
-        blast: TRUE # Use BLAST for taxonomic classification (TRUE or FALSE)
-        database: NCBI # Reference database for BLAST ("NCBI" or "SILVA")
-        db_path: database/ncbi/ # Path to BLAST database (e.g., SILVA: database/silva/silva.db or NCBI: database/ncbi/); downloaded automatically
+        blast: FALSE # Use BLAST for taxonomic classification (TRUE or FALSE)
+        database: ncbi # BLAST DB: ncbi (nt), silva (16S/18S), eukaryome (18S), rod (18S)
+        db_path: database/ncbi/ # BLAST DB path: ncbi: database/ncbi/, silva: database/silva/silva.db, eukaryome: database/eukaryome, rod: database/rod
         db_type: core_nt # Only for NCBI database; available DBs: core_nt (default), nt (entire database), nt_euk, nt_prok, nt_viruses, nt_others
         drop_tax_classes: 'no_filter' # Taxonomic classes to exclude; use 'no_filter' to disable filtering or comma-separated regex (e.g., 'uncultured', '.*unclassified.*')
         max_target_seqs: 10 # Number of BLAST hits saved per sequence or OTU (e.g., 10)

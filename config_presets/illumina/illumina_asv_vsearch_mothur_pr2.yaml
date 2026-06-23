@@ -1,8 +1,8 @@
 # Natrix2; Config File
 # General settings for the pipeline
 general:
-        filename: input_data/Illumina_data/16S_Prok_Samples/A071SE # Path to raw data folder with primer table and config file; use relative path if outside Natrix2 root (e.g., input/example_data)
-        output_dir: results_16S_illumina_vsearch_mothur_otu_pr2 # Path to the custom output directory (relative to the Natrix2 root, e.g., results/my_output); avoid using dashes in folder names
+        filename: input_data/illumina/16S_Prok_Samples/A071SE # Path to raw data folder with primer table and config file; use relative path if outside Natrix2 root (e.g., input/example_data)
+        output_dir: results_16S_illumina_asv_vsearch_mothur_pr2 # Path to the custom output directory (relative to the Natrix2 root, e.g., results/my_output); avoid using dashes in folder names
         primertable: primer_table/A071SE_16S_Illumina.csv # Path to the primer table (.csv); use a relative path if outside the Natrix2 root (e.g., input/example_data/Illumina.csv)
         units: units.tsv # Path to the sequencing unit sheet (.tsv); the filename will be concatenated with output_dir (e.g., units.tsv)
         cores: 20 # Number of CPU cores (e.g., 20)
@@ -10,7 +10,7 @@ general:
         multiqc: FALSE # Run initial quality check with FastQC and MultiQC (only for unassembled reads, e.g., TRUE)
         read_sorting: FALSE # Run read sorting for paired-end reads if not sorted by the sequencing provider (Illumina only, slow)
         already_assembled: FALSE # Skip quality control and assembly if reads are already assembled (Illumina only)
-        seq_rep: OTU # Type of sequence representative: "ASV" (via DADA2) or "OTU" (via SWARM or VSEARCH)
+        seq_rep: ASV # Type of sequence representative: "ASV" (via DADA2) or "OTU" (via SWARM or VSEARCH)
 
 # Define sequencing data type (e.g., Nanopore or Illumina)
 dataset:
@@ -76,26 +76,38 @@ classify:
         mothur: TRUE # Use MOTHUR for taxonomic classification (e.g., TRUE)
         search: kmer # Method to find the most similar reference: "suffix", "kmer", "blast", "align", or "distance" (default: "kmer")
         method: wang # Classification method: "wang", "knn", or "zap" (default: "wang")
-        database: pr2 # Reference database to use with MOTHUR: "pr2", "unite", or "silva" (e.g., "pr2")
+        database: pr2 # MOTHUR DB: pr2 (18S), eukaryome (18S), rod (18S), silva (16S/18S), unite (ITS)
         cutoff: 0 # Min. confidence (0–100), 0 = no filter (default: 0)
 # Reference database versions
 database_version:
-        pr2: 5.0.0 # Version number of the PR2 reference database
-        silva: 138.2 # Version number of the SILVA reference database
+        pr2: 5.0.0 # PR2 database version
+        eukaryome: 2.0 # Eukaryome database version
+        rod: 1.2 # ROD database version
+        silva: 138.2 # SILVA database version
 # Paths to reference and taxonomy files for each database
 database_path:
-        silva_tax: database/silva_db.138.2.tax # Path to SILVA taxonomy file
-        silva_ref: database/silva_db.138.2.fasta # Path to SILVA reference FASTA
+        # PR2: Protist Ribosomal Reference Database
         pr2_ref: database/pr2db.5.0.0.fasta # Path to PR2 reference FASTA
         pr2_tax: database/pr2db.5.0.0.tax # Path to PR2 taxonomy file
+        # Eukaryome Database
+        eukaryome_ref: database/EUK.2.0.fasta # Path to Eukaryome reference FASTA
+        eukaryome_tax: database/EUK.2.0.tax # Path to Eukaryome taxonomy file
+        eukaryome_version: SSU # Eukaryome database type: SSU, LSU, longread, or ITS
+        # ROD: Ribosomal Operon Database
+        rod_ref: database/RODdb.1.2_reference_sequences.fasta # Path to ROD reference FASTA
+        rod_tax: database/RODdb.1.2_reference_sequences.tax # Path to ROD taxonomy file
+        # SILVA rRNA Database
+        silva_ref: database/silva_db.138.2.fasta # Path to SILVA reference FASTA
+        silva_tax: database/silva_db.138.2.tax # Path to SILVA taxonomy file
+        # UNITE Fungal ITS Database
         unite_ref: database/unite_v10.fasta # Path to UNITE reference FASTA
         unite_tax: database/unite_v10.tax # Path to UNITE taxonomy file
 
 # BLAST classification
 blast:
         blast: FALSE # Use BLAST for taxonomic classification (TRUE or FALSE)
-        database: NCBI # Reference database for BLAST ("NCBI" or "SILVA")
-        db_path: database/ncbi/ # Path to BLAST database (e.g., SILVA: database/silva/silva.db or NCBI: database/ncbi/); downloaded automatically
+        database: ncbi # BLAST DB: ncbi (nt), silva (16S/18S), eukaryome (18S), rod (18S)
+        db_path: database/ncbi/ # BLAST DB path: ncbi: database/ncbi/, silva: database/silva/silva.db, eukaryome: database/eukaryome, rod: database/rod
         db_type: core_nt # Only for NCBI database; available DBs: core_nt (default), nt (entire database), nt_euk, nt_prok, nt_viruses, nt_others
         drop_tax_classes: 'no_filter' # Taxonomic classes to exclude; use 'no_filter' to disable filtering or comma-separated regex (e.g., 'uncultured', '.*unclassified.*')
         max_target_seqs: 10 # Number of BLAST hits saved per sequence or OTU (e.g., 10)
