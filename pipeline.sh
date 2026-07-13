@@ -1,16 +1,38 @@
 #!/bin/bash
 
-# Prints for pipeline.sh script
+# Launcher
 echo ""
-echo "Natrix2 Pipeline Script"
-echo "Enter project name (e.g. illumina_swarm):"
+echo "Natrix2 Pipeline Launcher"
+echo "Exit launcher: enter 'exit' or 'quit'"
+echo "Enter config:"
+echo "Project:  your_config.yaml (root directory)"
+echo "Test run: illumina_testrun (example config)"
 
-# Read user input file
-read varname
+# User input
+read -e -p "> " varname
+
+# Empty input
+if [[ -z "$varname" ]]; then
+    echo "ERROR: No configuration entered."
+    exit 1
+fi
+
+# Exit launcher
+case "${varname,,}" in
+    exit|quit)
+        echo "Launcher aborted."
+        exit 0
+        ;;
+esac
 
 # Append .yaml only if needed
 if [[ "$varname" != *.yaml ]]; then
     varname="${varname}.yaml"
+fi
+
+# Built-in config presets
+if [[ "$varname" == "illumina_testrun.yaml" ]]; then
+    varname="config_presets/illumina_testrun.yaml"
 fi
 
 # Check if the config file exists
@@ -40,6 +62,9 @@ fi
 
 # Create dataframe and start pipeline in screen
 if python create_dataframe.py "$varname"; then
-    session_name="${varname%.yaml}"
+    session_name="$(basename "$varname" .yaml)"
     screen -S "$session_name" bash -c "source \"$env_loc\"; conda activate natrix2; snakemake --use-conda --cores \"$cores\" --configfile \"$varname\" -p -r; exec sh"
+else
+    echo "ERROR: Failed to create dataframe."
+    exit 1
 fi

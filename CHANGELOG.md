@@ -5,6 +5,24 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
 
 ---
 
+### [2026-07-13]
+- Improve Natrix2 Launcher `pipeline.sh`
+  - Add interactive pipeline launcher
+  - Add built-in `illumina_testrun` configuration preset
+  - Support configuration names with and without `.yaml`
+  - Add Bash tab completion for configuration input
+  - Add case-insensitive `exit` and `quit` commands
+  - Validate empty configuration input
+  - Improve launcher error handling
+  - Fix preset configuration handling
+- Add `illumina_testrun.yaml` example configuration
+- Add automatic Docker build script: `build_docker.sh`
+- Update Docker image with latest changes
+- Fix Conda dependency resolution in `natrix2.yaml`
+- Remove unused pipeline files
+
+---
+
 ### [2026-06-23]
 - Add `Eukaryome` and `ROD` reference databases
 - Add preset configuration files for Eukaryome and ROD databases
