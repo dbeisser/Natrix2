@@ -5,6 +5,28 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
 
 ---
 
+### [2026-08-22]
+
+- Improve `create_dataframe.py`
+  - Add validation of FASTQ sample names against the primer table
+  - Validate required `Probe` column and sample consistency
+  - Improve user-facing validation messages and error reporting
+  - Refactor code structure and update inline comments
+- Fix and improve single-end read processing in `assembly.py`
+  - Fix inconsistent sequence and quality lengths after trimming
+  - Trim quality scores using the corresponding sequence offset
+  - Improve primer and barcode trimming
+  - Replace sequence-based removal with position-based trimming
+  - Check all intended primer positions (`0`, `±1`, `±2`)
+  - Improve code structure and add detailed inline comments
+  - Keep paired-end PANDAseq processing unchanged
+- Update Docker image with latest changes
+- Validate workflow execution using the provided test datasets
+- Fix environment issue by pinning Python=3.7
+- Remove unused and invalid files from the pipeline
+
+---
+
 ### [2026-07-13]
 - Improve Natrix2 Launcher `pipeline.sh`
   - Add interactive pipeline launcher

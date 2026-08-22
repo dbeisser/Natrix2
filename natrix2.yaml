@@ -4,6 +4,7 @@ channels:
   - bioconda
   - nodefaults
 dependencies:
+  - python=3.7
   - dinopy=2.0.1
   - snakemake=5.32.2
   - seqkit=2.10.0
