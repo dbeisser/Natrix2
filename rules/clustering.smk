@@ -12,11 +12,11 @@ if not config['dataset']['nanopore'] and config['clustering']== 'swarm':
             minoverlap=config["qc"]["minoverlap"],
             splitsamples=config["merge"]["filter_method"]
         conda:
-            "../envs/dada2.yaml"
+            "../envs/classification/dada2.yaml"
         log:
             os.path.join(config["general"]["output_dir"], "logs/{sample}_{unit}_dada2.log")
         script:
-            "../scripts/dada2.R"
+            "../scripts/classification/dada2.R"
 
 
     rule swarm:
@@ -27,7 +27,7 @@ if not config['dataset']['nanopore'] and config['clustering']== 'swarm':
             os.path.join(config["general"]["output_dir"],"clustering/merged.swarms")
         threads: config["general"]["cores"]
         conda:
-            "../envs/swarm.yaml"
+            "../envs/analysis/swarm.yaml"
         shell:
             "swarm -t {threads} -f -z -w {output[0]} < {input} > {output[1]}"
 
@@ -38,7 +38,7 @@ if not config['dataset']['nanopore'] and config['clustering']== 'swarm':
         output:
             os.path.join(config["general"]["output_dir"],"clustering/representatives_mod.fasta")
         script:
-            "../scripts/swarm_fasta_headers.py"
+            "../scripts/analysis/swarm_fasta_headers.py"
 
 
     rule clust_merge_results:
@@ -48,9 +48,9 @@ if not config['dataset']['nanopore'] and config['clustering']== 'swarm':
         output:
             out=os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") if config['clustering'] == "swarm" else os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv")
         conda:
-            "../envs/merge_results.yaml"
+            "../envs/utilities/merge_results.yaml"
         script:
-            "../scripts/merge_clust_results.py"
+            "../scripts/utilities/merge_clust_results.py"
 
     # SWARM clustering runs on all samples after AmpliconDuo
     rule write_fasta:

@@ -12,9 +12,9 @@ rule demultiplex:
         name_ext = config['merge']['name_ext'],
         output_dir = config['general']['output_dir']
     conda:
-        "../envs/demultiplexing.yaml"
+        "../envs/preprocessing/demultiplexing.yaml"
     script:
-        "../scripts/demultiplexing.py"
+        "../scripts/preprocessing/demultiplexing.py"
 
 rule unzip:
     input:

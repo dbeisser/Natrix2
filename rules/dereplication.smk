@@ -6,7 +6,7 @@ rule cdhit:
         os.path.join(config["general"]["output_dir"],"assembly/{sample}_{unit}/{sample}_{unit}_cdhit.fasta"),
         temp(os.path.join(config["general"]["output_dir"],"assembly/{sample}_{unit}/{sample}_{unit}_cdhit.fasta.clstr"))
     conda:
-        "../envs/dereplication.yaml"
+        "../envs/analysis/dereplication.yaml"
     threads: config["general"]["cores"]
     params:
         id_percent=config["derep"]["clustering"],
@@ -24,10 +24,10 @@ rule cluster_sorting:
     output:
         os.path.join(config["general"]["output_dir"],"assembly/{sample}_{unit}/{sample}_{unit}.dereplicated.fasta")
     conda:
-        "../envs/dereplication.yaml"
+        "../envs/analysis/dereplication.yaml"
     params:
         repr=config["derep"]["representative"],
         length_cutoff=config["derep"]["length_overlap"]
     script:
-        "../scripts/dereplication.py"
+        "../scripts/analysis/dereplication.py"
 

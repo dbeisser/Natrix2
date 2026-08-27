@@ -55,9 +55,9 @@ elif config["classify"]["database"] == "silva":
            output:
               expand("database/silva_db.{silva_db_version}.tax", silva_db_version=config["database_version"]["silva"])
            conda:
-              "../envs/blast.yaml"
+              "../envs/classification/blast.yaml"
            script:
-              "../scripts/edit_silva_mothur.py"
+              "../scripts/classification/edit_silva_mothur.py"
 
 elif config["classify"]["database"] == "rod":
     rule download_ROD:
@@ -85,9 +85,9 @@ elif config["classify"]["database"] == "rod":
         output:
             expand("database/RODdb.{ROD_db_version}_reference_sequences.tax", ROD_db_version=config["database_version"]["rod"])
         conda:
-            "../envs/blast.yaml"
+            "../envs/classification/blast.yaml"
         script:
-            "../scripts/edit_ROD_mothur.py"
+            "../scripts/classification/edit_ROD_mothur.py"
 
 elif config["classify"]["database"] == "eukaryome":
 

@@ -9,7 +9,7 @@ if config["blast"]["database"] == "silva":
         params:
             db_path=config["blast"]["db_path"]
         conda:
-            "../envs/blast.yaml"
+            "../envs/classification/blast.yaml"
         shell:
             """
                 dir_name=$(dirname {params[0]});
@@ -23,9 +23,9 @@ if config["blast"]["database"] == "silva":
         input: config["blast"]["db_path"] + ".fasta"
         output: os.path.join(os.path.dirname(config["blast"]["db_path"]), "tax_lineage.h5")
         conda:
-            "../envs/blast.yaml"
+            "../envs/classification/blast.yaml"
         script:
-            "../scripts/create_silva_taxonomy.py"
+            "../scripts/classification/create_silva_taxonomy.py"
 
 
 elif config["blast"]["database"] == "ncbi":
@@ -39,7 +39,7 @@ elif config["blast"]["database"] == "ncbi":
         log:
             config["blast"]["db_path"] + config["blast"]["db_type"] + ".download.log"
         conda:
-            "../envs/blast.yaml"
+            "../envs/classification/blast.yaml"
         shell:
             """
                 mkdir -p {params.db_dir}
@@ -56,7 +56,7 @@ elif config["blast"]["database"] == "ncbi":
         params:
             db_path=config["blast"]["db_path"]
         conda:
-            "../envs/blast.yaml"
+            "../envs/classification/blast.yaml"
         shell:
             """
                 dir_name={params.db_path}
@@ -71,11 +71,11 @@ elif config["blast"]["database"] == "ncbi":
         output:
             os.path.join(config["blast"]["db_path"], "tax_lineage.h5")
         conda:
-            "../envs/blast.yaml"
+            "../envs/classification/blast.yaml"
         log:
             os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
         script:
-            "../scripts/create_blast_taxonomy.py"
+            "../scripts/classification/create_blast_taxonomy.py"
 
 
 elif config["blast"]["database"] == "rod":
@@ -88,7 +88,7 @@ elif config["blast"]["database"] == "rod":
             db_path=config["blast"]["db_path"],
             db_version=config["database_version"]["rod"],
         conda:
-            "../envs/blast.yaml"
+            "../envs/classification/blast.yaml"
         shell:
             """
                 wget -O database/v{params.db_version}-goldenrod.zip --progress=bar https://github.com/krabberod/ROD/archive/refs/tags/v{params.db_version}-goldenrod.zip;
@@ -110,9 +110,9 @@ elif config["blast"]["database"] == "rod":
         input: config["blast"]["db_path"] + ".fasta"
         output: os.path.join(os.path.dirname(config["blast"]["db_path"]), "tax_lineage.h5")
         conda:
-            "../envs/blast.yaml"
+            "../envs/classification/blast.yaml"
         script:
-            "../scripts/create_rod_taxonomy.py"
+            "../scripts/classification/create_rod_taxonomy.py"
 
 
 elif config["blast"]["database"] == "eukaryome":
@@ -127,7 +127,7 @@ elif config["blast"]["database"] == "eukaryome":
             eukaryome_version=config["database_path"]["eukaryome_version"],
             db_version=config["database_version"]["eukaryome"],
         conda:
-            "../envs/blast.yaml"
+            "../envs/classification/blast.yaml"
         shell:
             """
                 wget -P ./database/ --progress=bar https://sisu.ut.ee/wp-content/uploads/sites/643/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.zip
@@ -147,9 +147,9 @@ elif config["blast"]["database"] == "eukaryome":
         input: config["blast"]["db_path"] + ".tax"
         output: os.path.join(os.path.dirname(config["blast"]["db_path"]), "tax_lineage.h5")
         conda:
-            "../envs/blast.yaml"
+            "../envs/classification/blast.yaml"
         script:
-            "../scripts/create_eukaryome_taxonomy.py"
+            "../scripts/classification/create_eukaryome_taxonomy.py"
 
 
 rule blast:
@@ -185,7 +185,7 @@ rule blast:
         evalue=str(config["blast"]["evalue"]),
         out6='"6 qseqid qlen length pident mismatch qstart qend sstart send gaps evalue staxid sseqid"'
     conda:
-        "../envs/blast.yaml"
+        "../envs/classification/blast.yaml"
     shell:
         """
             echo "Running BLAST with database: {params.db_path}" > {log}
@@ -220,11 +220,11 @@ if config['blast']['blast']:
 				max_target_seqs=config["blast"]["max_target_seqs"],
 				drop_tax_classes=str(config["blast"]["drop_tax_classes"])
 			conda:
-				"../envs/blast.yaml"
+				"../envs/classification/blast.yaml"
 			log:
 				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
-				"../scripts/ncbi_taxonomy.py"
+				"../scripts/classification/ncbi_taxonomy.py"
 
 		rule merge_results:
 			input:
@@ -243,13 +243,13 @@ if config['blast']['blast']:
 			params:
 				seq_rep=str(config["general"]["seq_rep"]),
 			conda:
-				"../envs/merge_results.yaml"
+				"../envs/utilities/merge_results.yaml"
 			log:
 				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
-				"../scripts/merge_results_vsearch_blast.py" \
+				"../scripts/utilities/merge_results_vsearch_blast.py" \
                 if config["clustering"]== "vsearch" and config["dataset"]["nanopore"] \
-                else "../scripts/merge_results.py"
+                else "../scripts/utilities/merge_results.py"
 
 
 	elif config["blast"]["database"] == "silva":
@@ -263,11 +263,11 @@ if config['blast']['blast']:
 			params:
 				drop_tax_classes=str(config["blast"]["drop_tax_classes"])
 			conda:
-				"../envs/blast.yaml"
+				"../envs/classification/blast.yaml"
 			log:
 				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
-				"../scripts/silva_taxonomy.py"
+				"../scripts/classification/silva_taxonomy.py"
 
 		rule merge_results:
 			input:
@@ -285,13 +285,13 @@ if config['blast']['blast']:
 			params:
 				seq_rep=str(config["general"]["seq_rep"]),
 			conda:
-				"../envs/merge_results.yaml"
+				"../envs/utilities/merge_results.yaml"
 			log:
 				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
-				"../scripts/merge_results_vsearch_blast.py" \
+				"../scripts/utilities/merge_results_vsearch_blast.py" \
                 if config["clustering"]== "vsearch" and config["dataset"]["nanopore"] \
-                else "../scripts/merge_results.py"
+                else "../scripts/utilities/merge_results.py"
 
 
 	elif config["blast"]["database"] == "eukaryome":
@@ -305,11 +305,11 @@ if config['blast']['blast']:
 			params:
 				drop_tax_classes=str(config["blast"]["drop_tax_classes"])
 			conda:
-				"../envs/blast.yaml"
+				"../envs/classification/blast.yaml"
 			log:
 				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
-				"../scripts/eukaryome_taxonomy.py"
+				"../scripts/classification/eukaryome_taxonomy.py"
 
 		rule merge_results:
 			input:
@@ -327,13 +327,13 @@ if config['blast']['blast']:
 			params:
 				seq_rep=str(config["general"]["seq_rep"]),
 			conda:
-				"../envs/merge_results.yaml"
+				"../envs/utilities/merge_results.yaml"
 			log:
 				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
-				"../scripts/merge_results_vsearch_blast.py" \
+				"../scripts/utilities/merge_results_vsearch_blast.py" \
                 if config["clustering"]== "vsearch" and config["dataset"]["nanopore"] \
-                else "../scripts/merge_results.py"
+                else "../scripts/utilities/merge_results.py"
 
 
 	elif config["blast"]["database"] == "rod":
@@ -347,11 +347,11 @@ if config['blast']['blast']:
 			params:
 				drop_tax_classes=str(config["blast"]["drop_tax_classes"])
 			conda:
-				"../envs/blast.yaml"
+				"../envs/classification/blast.yaml"
 			log:
 				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
-				"../scripts/silva_taxonomy.py"
+				"../scripts/classification/silva_taxonomy.py"
 
 		rule merge_results:
 			input:
@@ -369,10 +369,10 @@ if config['blast']['blast']:
 			params:
 				seq_rep=str(config["general"]["seq_rep"]),
 			conda:
-				"../envs/merge_results.yaml"
+				"../envs/utilities/merge_results.yaml"
 			log:
 				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
-				"../scripts/merge_results_vsearch_blast.py" \
+				"../scripts/utilities/merge_results_vsearch_blast.py" \
                 if config["clustering"]== "vsearch" and config["dataset"]["nanopore"] \
-                else "../scripts/merge_results.py"
+                else "../scripts/utilities/merge_results.py"

@@ -7,7 +7,7 @@ if config['classify']['mothur']:
         output:
             os.path.join(config["general"]["output_dir"],"mothur/{database}/OTU_mumu.fasta")
         script:
-            "../scripts/generate_fasta.py"
+            "../scripts/utilities/generate_fasta.py"
 
     rule vsearch_otu:
         input:
@@ -15,7 +15,7 @@ if config['classify']['mothur']:
         output:
             os.path.join(config["general"]["output_dir"],"mothur/{database}/match_scores.txt")
         conda:
-            "../envs/vsearch.yaml"
+            "../envs/analysis/vsearch.yaml"
         shell:
             "vsearch --usearch_global {input} -db {input} --self --id .84 --iddef 1 " \
             "--userout {output} -userfields query+target+id --maxaccepts 0 --query_cov .9 --maxhits 10"
@@ -30,7 +30,7 @@ if config['classify']['mothur']:
         log:
             os.path.join(config["general"]["output_dir"],"logs/otu_mumu.log")
         conda:
-            "../envs/mumu.yaml"
+            "../envs/classification/mumu.yaml"
         shell:
             """
             	cut -d "," -f 1,3- {input[0]} --output-delimiter="\t" > {output[0]};
@@ -46,7 +46,7 @@ if config['classify']['mothur']:
             os.path.join(config["general"]["output_dir"],"finalData/{database}/OTU_table_mumu.csv"),
             os.path.join(config["general"]["output_dir"],"finalData/{database}/metadata_table_mumu.csv")
         script:
-            "../scripts/merge_mumu_output.py"
+            "../scripts/utilities/merge_mumu_output.py"
 
 else:
     rule generate_otu_fasta:
@@ -55,7 +55,7 @@ else:
         output:
             os.path.join(config["general"]["output_dir"],"blast/OTU_mumu.fasta")
         script:
-            "../scripts/generate_fasta.py"
+            "../scripts/utilities/generate_fasta.py"
 
     rule vsearch_otu:
         input:
@@ -63,7 +63,7 @@ else:
         output:
             os.path.join(config["general"]["output_dir"],"blast/match_scores.txt")
         conda:
-            "../envs/vsearch.yaml"
+            "../envs/analysis/vsearch.yaml"
         shell:
             "vsearch --usearch_global {input} -db {input} --self --id .84 --iddef 1 " \
             "--userout {output} -userfields query+target+id --maxaccepts 0 --query_cov .9 --maxhits 10"
@@ -78,7 +78,7 @@ else:
         log:
             os.path.join(config["general"]["output_dir"],"logs/otu_mumu.log")
         conda:
-            "../envs/mumu.yaml"
+            "../envs/classification/mumu.yaml"
         shell:
             """
             	cut -d "," -f 1,3- {input[0]} --output-delimiter="\t" > {output[0]};
@@ -95,4 +95,4 @@ else:
             os.path.join(config["general"]["output_dir"],"finalData/blast_{database}/metadata_table_mumu.csv"),
             os.path.join(config["general"]["output_dir"],"finalData/blast_{database}/unmerged_seqids.csv")
         script:
-            "../scripts/merge_mumu_output_2.py"
+            "../scripts/utilities/merge_mumu_output_2.py"

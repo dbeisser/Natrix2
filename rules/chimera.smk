@@ -13,7 +13,7 @@ rule vsearch_chim:
         abskew=config["chim"]["abskew"]
     threads: 1
     conda:
-         "../envs/vsearch.yaml"
+         "../envs/analysis/vsearch.yaml"
     log:
         os.path.join(config["general"]["output_dir"],"logs/{sample}_{unit}/vsearch.log")
     shell:

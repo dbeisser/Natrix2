@@ -37,7 +37,7 @@ if config['dataset']['nanopore']:
             tailcrop = config["nanopore"]["tail_trim"],
             threads = config["general"]["cores"]
         conda:
-            "../envs/qfiltering.yaml"
+            "../envs/preprocessing/qfiltering.yaml"
         shell:
                 """
                 cat {input} | chopper --quality {params.qual} --minlength {params.minlength} --maxlength {params.maxlength} --headcrop {params.headcrop} --tailcrop {params.tailcrop} --threads {threads} > {output}

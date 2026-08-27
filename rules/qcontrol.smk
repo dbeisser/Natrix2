@@ -10,7 +10,7 @@ if not config['dataset']['nanopore']:
             config["general"]["output_dir"]
         threads: 20
         conda:
-            "../envs/qcontrol.yaml"
+            "../envs/preprocessing/qcontrol.yaml"
         shell:
             "fastqc -o {params}/qc/ {input} -t {threads}"
 
@@ -23,7 +23,7 @@ if not config['dataset']['nanopore']:
         params:
             config["general"]["output_dir"]
         conda:
-            "../envs/qcontrol.yaml"
+            "../envs/preprocessing/qcontrol.yaml"
         shell:
             "multiqc {params}/qc/ -o {params}/qc/"
 
@@ -39,7 +39,7 @@ else:
             config["general"]["output_dir"]
         threads: 20
         conda:
-            "../envs/qcontrol.yaml"
+            "../envs/preprocessing/qcontrol.yaml"
         shell:
             "fastqc -o {params}/qc/ {input} -t {threads}"
 
@@ -52,6 +52,6 @@ else:
         params:
             config["general"]["output_dir"]
         conda:
-            "../envs/qcontrol.yaml"
+            "../envs/preprocessing/qcontrol.yaml"
         shell:
             "multiqc {params}/qc/ -o {params}/qc/"

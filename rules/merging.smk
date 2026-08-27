@@ -7,9 +7,9 @@ rule unfiltered_table:
         os.path.join(config["general"]["output_dir"],"filtering/unfiltered_table.csv"),
         temp(os.path.join(config["general"]["output_dir"],"filtering/unfiltered_dict.hdf5"))
     conda:
-        "../envs/unfiltered_table.yaml"
+        "../envs/utilities/unfiltered_table.yaml"
     script:
-        "../scripts/unfiltered_table.py"
+        "../scripts/utilities/unfiltered_table.py"
 
 rule filtering:
     input:
@@ -21,9 +21,9 @@ rule filtering:
         filter_method=config["merge"]["filter_method"],
         cutoff=config["merge"]["cutoff"]
     conda:
-        "../envs/filtering.yaml"
+        "../envs/classification/filtering.yaml"
     script:
-        "../scripts/filtering.py"
+        "../scripts/preprocessing/filtering.py"
 
 rule ampliconduo:
     input:
@@ -36,11 +36,11 @@ rule ampliconduo:
         saving_format=config["merge"]["save_format"],
         p_corr=config["merge"]["ampli_corr"]
     conda:
-        "../envs/ampliconduo.yaml"
+        "../envs/analysis/ampliconduo.yaml"
     log:
         os.path.join(config["general"]["output_dir"],"logs/ampliconduo.log")
     script:
-        "../scripts/ampliconduo.R"
+        "../scripts/analysis/ampliconduo.R"
 
 if config['clustering']=="vsearch":
     rule write_fasta:

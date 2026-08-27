@@ -1,9 +1,5 @@
 import pandas as pd
 import os
-from snakemake.utils import validate
-
-# Validate configuration against schema
-validate(config, "schema/config.schema.yaml")
 
 # Load sample metadata
 units = pd.read_table(os.path.join(config["general"]["output_dir"],config["general"]["units"]), 

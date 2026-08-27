@@ -5,6 +5,17 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
 
 ---
 
+### [2026-08-27]
+
+- Improve workflow structure and rule organization
+- Add subfolders to `envs/` and `scripts/`
+- Update rule paths for new subfolder structure
+- Update Docker image with latest changes
+- Validate workflow execution using the provided test datasets
+- Remove invalid Snakemake configuration schema
+
+---
+
 ### [2026-08-22]
 
 - Improve `create_dataframe.py`

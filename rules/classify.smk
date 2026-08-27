@@ -21,7 +21,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 output=config['general']['output_dir'],
                 input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"]["seq_rep"] == "OTU" else os.path.join(config["general"]["output_dir"],"filtering"),
             conda:
-                "../envs/mothur.yaml"
+                "../envs/classification/mothur.yaml"
             log:
                 os.path.join(config["general"]["output_dir"], "logs/mothur_classify.log")
             shell:
@@ -52,7 +52,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 threads=config['general']['cores'],
                 input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"]["seq_rep"] == "OTU" else os.path.join(config["general"]["output_dir"],"filtering"),
             conda:
-                "../envs/mothur.yaml"
+                "../envs/classification/mothur.yaml"
             log:
                 "logs/mothur_classify.log"
             shell:
@@ -83,7 +83,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 threads=config['general']['cores'],
                 input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"]["seq_rep"] == "OTU" else os.path.join(config["general"]["output_dir"],"filtering"),
             conda:
-                "../envs/mothur.yaml"
+                "../envs/classification/mothur.yaml"
             log:
                 os.path.join(config["general"]["output_dir"],"logs/mothur_classify.log")
             shell:
@@ -114,7 +114,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 output=config['general']['output_dir'],
                 input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"]["seq_rep"] == "OTU" or config["general"]["seq_rep"] == "ASV" else os.path.join(config["general"]["output_dir"],"filtering"),
             conda:
-                "../envs/mothur.yaml"
+                "../envs/classification/mothur.yaml"
             log:
                 os.path.join(config["general"]["output_dir"], "logs/mothur_classify.log")
             shell:
@@ -145,7 +145,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 threads=config['general']['cores'],
                 input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"]["seq_rep"] == "OTU"   or config["general"]["seq_rep"] == "ASV" else os.path.join(config["general"]["output_dir"],"filtering"),
             conda:
-                "../envs/mothur.yaml"
+                "../envs/classification/mothur.yaml"
             log:
                 "logs/mothur_classify.log"
             shell:
@@ -166,7 +166,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
             cleaned_taxonomy=os.path.join(config["general"]["output_dir"], "mothur/{database}/mothur_out.taxonomy"),
             cleaned_summary=os.path.join(config["general"]["output_dir"], "mothur/{database}/mothur_out.summary")
         script:
-            "../scripts/filter_unclassified.py"
+            "../scripts/classification/filter_unclassified.py"
 
     # Merge Mothur taxonomy assignments with the abundance/clustering table and export final result tables.
     rule merge_output:
@@ -180,7 +180,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
         params:
             clustering=config['clustering']
         script:
-                "../scripts/merge_results2.py"
+            "../scripts/utilities/merge_results2.py"
 
 
 
@@ -207,7 +207,7 @@ elif config['dataset']['nanopore']:
                                                                                         "seq_rep"] == "OTU" and config ["dataset"]["nanopore"] == "FALSE" 
                    else ( os.path.join(config["general"]["output_dir"],"clustering") if config["clustering"]=="vsearch" else os.path.join(config["general"]["output_dir"],"filtering")),
             conda:
-                "../envs/mothur.yaml"
+                "../envs/classification/mothur.yaml"
             log:
                 os.path.join(config["general"]["output_dir"],"logs/mothur_classify.log")
             shell:
@@ -239,7 +239,7 @@ elif config['dataset']['nanopore']:
                                                                                         "seq_rep"] == "OTU" and config ["dataset"]["nanopore"] == "FALSE" 
                    else ( os.path.join(config["general"]["output_dir"],"clustering") if config["clustering"]=="vsearch" else os.path.join(config["general"]["output_dir"],"filtering")),
             conda:
-                "../envs/mothur.yaml"
+                "../envs/classification/mothur.yaml"
             log:
                 os.path.join(config["general"]["output_dir"],"logs/mothur_classify.log")
             shell:
@@ -272,7 +272,7 @@ elif config['dataset']['nanopore']:
                                                                                         "seq_rep"] == "OTU" and config ["dataset"]["nanopore"] == "FALSE" 
                    else ( os.path.join(config["general"]["output_dir"],"clustering") if config["clustering"]=="vsearch" else os.path.join(config["general"]["output_dir"],"filtering")),
             conda:
-                "../envs/mothur.yaml"
+                "../envs/classification/mothur.yaml"
             log:
                 os.path.join(config["general"]["output_dir"],"logs/mothur_classify.log")
             shell:
@@ -303,7 +303,7 @@ elif config['dataset']['nanopore']:
                 input=os.path.join(config["general"]["output_dir"],"clustering") if config["general"]["seq_rep"] == "OTU" and config ["dataset"]["nanopore"] == "FALSE" 
                    else ( os.path.join(config["general"]["output_dir"],"clustering") if config["clustering"]=="vsearch" else os.path.join(config["general"]["output_dir"],"filtering")),
             conda:
-                "../envs/mothur.yaml" 
+                "../envs/classification/mothur.yaml" 
             log:
                 os.path.join(config["general"]["output_dir"],"logs/mothur_classify.log")
             shell:
@@ -335,7 +335,7 @@ elif config['dataset']['nanopore']:
                                                                                         "seq_rep"] == "OTU" and config ["dataset"]["nanopore"] == "FALSE" 
                    else ( os.path.join(config["general"]["output_dir"],"clustering") if config["clustering"]=="vsearch" else os.path.join(config["general"]["output_dir"],"filtering")),
             conda:
-                "../envs/mothur.yaml"
+                "../envs/classification/mothur.yaml"
             log:
                 os.path.join(config["general"]["output_dir"],"logs/mothur_classify.log")
             shell:
@@ -355,7 +355,7 @@ elif config['dataset']['nanopore']:
             cleaned_taxonomy=os.path.join(config["general"]["output_dir"], "mothur/{database}/mothur_out.taxonomy"),
             cleaned_summary=os.path.join(config["general"]["output_dir"], "mothur/{database}/mothur_out.summary")
         script:
-            "../scripts/filter_unclassified.py"
+            "../scripts/classification/filter_unclassified.py"
 
     # Merge Mothur taxonomy assignments with the abundance/clustering table and export final result tables.
     rule merge_output:
@@ -369,4 +369,4 @@ elif config['dataset']['nanopore']:
         params:
             clustering=config['clustering']
         script:
-            "../scripts/merge_results2.py"
+            "../scripts/utilities/merge_results2.py"

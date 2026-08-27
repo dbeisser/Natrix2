@@ -18,9 +18,9 @@ if not config['dataset']['nanopore']:
            bar_removed=config["qc"]["barcode_removed"],
            all_removed=config["qc"]["all_primer"]
         conda:
-            "../envs/define_primer.yaml"
+            "../envs/preprocessing/define_primer.yaml"
         script:
-            "../scripts/define_primer.py"
+            "../scripts/preprocessing/define_primer.py"
 
     rule prinseq:
         input:
@@ -34,9 +34,9 @@ if not config['dataset']['nanopore']:
         log:
             os.path.join(config["general"]["output_dir"],"logs/{sample}_{unit}/prinseq.log")
         conda:
-            "../envs/prinseq.yaml"
+            "../envs/preprocessing/prinseq.yaml"
         script:
-            "../scripts/prinseq.py"
+            "../scripts/preprocessing/prinseq.py"
 
     rule cutadapt:
         input:
@@ -55,11 +55,11 @@ if not config['dataset']['nanopore']:
             minlen=config["qc"]["minlen"],
             maxlen=config["qc"]["maxlen"]
         conda:
-            "../envs/cutadapt.yaml"
+            "../envs/preprocessing/cutadapt.yaml"
         log:
             os.path.join(config["general"]["output_dir"],"logs/{sample}_{unit}/cutadapt.log")
         script:
-            "../scripts/cutadapt.py"
+            "../scripts/preprocessing/cutadapt.py"
 
     rule assembly:
         input:
@@ -79,11 +79,11 @@ if not config['dataset']['nanopore']:
             minqual=config["qc"]["minqual"],
             prim_rm=config["qc"]["all_primer"]
         conda:
-            "../envs/assembly.yaml"
+            "../envs/analysis/assembly.yaml"
         log:
             os.path.join(config["general"]["output_dir"],"logs/{sample}_{unit}/read_assembly.log")
         script:
-            "../scripts/assembly.py"
+            "../scripts/analysis/assembly.py"
 
     rule copy_to_fasta:
         input:
@@ -91,6 +91,6 @@ if not config['dataset']['nanopore']:
         output:
             temp(os.path.join(config["general"]["output_dir"],"assembly/{sample}_{unit}/{sample}_{unit}.fasta"))
         conda:
-            "../envs/seqtk.yaml"
+            "../envs/utilities/seqtk.yaml"
         shell:
             "seqtk seq -a {input} > {output}"

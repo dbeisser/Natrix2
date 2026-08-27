@@ -12,7 +12,7 @@ rule vsearch_clust:
 	params:
 	    id=config["vsearch_id"]
 	conda:
-		"../envs/vsearch.yaml"
+		"../envs/analysis/vsearch.yaml"
 	shell:
 		"""
 			vsearch --cluster_fast {input} \
@@ -30,7 +30,7 @@ rule  write_clusters_uc:
     output:
         os.path.join(config["general"]["output_dir"],"clustering/vsearch_clusters_names.txt")
     script:
-        "../scripts/vsearch_uc.py"
+        "../scripts/analysis/vsearch_uc.py"
 
 rule clust_merge_results_vsearch:
     input:
@@ -39,9 +39,9 @@ rule clust_merge_results_vsearch:
     output:
         out=os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv")
     conda:
-        "../envs/merge_results.yaml"
+        "../envs/utilities/merge_results.yaml"
     script:
-        "../scripts/merge_clust_results.py"
+        "../scripts/utilities/merge_clust_results.py"
 
 rule vsearch_header:
     input:
@@ -50,4 +50,4 @@ rule vsearch_header:
     output:
         os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta")
     script:
-        "../scripts/vsearch_fasta_headers.py"
+        "../scripts/analysis/vsearch_fasta_headers.py"

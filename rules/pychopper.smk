@@ -70,7 +70,7 @@ if config['dataset']['nanopore'] and config['nanopore']['pychopper']:
             qual = config["nanopore"]["pychopqual"],
             length = config["nanopore"]["min_length"]
         conda:
-            "../envs/pychopper.yaml"
+            "../envs/preprocessing/pychopper.yaml"
         shell:
                 """
                 pychopper -m edlib -b {input.primers} -Q {params.qual} -z {params.length} -l {output.length_out} -c {input.primers_config} -r {output.pdf_out} -u {output.unclass_fastq} -w {output.rescue_fastq} -t {threads} {input.fastq} {output.out_fastq};
@@ -104,7 +104,7 @@ if config['dataset']['nanopore'] and config['nanopore']['pychopper']:
             qual =config["nanopore"]["pychopqual"],
             length = config["nanopore"]["min_length"]
         conda:
-            "../envs/pychopper.yaml"
+            "../envs/preprocessing/pychopper.yaml"
         shell:
             """
             pychopper -m edlib -x rescue -b {input.primers} -Q {params.qual} -z {params.length} -l {output.length_out} -c {input.primers_config} -r {output.unclass_pdf} -u {output.unclass_unclass_fastq} -w {output.unclass_rescue_fastq} -t {threads} {input.unclass_fastq} {output.unclass_out_fastq};
