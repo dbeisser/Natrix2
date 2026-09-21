@@ -17,6 +17,8 @@ if not config['dataset']['nanopore']:
            offset=config["qc"]["primer_offset"],
            bar_removed=config["qc"]["barcode_removed"],
            all_removed=config["qc"]["all_primer"]
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/assembly/define_primer.log")
         conda:
             "../envs/preprocessing/define_primer.yaml"
         script:
@@ -32,7 +34,7 @@ if not config['dataset']['nanopore']:
         params:
             config["qc"]["mq"]
         log:
-            os.path.join(config["general"]["output_dir"],"logs/{sample}_{unit}/prinseq.log")
+            os.path.join(config["general"]["output_dir"],"logfiles/assembly/prinseq/{sample}_{unit}.log")
         conda:
             "../envs/preprocessing/prinseq.yaml"
         script:
@@ -54,10 +56,10 @@ if not config['dataset']['nanopore']:
             prim_rm=config["qc"]["all_primer"],
             minlen=config["qc"]["minlen"],
             maxlen=config["qc"]["maxlen"]
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/assembly/cutadapt/{sample}_{unit}.log")
         conda:
             "../envs/preprocessing/cutadapt.yaml"
-        log:
-            os.path.join(config["general"]["output_dir"],"logs/{sample}_{unit}/cutadapt.log")
         script:
             "../scripts/preprocessing/cutadapt.py"
 
@@ -69,7 +71,6 @@ if not config['dataset']['nanopore']:
             primer_t=os.path.join(config["general"]["output_dir"],"primer_table.csv")
         output:
             os.path.join(config["general"]["output_dir"],"assembly/{sample}_{unit}/{sample}_{unit}_assembled.fastq")
-        threads: 20
         params:
             paired_end=config["merge"]["paired_End"],
             threshold=config["qc"]["threshold"],
@@ -78,10 +79,11 @@ if not config['dataset']['nanopore']:
             maxlen=config["qc"]["maxlen"],
             minqual=config["qc"]["minqual"],
             prim_rm=config["qc"]["all_primer"]
+        threads: 20
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/assembly/assembly/{sample}_{unit}.log")
         conda:
             "../envs/analysis/assembly.yaml"
-        log:
-            os.path.join(config["general"]["output_dir"],"logs/{sample}_{unit}/read_assembly.log")
         script:
             "../scripts/analysis/assembly.py"
 
@@ -90,6 +92,8 @@ if not config['dataset']['nanopore']:
             os.path.join(config["general"]["output_dir"],"assembly/{sample}_{unit}/{sample}_{unit}_assembled.fastq")
         output:
             temp(os.path.join(config["general"]["output_dir"],"assembly/{sample}_{unit}/{sample}_{unit}.fasta"))
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/assembly/copy_to_fasta/{sample}_{unit}.log")
         conda:
             "../envs/utilities/seqtk.yaml"
         shell:

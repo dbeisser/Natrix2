@@ -6,6 +6,8 @@ if config['classify']['mothur']:
             os.path.join(config["general"]["output_dir"], "finalData/{database}/full_table.csv")
         output:
             os.path.join(config["general"]["output_dir"],"mothur/{database}/OTU_mumu.fasta")
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/mumu/generate_otu_fasta/{database}.log")
         script:
             "../scripts/utilities/generate_fasta.py"
 
@@ -14,6 +16,8 @@ if config['classify']['mothur']:
             os.path.join(config["general"]["output_dir"],"mothur/{database}/OTU_mumu.fasta")
         output:
             os.path.join(config["general"]["output_dir"],"mothur/{database}/match_scores.txt")
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/mumu/vsearch_otu/{database}.log")
         conda:
             "../envs/analysis/vsearch.yaml"
         shell:
@@ -28,7 +32,7 @@ if config['classify']['mothur']:
             temp(expand(os.path.join(config["general"]["output_dir"], "mothur/{database}/OTU_table_mumu.tmp"), database=config['classify']['database'])),
             expand(os.path.join(config["general"]["output_dir"],"mothur/{database}/OTU_table_mumu.csv"), database=config['classify']['database'])
         log:
-            os.path.join(config["general"]["output_dir"],"logs/otu_mumu.log")
+            os.path.join(config["general"]["output_dir"],"logfiles/mumu/run_mumu.log")
         conda:
             "../envs/classification/mumu.yaml"
         shell:
@@ -45,6 +49,8 @@ if config['classify']['mothur']:
             os.path.join(config["general"]["output_dir"],"finalData/{database}/full_table_mumu.csv"),
             os.path.join(config["general"]["output_dir"],"finalData/{database}/OTU_table_mumu.csv"),
             os.path.join(config["general"]["output_dir"],"finalData/{database}/metadata_table_mumu.csv")
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/mumu/merge_mumu_mothur_output/{database}.log")
         script:
             "../scripts/utilities/merge_mumu_output.py"
 
@@ -54,6 +60,8 @@ else:
             expand(os.path.join(config["general"]["output_dir"], "finalData/blast_{database}/full_table.csv"), database=config['blast']['database'].lower())
         output:
             os.path.join(config["general"]["output_dir"],"blast/OTU_mumu.fasta")
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/mumu/generate_otu_fasta.log")
         script:
             "../scripts/utilities/generate_fasta.py"
 
@@ -62,6 +70,8 @@ else:
             os.path.join(config["general"]["output_dir"],"blast/OTU_mumu.fasta")
         output:
             os.path.join(config["general"]["output_dir"],"blast/match_scores.txt")
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/mumu/vsearch_otu.log")
         conda:
             "../envs/analysis/vsearch.yaml"
         shell:
@@ -76,7 +86,7 @@ else:
             temp(expand(os.path.join(config["general"]["output_dir"], "blast/OTU_table_mumu.tmp"), database=config['classify']['database'])),
             expand(os.path.join(config["general"]["output_dir"],"blast/OTU_table_mumu.csv"), database=config['classify']['database'])
         log:
-            os.path.join(config["general"]["output_dir"],"logs/otu_mumu.log")
+            os.path.join(config["general"]["output_dir"],"logfiles/mumu/run_mumu.log")
         conda:
             "../envs/classification/mumu.yaml"
         shell:
@@ -94,5 +104,7 @@ else:
             os.path.join(config["general"]["output_dir"],"finalData/blast_{database}/OTU_table_mumu.csv"),
             os.path.join(config["general"]["output_dir"],"finalData/blast_{database}/metadata_table_mumu.csv"),
             os.path.join(config["general"]["output_dir"],"finalData/blast_{database}/unmerged_seqids.csv")
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/mumu/merge_mumu_blast_output/{database}.log")
         script:
             "../scripts/utilities/merge_mumu_output_2.py"

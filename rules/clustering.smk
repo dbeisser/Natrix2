@@ -1,4 +1,5 @@
 import os
+
 if not config['dataset']['nanopore'] and config['clustering']== 'swarm':
     # dada runs per sample after preprocessing and before chimera removal and AmpliconDuo
     rule DADA2:
@@ -11,10 +12,10 @@ if not config['dataset']['nanopore'] and config['clustering']== 'swarm':
             paired_end=config["merge"]["paired_End"],
             minoverlap=config["qc"]["minoverlap"],
             splitsamples=config["merge"]["filter_method"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/clustering/DADA2/{sample}_{unit}.log")
         conda:
             "../envs/classification/dada2.yaml"
-        log:
-            os.path.join(config["general"]["output_dir"], "logs/{sample}_{unit}_dada2.log")
         script:
             "../scripts/classification/dada2.R"
 
@@ -26,6 +27,8 @@ if not config['dataset']['nanopore'] and config['clustering']== 'swarm':
             os.path.join(config["general"]["output_dir"],"clustering/representatives.fasta"),
             os.path.join(config["general"]["output_dir"],"clustering/merged.swarms")
         threads: config["general"]["cores"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/clustering/swarm.log")
         conda:
             "../envs/analysis/swarm.yaml"
         shell:
@@ -37,6 +40,8 @@ if not config['dataset']['nanopore'] and config['clustering']== 'swarm':
             os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv")
         output:
             os.path.join(config["general"]["output_dir"],"clustering/representatives_mod.fasta")
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/clustering/swarm_headers.log")
         script:
             "../scripts/analysis/swarm_fasta_headers.py"
 
@@ -47,6 +52,8 @@ if not config['dataset']['nanopore'] and config['clustering']== 'swarm':
             final_table_path2=os.path.join(config["general"]["output_dir"],"filtering/filtered_table.csv")
         output:
             out=os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") if config['clustering'] == "swarm" else os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv")
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/clustering/clust_merge_results.log")
         conda:
             "../envs/utilities/merge_results.yaml"
         script:
@@ -59,6 +66,8 @@ if not config['dataset']['nanopore'] and config['clustering']== 'swarm':
         output:
             os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
             os.path.join(config["general"]["output_dir"],"filtering/filtered_table.csv")
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/clustering/write_fasta.log")
         run:
             import csv
 

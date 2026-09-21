@@ -8,6 +8,8 @@
 
 Natrix2 is an open-source bioinformatics pipeline for the preprocessing of long and short raw sequencing data. The need for a scalable, reproducible workflow for the processing of environmental amplicon data led to the development of Natrix2. It is divided into quality assessment, dereplication, chimera detection, split-sample merging, ASV or OTU generation, and taxonomic assessment. The pipeline is written in [Snakemake](https://snakemake.readthedocs.io) (Köster and Rahmann 2018), a workflow management engine for the development of data analysis workflows. Snakemake ensures the reproducibility of a workflow by automatically deploying dependencies of workflow steps (rules) and scales seamlessly to different computing environments such as servers, computer clusters, or cloud services. While Natrix2 was only tested with 16S and 18S amplicon data, it should also work for other kinds of sequencing data. The pipeline contains separate rules for each step of the pipeline, and each rule that has additional dependencies has a separate [Conda](https://conda.io/) environment that will be automatically created when starting the pipeline for the first time. The encapsulation of rules and their dependencies allows for hassle-free sharing of rules between workflows.
 
+---
+
 ### Branch Selection
 
 To access the latest features and ongoing developments, it is recommended to use the [dev branch](https://github.com/dbeisser/Natrix2/tree/dev) of Natrix2, which contains recent updates and patches not yet available in the [main branch](https://github.com/dbeisser/Natrix2/tree/main). The main branch represents the stable version of the pipeline, providing validated and tested code suitable for routine analyses and reproducible workflows, while the dev branch is intended for testing and early access to new features.
@@ -50,19 +52,18 @@ To access the latest features and ongoing developments, it is recommended to use
 - [Conda](https://conda.io/en/latest/index.html) – package and environment manager  
   Cross-platform package and environment manager used to install all required software in isolated, reproducible environments. Conda ensures that the correct versions of all dependencies are used and allows easy sharing of the computational environment.
 
-- [GNU screen](https://www.gnu.org/software/screen/) – terminal multiplexer   
-  Terminal multiplexer that allows long-running pipeline executions to run in detached sessions, preventing termination when the terminal connection is interrupted (e.g., SSH disconnects). GNU Screen is widely available and commonly pre-installed on many Linux systems.
+- [GNU Screen](https://www.gnu.org/software/screen/) – terminal multiplexer  
+  Allows long-running pipeline executions to continue in detached sessions, preventing termination if the terminal connection is interrupted (e.g., SSH disconnects). GNU Screen is widely available on Linux systems.
 
-  Alternatively, tools like [tmux](https://github.com/tmux/tmux) can be used for similar purposes and provide more advanced features.
+  Alternatively, [tmux](https://github.com/tmux/tmux) can be used for the same purpose.
 
-  Installation example (GNU Screen):
+  Installation example (Debian/Ubuntu):
 
-  - Debian/Ubuntu-based systems:
-    ```bash
-    apt-get install screen
-    ```
+  ```bash
+  apt-get install screen
+  ```
 
-  Using a terminal multiplexer is strongly recommended for running Natrix2, especially for long analyses on remote systems. This helps ensure stable and uninterrupted execution of the workflow.
+Using a terminal multiplexer is strongly recommended for running Natrix2, especially for long analyses on remote systems. It allows the workflow to continue running if the remote connection is interrupted, helping to ensure stable and uninterrupted execution.
 
 ---
 
@@ -86,71 +87,85 @@ Dependencies will be automatically installed using Conda environments and can be
 conda env create -f natrix2.yaml # Create the Natrix2 Conda environment
 ```
 
-Natrix2 comes with example [primertables](#primertable) (`/primer_table`), example [configfiles](#configuration) (`illumina_swarm.yaml`, `nanopore_vsearch.yaml`, `/config_presets`), and example amplicon datasets located in the `/input_data` directory. To test Natrix2 using the provided example data (`Illumina_data` or `Nanopore_data`), run the following command:
+Natrix2 includes example [primertables](#primertable) (`/primer_table`), [configuration files](#configuration) (`/config_presets`), and amplicon datasets (`/input_data`). To test Natrix2 with the provided example data, start the pipeline launcher and select the available test run (`illumina_testrun`):
 
 ```shell
-$ ./pipeline.sh # Start Natrix2 pipeline script
-Natrix2 Pipeline Script # Output
-Enter project name (e.g. illumina_swarm): # Output
-$ illumina_swarm # Select illumina_swarm config
+# Launch Natrix2 using pipeline.sh
+$ ./pipeline.sh
+
+# Pipeline launcher output
+Natrix2 Pipeline Launcher
+Exit launcher: enter 'exit' or 'quit'
+Enter config:
+Project:  your_config.yaml (root directory)
+Test run: illumina_testrun (example config)
+
+# Run Illumina test
+$ > illumina_testrun
 ```
 
 The pipeline will then start a screen session using the project name (here, example_data) as the session name and begin downloading dependencies for the workflow rules. To detach from the screen session, press `Ctrl+a, d` (first press Ctrl+a, then d). Common GNU Screen commands:
 
 ```shell
-screen -ls # List all running screen sessions
+# Manage screen sessions
+screen -ls # List active screen sessions
 screen -r # Reattach to the most recent session
-screen -r <session_name> # Reattach to a specific session by name or ID
-screen -d -r <session_name> # Force reattach if the session is already attached elsewhere
+screen -r <session_name> # Reattach to a specific session
+screen -d -r <session_name> # Force reattach to a session
 ```
 
 Basic key bindings inside a screen session:
 
 ```text
-- Ctrl+a, d # Detach from the current session
-- Ctrl+a, k # Kill the current session
+Ctrl+a, d # Detach from the current session
+Ctrl+a, k # Kill the current session
 ```
 
 ---
 
 # Sequence Count
 
-Before starting the workflow, it is recommended to verify the number of sequences in your input files (`*.fastq`, `*.fastq.gz`), as the workflow may fail if too few sequences are present. Empirical observations indicate that issues can occur when the number of sequences falls below 150. To prevent such errors, analyze your data using the `nseqc` tool (nucleotide sequence counter).
+Before starting the workflow, it is recommended to verify the number of sequences in your input data. All provided sequence files (`*.fastq`, `*.fastq.gz`) should contain a sufficient number of sequences to ensure proper workflow execution. Empirical observations indicate that issues can occur when the sequence count falls below 150 sequences per input file. Checking the input data beforehand can therefore help identify potentially problematic samples and prevent unnecessary workflow failures. For this purpose, Natrix2 provides the `nseqc` tool (nucleotide sequence counter) to analyze the sequence count of each input file before starting the workflow.
 
-- **Recommended minimum threshold: `150`**  
-- **After validating your data, the workflow can be started as usual.**
+- **Important:** A minimum threshold of `150` sequences per input file is recommended.  
+  After validating your input data, the workflow can be started as usual.
 
-The tool compares the specified threshold with the number of sequences in each file. If a file falls below this threshold, a warning is issued. Affected files should be removed from the input directory to ensure proper execution of the workflow.
+The tool compares the specified threshold with the sequence count of each input file. If the sequence count falls below the defined threshold, a warning is displayed. Affected files should be removed from the input directory before starting the workflow to ensure proper execution.
 
-## Using the nseqc Tool
+### Using the nseqc Tool
 
-Navigate to your main directory and run the following command:
+Navigate to the Natrix2 main directory and run the following command:
 
 ```shell
-python3 libnatrix2/nseqc_tool.py <folder_path> <threshold> # Check sequence counts in FASTQ files
+# Check sequence counts in FASTQ files
+python3 libnatrix2/nseqc_tool.py <folder_path> <threshold>
+
+# Example: 16S Prokaryote test data (A071SE)
+python3 libnatrix2/nseqc_tool.py input_data/illumina/16S_Prok_Samples/A071SE 150
 ```
 
 ---
 
 # Tutorial Natrix2
 
-This tutorial provides a step-by-step guide for preparing input data and running Natrix2. It outlines the required file naming conventions, input structure, and configuration setup needed to successfully execute the workflow. The following sections describe how to organize your sequencing data, prepare the necessary metadata files, and start the pipeline using predefined or custom configurations. 
+This tutorial provides a step-by-step guide for preparing input data and running Natrix2. It covers the required file naming conventions, input structure, and configuration settings for successful workflow execution. The following sections explain how to organize sequencing data, prepare the required metadata files, configure the workflow, and start the pipeline using predefined or custom configurations.
 
-**FASTQ files must follow a specific naming convention**:
+**FASTQ files must follow a specific naming convention:**
 
 <p align="center">
-<img src="documentation/images/lightmode/filename.png" alt="naming" width="400"/>
+<img src="documentation/images/lightmode/filename.png" alt="FASTQ file naming convention" width="400"/>
 </p>
-<p><b>Fig. 3</b>: Specific naming for the FASTQ files</p>
+<p><b>Fig. 3</b>: Naming convention for FASTQ files</p>
 
 ```shell
 sample_unit_direction.fastq.gz  # sampleID, A/B, R1/R2
 ```
 
 with:
-- **samplename**: identifier for the sample; use only alphanumeric characters (required).  
-- **unit**: identifier for [split-samples](#ampliconduo--split-sample-approach-illumina-and-nanopore-variant); use **A** if not applicable (required).  
-- **direction**: identifier for read orientation; use **R1** for single-end data (required).   
+
+- **samplename**: sample identifier; use only alphanumeric characters (required).  
+- **unit**: split-sample identifier; use **A** if not applicable (required).  
+- **direction**: read orientation; use **R1** for single-end data (required).  
 
 A dataset should look like this (two samples, paired-end, no split-sample approach):
 
@@ -161,66 +176,85 @@ S2016BY_A_R1.fastq.gz  # S2016BY, A, R1
 S2016BY_A_R2.fastq.gz  # S2016BY, A, R2
 ```
 
-In addition to the FASTQ files generated during sequencing, Natrix2 requires a [primertable](#primertable) containing the sample names and, if present, the length of poly-N tails, primer sequences, and barcodes used for each sample and read direction. Except for the sample names, all other information may be omitted if the data has already been preprocessed or does not contain the corresponding subsequences. Natrix2 also requires a [configuration](#configuration) file in YAML format that specifies parameter values for the tools used in the pipeline.
+In addition to the FASTQ files generated during sequencing, Natrix2 requires a [primertable](#primertable) containing the sample names and, if applicable, the length of poly-N tails, primer sequences, and barcodes for each sample and read direction. Except for the sample names, all other information may be omitted if the data has already been preprocessed or does not contain the corresponding subsequences. Natrix2 also requires a YAML [configuration](#configuration) file that defines the parameters used by the pipeline.
 
-The primertable, configuration file, and the folder containing the FASTQ files must all be located in the root directory of the pipeline and share the same project name (with their respective extensions: `project.yaml`, `project.csv`, and the project folder containing the FASTQ files). The first configfile entry, `filename`, must also match the project name.
+The primertable, configuration file, and FASTQ folder must be located in the root directory of the pipeline and share the same project name (`project.csv`, `project.yaml`, and the corresponding `project` folder). This naming scheme ensures that all required files are correctly assigned to the respective project during workflow execution. The `filename` entry in the configuration file must also match the project name to ensure that Natrix2 can correctly identify and process the input data.
 
 ## Running Natrix2 using `pipeline.sh`
 
-If everything is configured correctly, the pipeline can be started from the terminal using the `illumina_swarm.yaml` configuration file as an example for running the workflow with predefined parameters.
+Once everything is configured correctly, Natrix2 can be started using the `pipeline.sh` launcher. The launcher allows you to select a project configuration from the root directory or start one of the provided test runs.
 
 ```shell
-$ ./pipeline.sh # Start Natrix2 pipeline script
-Natrix2 Pipeline Script # Output
-Enter project name (e.g. illumina_swarm): # Output
-$ illumina_swarm # Select illumina_swarm config
+# Launch Natrix2 using pipeline.sh
+$ ./pipeline.sh
+
+# Pipeline launcher output
+Natrix2 Pipeline Launcher
+Exit launcher: enter 'exit' or 'quit'
+Enter config:
+Project:  your_config.yaml (root directory)
+Test run: illumina_testrun (example config)
+
+# Run config from root directory
+$ > illumina_otu_swarm_mumu_mothur_pr2.yaml
 ```
 
-The pipeline will then start a screen session using the project name as the session name and begin downloading the required dependencies for the workflow rules. To detach from the screen session, press `Ctrl+a, d` (first press Ctrl+a, then d). To reattach to an active screen session, type:
+Alternatively, run a config from `config_presets`:
 
 ```shell
-screen -ls # List all running screen sessions
-screen -r # Reattach if only one session is running
+# Run config from config_presets directory
+$ > config_presets/...
+```
+
+The pipeline will start a screen session using the selected project name as the session name and begin executing the workflow. Required dependencies for individual workflow rules are automatically prepared during execution. To detach from the current screen session, press `Ctrl+a, d` (first press `Ctrl+a`, then `d`). Use the following commands to manage or reattach to an active screen session:
+
+```shell
+# Manage screen sessions
+screen -ls # List active screen sessions
+screen -r # Reattach to the most recent session
 screen -r <session_name> # Reattach to a specific session
+screen -d -r <session_name> # Force reattach to a session
 ```
-
-**Important: Make sure that the Conda environment (natrix2) is activated when managing or reattaching screen sessions, as this ensures that all required commands are available and helps to correctly identify your session. When the workflow has finished, press `Ctrl+a, d` (first press Ctrl+a, then k) to end the screen session and terminate any remaining processes.**
+**Important:** Make sure that the Natrix2 Conda environment (`natrix2`) is activated
+when managing or reattaching to screen sessions. This ensures that all required
+commands and dependencies are available. To detach from a running session, use
+`Ctrl+a, d`. To terminate a screen session, use `Ctrl+a, k`.
 
 ## Running Natrix2 Manually
 
-If you prefer to run the preparation script and Snakemake manually, start by activating the Natrix2 Conda environment:
+To run the preparation script and Snakemake manually, first activate the Natrix2 Conda environment:
 
 ```shell
-conda activate natrix2 
-# Activate the Snakemake environment
+# Activate the Natrix2 Conda environment
+conda activate natrix2
 ```
 
-Next, run the preparation script, where project refers to the name of your project:
+Next, run the preparation script using your project configuration:
 
 ```shell
+# Generate the units.tsv file required by Natrix2
 python3 create_dataframe.py <project>.yaml
-# Generates the `units.tsv` file required by Natrix2.
 ```
 
-To start the main Natrix2 pipeline, execute the following command in your terminal:
+Start the Natrix2 workflow using Snakemake:
 
 ```shell
-snakemake --use-conda --configfile <project>.yaml --cores <cores> 
-# Start Natrix2 pipeline
+# Run Natrix2
+snakemake --use-conda --configfile <project>.yaml --cores <cores>
 ```
 
-Here, project refers to the project name, and cores specifies the number of CPU cores allocated to Natrix2. If the pipeline terminates prematurely (e.g., due to an error or manual interruption), rerunning the same command will resume execution from the point at which it stopped.
+Here, `<project>` refers to the project name and `<cores>` specifies the number of CPU cores allocated to Natrix2. If the workflow is interrupted or terminates due to an error, running the same command again will resume execution from the last completed workflow steps.
 
-**Optional**: To perform a dry run and verify that the workflow is configured correctly, use the -n flag in Snakemake:
+**Optional:** Verify the workflow setup with a Snakemake dry run using `-n`:
 
 ```shell
-snakemake --use-conda --configfile <project>.yaml --cores <cores> -n 
-# Dry run (no execution)
+# Perform a dry run
+snakemake --use-conda --configfile <project>.yaml --cores <cores> -n
 ```
 
 ## Docker or Docker Compose
 
-Detailed setup instructions are provided in the [Docker manual](documentation/manuals/docker_manual.pdf).
+Detailed setup instructions are available in the [Docker manual](documentation/manuals/docker_manual.pdf).
 
 ### Docker Installation and Natrix2 Image
 
@@ -229,65 +263,63 @@ Natrix2 can be executed within a Docker container. Therefore, Docker must be ins
 To verify that Docker has been installed correctly, run:
 
 ```bash
-docker --version # Check Docker installation
+# Check Docker installation
+docker --version
 ```
 
-To run Natrix2 using Docker, download the pre-built image from [Docker Hub](https://hub.docker.com/r/dbeisser/natrix2):
+Download the latest Natrix2 image from [Docker Hub](https://hub.docker.com/r/dbeisser/natrix2):
 
 ```bash
-docker pull dbeisser/natrix2:latest # Download Natrix2 image
+# Download Natrix2 image
+docker pull dbeisser/natrix2:latest
 ```
 
 #### Environment Setup
 
 **Step 1:**  
-Before using Docker, create the following directories on your system: `input`, `output`, and `database`, which are required for organizing input data, storing analysis results, and managing reference databases. An example folder structure is shown below.
+Before using Docker, create the following directories on your system: `input`, `output`, and `database`. These directories are required for organizing input data, storing analysis results, and managing reference databases.
 
 **Step 2:**  
-Copy the configuration file `config.yaml` and the primer table `primer.csv` used for your analysis into the `input` directory. You may create a subdirectory for your sample files. However, the configuration file and primer table must be located directly in the `input` directory. Ensure that all paths are specified correctly in the configuration file.
+Copy the configuration file `config.yaml` and the primer table `primer.csv` into the `input` directory. Sample files can be stored in a separate subdirectory such as `input/samples` to keep the input data organized.
 
 **Step 3:**  
-Open the configuration file `config.yaml` with a text editor and adjust the parameters for your samples. Before starting the analysis, make sure to define the number of CPU cores and the available working memory (RAM).
+Open the configuration file `config.yaml` with a text editor and adjust the parameters according to your analysis. Make sure to define the required number of CPU cores and the available working memory (RAM).
 
 **Step 4:**  
-Define the path to your input data in the configuration file so that the pipeline can locate it correctly (e.g. `filename: input`). If your data is stored in a subdirectory, adjust the path accordingly (e.g., `filename: input/samples`). The same applies to the primer table path.
+Define the required paths in `config.yaml` so that Natrix2 can locate the input data correctly. If your samples are stored in a subdirectory, specify the corresponding path (e.g., `filename: input/samples`).
 
-**Example folder structure**
+**Example folder structure:**
 
-```bash
-# Example folder structure for the Docker setup (created locally)
-
-./natrix2/ # Main project directory
-    input/ # Files required for analysis
-        samples/ # Input FASTQ files
-        config.yaml # Configuration file
-        primer.csv # Primer table
-    output/ # Analysis output
-        results/ # Result files
-    database/ # Reference database
+```text
+./natrix2/             # Main project directory
+├── input/             # Files required for analysis
+│   ├── samples/       # Input FASTQ files
+│   ├── config.yaml    # Configuration file
+│   └── primer.csv     # Primer table
+├── output/            # Analysis output
+│   └── results/       # Result files
+└── database/          # Reference databases
 ```
 
 #### Example `config.yaml`
 
 ```yaml
-# Example configuration file
-
 general:
-    filename: input/samples # Path to samples directory
-    output_dir: output/results # Path to results directory
+    filename: input/samples       # Path to samples directory
+    output_dir: output/results    # Path to results directory
     primertable: input/primer.csv # Path to primer table
-    cores: 20 # Number of CPU cores
-    memory: 10000 # RAM in megabytes
-    # further configuration options
+    cores: 20                     # Number of CPU cores
+    memory: 10000                 # RAM in megabytes
+    # Further configuration options...
 ```
 
 #### Create Docker Container
 
-The Docker container includes all required environments pre-installed, so the workflow does not need to download them during the initial setup. To open a shell inside the container, run:
+The Docker image includes all required environments, so they do not need to be downloaded during the initial workflow setup. To create the container and open a shell inside it, run:
 
 ```bash
 # Replace `/your/local/` with the paths to your local Natrix2 directories
-# Example: `/your/local/natrix2/input` to `/path/to/natrix2/input`
+# Example: `/your/local/natrix2/input` to `/app/input`
 
 docker run -it --label natrix2_container \
   -v /your/local/natrix2/input:/app/input \
@@ -296,21 +328,18 @@ docker run -it --label natrix2_container \
   dbeisser/natrix2:latest bash
 ```
 
-The Docker container uses three main directories. The `input` directory contains the input data, including your samples as well as the configuration file and primer table, which must be located directly in this directory. The `output` directory is used to store the workflow results so that they are accessible outside the container. The `database` directory provides a location for installing reference databases (SILVA or NCBI) and is optional, only required if BLAST is used for taxonomic assignment.
+The Docker container uses three main directories. The `input` directory contains the sample data, configuration file, and primer table. The `output` directory stores the workflow results and makes them accessible outside the container. The `database` directory stores reference databases such as SILVA or NCBI and is only required when BLAST is used for taxonomic assignment.
 
 ### Run Natrix2 in a Configured Docker Container
 
-After starting the container and opening a shell, you can follow the instructions in  
-[Running Natrix2 manually](#running-natrix2-manually).
-
-**Alternatively**, you can use the `docker_pipeline.sh` script. Once the container is running, start the analysis by specifying the name of your configuration file located in the `input` directory.
+After starting the container and opening a shell, you can follow the instructions in [Running Natrix2 manually](#running-natrix2-manually) to start the workflow. Alternatively, you can use the `docker_pipeline.sh` script. Once the container is running, start the analysis by specifying the name of your configuration file located in the `input` directory.
 
 ```bash
 # Replace `config` with the name of your configuration file
 ./docker_pipeline.sh config
 ```
 
-To test the Docker container before running your own data, you can use the provided Nanopore test dataset. Start a test run using the `test_docker.yaml` configuration file:
+To test the Docker container before running your own data, use the provided Nanopore test dataset. Start the test run using the `test_docker.yaml` configuration file:
 
 ```bash
 # Start a test run using the provided sample data
@@ -319,83 +348,81 @@ To test the Docker container before running your own data, you can use the provi
 
 ### Use Docker Compose
 
-Alternatively, the workflow can be started using Docker Compose from the root
-directory of the pipeline. Make sure that Docker Compose is installed on your
-system before proceeding. You can verify the installation with:
+Alternatively, Natrix2 can be started using Docker Compose from the root directory of the pipeline. Make sure that Docker Compose is installed on your system before proceeding. Verify the installation with:
 
 ```shell
-docker-compose --version # Check Docker Compose installation
+# Check Docker Compose installation
+docker-compose --version
 ```
 
-All container-related directories will be located under `/srv/docker/`.
+All container-related directories are located under `/srv/docker/`.
 
 **Step 1:**  
-Copy your `samples/` directory, `config.yaml`, and `primer.csv` files to
-`/srv/docker/natrix2_cont_1/input/`. If the `natrix2_cont_1/` directory does not yet
-exist, create the required container folder structure first (see the recommended
-[Docker Compose folder structure](#example-folder-structure-for-docker-compose)
-below). By default, the container will wait until the input files are available.
+Copy your `samples/` directory, `config.yaml`, and `primer.csv` to
+`/srv/docker/natrix2_cont_1/input/`. If the directory does not exist, create the
+required folder structure first (see the recommended [Docker Compose folder
+structure](#example-folder-structure-for-docker-compose) below). By default, the
+container will wait until the input files are available.
 
-#### Example: Folder structure for Docker Compose
+#### Example Folder Structure for Docker Compose
 
-```bash
+```text
 # Check the docker-compose.yaml file for additional configuration details.
 
 # natrix2_cont_1 (container 1)
 ./srv/docker/natrix2_cont_1/
-    input/
-        samples/ # Samples to be analyzed
-        config.yaml # Configuration file
-        primer.csv # Primer table
-    output/            
-        results/ # Analysis results
-    database/ # Reference database
+├── input/
+│   ├── samples/       # Samples to be analyzed
+│   ├── config.yaml    # Configuration file
+│   └── primer.csv     # Primer table
+├── output/
+│   └── results/       # Analysis results
+└── database/          # Reference databases
 
 # Additional containers can be added if required
-# e.g. natrix2_cont_2, natrix2_cont_3, ...
+# e.g., natrix2_cont_2, natrix2_cont_3, ...
 ```
 
-**Step 2:**   
-Open your configuration file in a text editor and define all required
-directories and file paths. Then configure the parameters for your samples. Refer
-to the [example configuration](#example-configyaml) for guidance.
+**Step 2:**  
+Open your configuration file in a text editor and define all required directories
+and file paths. Then adjust the parameters according to your analysis. Refer to the
+[example configuration](#example-configyaml) above for guidance.
 
-**Step 3:**   
-Assign a project name to your configuration file, which will be used at
-startup. To run multiple containers, specify a unique project name for each
+**Step 3:**  
+Assign a project name to your configuration file, which will be used when starting
+the container. To run multiple containers, specify a unique project name for each
 container in the `docker-compose.yaml` file.
 
-**Example:** rename `config.yaml` to `project_name.yaml`.
+**Example:** Rename `config.yaml` to `project_name.yaml`.
 
-**Step 4:**   
-Once everything is configured correctly, start the container using the
-commands listed below. During the first launch, required databases will be
-downloaded to `natrix2_cont_1/databases/`, which may take some time.
+**Step 4:**  
+Once everything is configured correctly, start the container using the command
+below. During the first launch, required reference databases will be downloaded to
+`natrix2_cont_1/database/`, which may take some time.
 
-**If multiple containers are required, set up all corresponding container
-directories in advance as defined in `docker-compose.yaml`.**
+**If multiple containers are required, create the corresponding directories as defined in `docker-compose.yaml`.**
 
 ```shell
-# Optional: the '-d' parameter starts the container in detached mode
+# Start the container in detached mode
 sudo PROJECT_NAME="project_name" docker compose up -d
 ```
 
-If multiple containers are defined in the docker-compose.yaml file, all containers
-can be started at once using the following command. Make sure that all paths and
-project names are specified correctly to ensure a successful analysis.
+If multiple containers are defined in `docker-compose.yaml`, all containers can be
+started at once using the following command. Make sure that all paths and project
+names are specified correctly to ensure successful workflow execution.
 
 ```shell
-sudo docker compose up # Start all defined containers
+# Start all defined containers
+sudo docker compose up
 ```
 
-#### Building the Container Manually
+#### Build the Container Manually
 
-If you prefer to build the Docker container yourself from the repository (for
-example, after modifying the Natrix2 source code), you can build the container using
-the following command:
+If you prefer to build the Docker container directly from the repository, for example after modifying or updating the Natrix2 source code, you can build the Docker image locally using the following command:
 
 ```bash
-docker build -t natrix2 . # Build the Natrix2 Docker image locally
+# Build the Natrix2 Docker image locally
+docker build -t natrix2 .
 ```
 
 ---
@@ -403,48 +430,62 @@ docker build -t natrix2 . # Build the Natrix2 Docker image locally
 # Cluster Execution
 
 Natrix2 can be run on cluster systems using either Conda or the Docker container.
-For most cluster environments, it is sufficient to add the `--cluster` option to
-the Snakemake command together with a job submission command (e.g. `qsub`).
+This allows the workflow to efficiently use the computing resources available on
+the respective cluster system. For most common cluster environments, it is sufficient
+to add the `--cluster` option to the Snakemake command together with a job submission
+command such as `qsub`.
 
 An example command is shown below:
 
 ```shell
+# Run Natrix2 on a cluster using qsub
 snakemake -s <path/to/Snakefile> --use-conda \
   --configfile <path/to/configfile.yaml> \
-  --cluster "qsub -N <project_name> -S /bin/bash/" \
+  --cluster "qsub -N <project_name> -S /bin/bash" \
   --jobs 100
 ```
 
-Additional qsub arguments with brief explanations can be found in the
+Additional `qsub` arguments with brief explanations can be found in the
 [qsub documentation](http://bioinformatics.mdc-berlin.de/intro2UnixandSGE/sun_grid_engine_for_beginners/how_to_submit_a_job_using_qsub.html).
-To run additional commands for each job, the `--jobscript path/to/jobscript.sh`
-option can be used. An example job script that sources `.bashrc` and activates the
-Snakemake environment before execution is shown below:
+
+To execute additional commands for each job, the `--jobscript <path/to/jobscript.sh>`
+option can be used. An example job script that loads `.bashrc` and activates the
+Natrix2 Conda environment before execution is shown below:
 
 ```shell
 #!/usr/bin/env bash
-source ~/.bashrc # Load user environment
-conda activate natrix # Activate Natrix2 Conda environment
-{exec_job} # Execute Snakemake job command
+
+# Load user environment
+source ~/.bashrc
+
+# Activate Natrix2 Conda environment
+conda activate natrix2
+
+# Execute Snakemake job command
+{exec_job}
 ```
 
 Instead of passing cluster submission arguments directly to the Snakemake command,
-it is also possible to use a Snakemake profile that defines cluster commands and
-resource settings. Profiles allow the specification of rule-specific hardware
-requirements. For example, rules such as BLAST benefit from a high number of CPU
-cores, while other rules (e.g. AmpliconDuo) require fewer resources. By assigning
-appropriate resources per rule, profiles enable more efficient use of cluster
-resources and can reduce queue waiting times. Profile creation depends on the
-available cluster software and hardware. Once a profile is configured, Natrix2 can
-be executed with:
+a Snakemake profile can be used to define cluster commands and resource settings.
+Profiles also allow rule-specific hardware requirements to be configured. For
+example, BLAST can benefit from more CPU cores, while other rules such as
+AmpliconDuo may require fewer resources.
+
+Assigning appropriate resources to individual rules enables more efficient use of
+cluster resources and can reduce queue waiting times. Profile configuration depends
+on the available cluster software and hardware. Once a profile is configured,
+Natrix2 can be executed with:
 
 ```shell
-snakemake -s <path/to/Snakefile> --profile myprofile # Run Natrix2 using a Snakemake profile
+# Run Natrix2 using a Snakemake profile
+snakemake -s <path/to/Snakefile> --profile myprofile
 ```
 
-The Snakemake documentation provides a tutorial on
+The Snakemake documentation provides detailed information and guidance on
 [profile creation](https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles),
-and example profiles for different cluster systems are available on the
+including the configuration of cluster-specific settings, resources, and execution
+parameters. Additional examples and predefined profiles for different cluster
+systems and workload managers are also available on the
 [Snakemake profiles GitHub page](https://github.com/snakemake-profiles/doc).
 
 ---

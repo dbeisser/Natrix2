@@ -12,10 +12,10 @@ rule vsearch_chim:
         pseudo_c=config["chim"]["pseudo_count"],
         abskew=config["chim"]["abskew"]
     threads: 1
+    log:
+        os.path.join(config["general"]["output_dir"],"logfiles/chimera/vsearch_chim/{sample}_{unit}.log")
     conda:
          "../envs/analysis/vsearch.yaml"
-    log:
-        os.path.join(config["general"]["output_dir"],"logs/{sample}_{unit}/vsearch.log")
     shell:
         "vsearch --uchime3_denovo {input} -uchimeout {output.uchime_out}"
         " -chimeras {output.chim} -nonchimeras {output.nonchim} -xn {params.beta}"

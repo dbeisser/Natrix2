@@ -5,6 +5,19 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
 
 ---
 
+### [2026-09-21]
+
+- Improve `LOG-System` for selected workflow files:
+  - Update `assembly.smk`, `blast.smk`, `chimera.smk`
+  - Update `clustering.smk`, `mumu.smk`, `pychopper.smk`
+  - Standardize log handling
+- Improve workflow structure and rule organization
+- Update `README.md` structure and content
+- Validate workflow execution using the provided test datasets
+- Update the Docker image with the latest changes
+
+---
+
 ### [2026-08-27]
 
 - Improve workflow structure and rule organization

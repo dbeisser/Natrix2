@@ -8,6 +8,8 @@ if config["blast"]["database"] == "silva":
             config["blast"]["db_path"] + ".fasta"
         params:
             db_path=config["blast"]["db_path"]
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/blast/make_silva_db.log")
         conda:
             "../envs/classification/blast.yaml"
         shell:
@@ -20,8 +22,12 @@ if config["blast"]["database"] == "silva":
             """
 
     rule create_silva_taxonomy:
-        input: config["blast"]["db_path"] + ".fasta"
-        output: os.path.join(os.path.dirname(config["blast"]["db_path"]), "tax_lineage.h5")
+        input: 
+            config["blast"]["db_path"] + ".fasta"
+        output: 
+            os.path.join(os.path.dirname(config["blast"]["db_path"]), "tax_lineage.h5")
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/blast/create_silva_taxonomy.log")
         conda:
             "../envs/classification/blast.yaml"
         script:
@@ -37,7 +43,7 @@ elif config["blast"]["database"] == "ncbi":
             db_dir=config["blast"]["db_path"],
             db_type=config["blast"]["db_type"]
         log:
-            config["blast"]["db_path"] + config["blast"]["db_type"] + ".download.log"
+            os.path.join(config["general"]["output_dir"],"logfiles/blast/make_ncbi_db.log")
         conda:
             "../envs/classification/blast.yaml"
         shell:
@@ -55,6 +61,8 @@ elif config["blast"]["database"] == "ncbi":
             os.path.join(config["blast"]["db_path"], "fullnamelineage.dmp")
         params:
             db_path=config["blast"]["db_path"]
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/blast/download_taxonomy.log")
         conda:
             "../envs/classification/blast.yaml"
         shell:
@@ -70,10 +78,10 @@ elif config["blast"]["database"] == "ncbi":
             os.path.join(config["blast"]["db_path"], "fullnamelineage.dmp")
         output:
             os.path.join(config["blast"]["db_path"], "tax_lineage.h5")
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/blast/create_blast_taxonomy.log")
         conda:
             "../envs/classification/blast.yaml"
-        log:
-            os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
         script:
             "../scripts/classification/create_blast_taxonomy.py"
 
@@ -87,6 +95,8 @@ elif config["blast"]["database"] == "rod":
         params:
             db_path=config["blast"]["db_path"],
             db_version=config["database_version"]["rod"],
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/blast/make_ROD_db.log")
         conda:
             "../envs/classification/blast.yaml"
         shell:
@@ -107,8 +117,12 @@ elif config["blast"]["database"] == "rod":
             """
 
     rule create_ROD_taxonomy:
-        input: config["blast"]["db_path"] + ".fasta"
-        output: os.path.join(os.path.dirname(config["blast"]["db_path"]), "tax_lineage.h5")
+        input: 
+            config["blast"]["db_path"] + ".fasta"
+        output: 
+            os.path.join(os.path.dirname(config["blast"]["db_path"]), "tax_lineage.h5")
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/blast/create_ROD_taxonomy.log")
         conda:
             "../envs/classification/blast.yaml"
         script:
@@ -126,6 +140,8 @@ elif config["blast"]["database"] == "eukaryome":
             db_path=config["blast"]["db_path"],
             eukaryome_version=config["database_path"]["eukaryome_version"],
             db_version=config["database_version"]["eukaryome"],
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/blast/make_Eukaryome_db.log")
         conda:
             "../envs/classification/blast.yaml"
         shell:
@@ -144,8 +160,12 @@ elif config["blast"]["database"] == "eukaryome":
             """
 
     rule create_Eukaryome_taxonomy:
-        input: config["blast"]["db_path"] + ".tax"
-        output: os.path.join(os.path.dirname(config["blast"]["db_path"]), "tax_lineage.h5")
+        input: 
+            config["blast"]["db_path"] + ".tax"
+        output: 
+            os.path.join(os.path.dirname(config["blast"]["db_path"]), "tax_lineage.h5")
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/blast/create_Eukaryome_taxonomy.log")
         conda:
             "../envs/classification/blast.yaml"
         script:
@@ -170,10 +190,6 @@ rule blast:
         )
     output:
         os.path.join(config["general"]["output_dir"],"blast/blast_taxonomy.tsv")
-    log:
-        os.path.join(config["general"]["output_dir"],"blast/blast.log")
-    threads: 
-        config["general"]["cores"]
     params:
         db_path = (
             config["blast"]["db_path"] + config["blast"]["db_type"]
@@ -184,6 +200,10 @@ rule blast:
         ident=str(config["blast"]["ident"]),
         evalue=str(config["blast"]["evalue"]),
         out6='"6 qseqid qlen length pident mismatch qstart qend sstart send gaps evalue staxid sseqid"'
+    threads: 
+        config["general"]["cores"]
+    log:
+        os.path.join(config["general"]["output_dir"],"logfiles/blast/blast.log")
     conda:
         "../envs/classification/blast.yaml"
     shell:
@@ -219,10 +239,10 @@ if config['blast']['blast']:
 			params:
 				max_target_seqs=config["blast"]["max_target_seqs"],
 				drop_tax_classes=str(config["blast"]["drop_tax_classes"])
+			log:
+				os.path.join(config["general"]["output_dir"],"logfiles/blast/ncbi_taxonomy.log")
 			conda:
 				"../envs/classification/blast.yaml"
-			log:
-				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
 				"../scripts/classification/ncbi_taxonomy.py"
 
@@ -242,10 +262,10 @@ if config['blast']['blast']:
 				metadata=os.path.join(config["general"]["output_dir"],"finalData/blast_ncbi/metadata_table.csv"),
 			params:
 				seq_rep=str(config["general"]["seq_rep"]),
+			log:
+                os.path.join(config["general"]["output_dir"],"logfiles/blast/merge_results.log")
 			conda:
 				"../envs/utilities/merge_results.yaml"
-			log:
-				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
 				"../scripts/utilities/merge_results_vsearch_blast.py" \
                 if config["clustering"]== "vsearch" and config["dataset"]["nanopore"] \
@@ -262,10 +282,10 @@ if config['blast']['blast']:
 				temp(os.path.join(config["general"]["output_dir"],"blast/blast_taxonomic_lineage.tsv"))
 			params:
 				drop_tax_classes=str(config["blast"]["drop_tax_classes"])
+			log:
+                os.path.join(config["general"]["output_dir"],"logfiles/blast/silva_taxonomy.log")
 			conda:
 				"../envs/classification/blast.yaml"
-			log:
-				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
 				"../scripts/classification/silva_taxonomy.py"
 
@@ -284,10 +304,10 @@ if config['blast']['blast']:
 				metadata=os.path.join(config["general"]["output_dir"],"finalData/blast_silva/metadata_table.csv"),
 			params:
 				seq_rep=str(config["general"]["seq_rep"]),
+			log:
+                os.path.join(config["general"]["output_dir"],"logfiles/blast/merge_results.log")
 			conda:
 				"../envs/utilities/merge_results.yaml"
-			log:
-				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
 				"../scripts/utilities/merge_results_vsearch_blast.py" \
                 if config["clustering"]== "vsearch" and config["dataset"]["nanopore"] \
@@ -304,10 +324,10 @@ if config['blast']['blast']:
 				temp(os.path.join(config["general"]["output_dir"],"blast/blast_taxonomic_lineage.tsv"))
 			params:
 				drop_tax_classes=str(config["blast"]["drop_tax_classes"])
+			log:
+                os.path.join(config["general"]["output_dir"],"logfiles/blast/Eukaryome_taxonomy.log")
 			conda:
 				"../envs/classification/blast.yaml"
-			log:
-				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
 				"../scripts/classification/eukaryome_taxonomy.py"
 
@@ -326,10 +346,10 @@ if config['blast']['blast']:
 				metadata=os.path.join(config["general"]["output_dir"],"finalData/blast_eukaryome/metadata_table.csv"),
 			params:
 				seq_rep=str(config["general"]["seq_rep"]),
+			log:
+                os.path.join(config["general"]["output_dir"],"logfiles/blast/merge_results.log")
 			conda:
 				"../envs/utilities/merge_results.yaml"
-			log:
-				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
 				"../scripts/utilities/merge_results_vsearch_blast.py" \
                 if config["clustering"]== "vsearch" and config["dataset"]["nanopore"] \
@@ -346,10 +366,10 @@ if config['blast']['blast']:
 				temp(os.path.join(config["general"]["output_dir"],"blast/blast_taxonomic_lineage.tsv"))
 			params:
 				drop_tax_classes=str(config["blast"]["drop_tax_classes"])
+			log:
+                os.path.join(config["general"]["output_dir"],"logfiles/blast/ROD_taxonomy.log")
 			conda:
 				"../envs/classification/blast.yaml"
-			log:
-				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
 				"../scripts/classification/silva_taxonomy.py"
 
@@ -368,10 +388,10 @@ if config['blast']['blast']:
 				metadata=os.path.join(config["general"]["output_dir"],"finalData/blast_rod/metadata_table.csv"),
 			params:
 				seq_rep=str(config["general"]["seq_rep"]),
+			log:
+                os.path.join(config["general"]["output_dir"],"logfiles/blast/merge_results.log")
 			conda:
 				"../envs/utilities/merge_results.yaml"
-			log:
-				os.path.join(config["general"]["output_dir"],"logs/BLAST.log")
 			script:
 				"../scripts/utilities/merge_results_vsearch_blast.py" \
                 if config["clustering"]== "vsearch" and config["dataset"]["nanopore"] \

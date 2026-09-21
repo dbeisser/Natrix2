@@ -29,6 +29,8 @@ if config['dataset']['nanopore'] and config['nanopore']['pychopper']:
         params:
             # CSV table containing SSP and VNP primer sequences
             primer = config["general"]["primertable"]
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/pychopper/define_pychop_primer.log")
         shell:
                 """
                 forward_primer=$(sed -n "2p" {params.primer} | cut -d, -f4);
@@ -65,10 +67,12 @@ if config['dataset']['nanopore'] and config['nanopore']['pychopper']:
             rescue_fastq = temp(expand(os.path.join(config["general"]["output_dir"],"pychopper/rescued/normal/{{sample}}_{{unit}}_R{read}.fastq"), read=reads)),
             # Reads filtered out by minimum length
             length_out = temp(expand(os.path.join(config["general"]["output_dir"], "pychopper/unclassified/normal/{{sample}}_{{unit}}_R{read}_length_out.fastq"), read=reads))
-        threads: config["general"]["cores"]
         params:
             qual = config["nanopore"]["pychopqual"],
             length = config["nanopore"]["min_length"]
+        threads: config["general"]["cores"]
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/pychopper/pychop/{sample}_{unit}.log")
         conda:
             "../envs/preprocessing/pychopper.yaml"
         shell:
@@ -99,10 +103,12 @@ if config['dataset']['nanopore'] and config['nanopore']['pychopper']:
             unclass_pdf = expand(os.path.join(config["general"]["output_dir"],"pychopper/reports/rescue/{{sample}}_{{unit}}_R{read}.pdf"),  read=reads),
             # Rescue reads filtered out by minimum length
             length_out = temp(expand(os.path.join(config["general"]["output_dir"], "pychopper/unclassified/rescue/{{sample}}_{{unit}}_R{read}_length_out.fastq"), read=reads))
-        threads: config["general"]["cores"]
         params:
             qual =config["nanopore"]["pychopqual"],
             length = config["nanopore"]["min_length"]
+        threads: config["general"]["cores"]
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/pychopper/pychopper_rescue/{sample}_{unit}.log")
         conda:
             "../envs/preprocessing/pychopper.yaml"
         shell:
@@ -121,6 +127,8 @@ if config['dataset']['nanopore'] and config['nanopore']['pychopper']:
         output:
             # Combined classified reads for downstream processing
             pychopper_merged = expand(os.path.join(config["general"]["output_dir"], "pychopper/output/merged/{{sample}}_{{unit}}_R{read}.fastq"), read=reads)
+        log:
+            os.path.join(config["general"]["output_dir"],"logfiles/pychopper/merge_pychopper/{sample}_{unit}.log")
         shell:
             """
             cat {input.out_fastq} {input.unclass_out_fastq} > {output.pychopper_merged}
