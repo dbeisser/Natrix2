@@ -13,6 +13,7 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
   - Update `qfiltering.smk`, `rcorrection.smk`, `vsearch.smk`
 - Update `README.md` structure and content
 - Update image for FASTQ file naming conventions
+- Update image for Natrix2 output files
 - Update `docker-compose.yaml`
 - Validate workflow execution using the provided test datasets
 - Update the Docker image with the latest changes
