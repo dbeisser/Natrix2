@@ -1,29 +1,42 @@
 services:
-  natrix2_cont1: # Container 1
+  natrix2_cont1: # CONTAINER_1
     image: dbeisser/natrix2:latest # Docker image
     # build: . Create your own Docker image
-    restart: on-failure # Restarts the container if an error occurs
+    # Restarts the container if an error occurs
+    restart: on-failure
     environment:
-      PROJECT_NAME: ${PROJECT_NAME} # Must match config file in input folder
+      # Must match config file in input folder
+      PROJECT_NAME: ${PROJECT_NAME}
     volumes:
-      - /srv/docker/natrix2_cont_1/input:/app/input # Mount: directory for input data
-      - /srv/docker/natrix2_cont_1/output:/app/output # Mount: directory for results
-      - /srv/docker/natrix2_cont_1/database:/app/database # Mount: directory for the database
-      - /srv/docker/natrix2_cont_1/demultiplexed:/app/demultiplexed # Mount: directory for demultiplexed data
+      # Mount: directory for input data
+      - /srv/docker/natrix2_cont_1/input:/app/input
+      # Mount: directory for results
+      - /srv/docker/natrix2_cont_1/output:/app/output
+      # Mount: directory for the database
+      - /srv/docker/natrix2_cont_1/database:/app/database
+      # Mount: directory for demultiplexed data
+      - /srv/docker/natrix2_cont_1/demultiplexed:/app/demultiplexed
 
 # Important: Running Multiple Containers
-# To run multiple containers (e.g., natrix2_cont1, natrix2_cont2), use unique project names and folders.
+# When running multiple containers (e.g., natrix2_cont1 and natrix2_cont2),
+# use a unique project name and a separate directory for each container.
 # Replace ${PROJECT_NAME} with a fixed name that matches each config file.
-# Start all containers with: sudo docker compose up
- 
-#  natrix2_cont2: # Container 2
+# Start all configured containers with: sudo docker compose up
+
+#  natrix2_cont2: # CONTAINER_2
 #    image: dbeisser/natrix2:latest # Docker image
 #    # build: . Create your own Docker image
-#    restart: on-failure # Restarts the container if an error occurs
+#    # Restarts the container if an error occurs
+#    restart: on-failure
 #    environment:
-#      PROJECT_NAME: project_name # Must match config file in input folder
+#      # Must match config file in input folder
+#      PROJECT_NAME: project_name
 #    volumes:
-#      - /srv/docker/natrix2_cont_2/input:/app/input # Mount: directory for input data
-#      - /srv/docker/natrix2_cont_2/output:/app/output # Mount: directory for results
-#      - /srv/docker/natrix2_cont_2/database:/app/database # Mount: directory for the database
-#      - /srv/docker/natrix2_cont_2/demultiplexed:/app/demultiplexed # Mount: directory for demultiplexed data
+#      # Mount: directory for input data
+#      - /srv/docker/natrix2_cont_2/input:/app/input
+#      # Mount: directory for results
+#      - /srv/docker/natrix2_cont_2/output:/app/output
+#      # Mount: directory for the database
+#      - /srv/docker/natrix2_cont_2/database:/app/database
+#      # Mount: directory for demultiplexed data
+#      - /srv/docker/natrix2_cont_2/demultiplexed:/app/demultiplexed

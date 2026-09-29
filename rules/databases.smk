@@ -1,3 +1,4 @@
+import os
 
 if config["classify"]["database"] == "pr2":
     rule download_pr2:
@@ -5,6 +6,8 @@ if config["classify"]["database"] == "pr2":
             expand(["database/pr2db.{pr2_db_version}.fasta", "database/pr2db.{pr2_db_version}.tax"], pr2_db_version=config["database_version"]["pr2"])
         params:
             db_version=config["database_version"]["pr2"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/databases/download_pr2.log")
         shell:
             """
                 wget -P ./ --progress=bar https://github.com/pr2database/pr2database/releases/download/v{params.db_version}/pr2_version_{params.db_version}_SSU_mothur.fasta.gz;
@@ -19,6 +22,8 @@ elif config["classify"]["database"] == "unite":
         output:
             "database/unite_v10.fasta",
             "database/unite_v10.tax" # no version for download available, needs to be changed here not in config
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/databases/download_unite.log")
         shell:
             """
                 wget -P ./ --progress=bar  -O sh_mothur_release_2024-04-04.tgz --progress=bar https://s3.hpc.ut.ee/plutof-public/original/10220f9f-17c8-4a2f-aada-1f852f50c0f7.tgz;
@@ -41,6 +46,8 @@ elif config["classify"]["database"] == "silva":
                 expand(["database/silva_db.{silva_db_version}.fasta", "database/silva_db.{silva_db_version}.tax.temp"], silva_db_version=config["database_version"]["silva"])
             params:
                 db_version=config["database_version"]["silva"]
+            log:
+                os.path.join(config["general"]["output_dir"], "logfiles/databases/download_silva.log")
             shell:
                 """
                 wget -P ./ --progress=bar -O database/silva_{params.db_version}.fasta.gz https://www.arb-silva.de/fileadmin/silva_databases/release_{params.db_version}/Exports/SILVA_{params.db_version}_SSURef_tax_silva.fasta.gz;
@@ -50,14 +57,16 @@ elif config["classify"]["database"] == "silva":
                 """
 
         rule edit_silva:
-           input:
-              expand("database/silva_db.{silva_db_version}.tax.temp", silva_db_version=config["database_version"]["silva"])
-           output:
-              expand("database/silva_db.{silva_db_version}.tax", silva_db_version=config["database_version"]["silva"])
-           conda:
-              "../envs/classification/blast.yaml"
-           script:
-              "../scripts/classification/edit_silva_mothur.py"
+            input:
+                expand("database/silva_db.{silva_db_version}.tax.temp", silva_db_version=config["database_version"]["silva"])
+            output:
+                expand("database/silva_db.{silva_db_version}.tax", silva_db_version=config["database_version"]["silva"])
+            log:
+                os.path.join(config["general"]["output_dir"], "logfiles/databases/edit_silva.log")
+            conda:
+                "../envs/classification/blast.yaml"
+            script:
+                "../scripts/classification/edit_silva_mothur.py"
 
 elif config["classify"]["database"] == "rod":
     rule download_ROD:
@@ -66,6 +75,8 @@ elif config["classify"]["database"] == "rod":
             temp(expand(["database/RODdb.{ROD_db_version}_reference_sequences.tab.temp"], ROD_db_version=config["database_version"]["rod"]))
         params:
             db_version=config["database_version"]["rod"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/databases/download_ROD.log")
         shell:
             """
                 wget -P ./ --progress=bar https://github.com/krabberod/ROD/archive/refs/tags/v{params.db_version}-goldenrod.zip;
@@ -84,6 +95,8 @@ elif config["classify"]["database"] == "rod":
             expand("database/RODdb.{ROD_db_version}_reference_sequences.tab.temp", ROD_db_version=config["database_version"]["rod"])
         output:
             expand("database/RODdb.{ROD_db_version}_reference_sequences.tax", ROD_db_version=config["database_version"]["rod"])
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/databases/edit_ROD.log")
         conda:
             "../envs/classification/blast.yaml"
         script:
@@ -97,6 +110,8 @@ elif config["classify"]["database"] == "eukaryome":
         params:
             db_version=config["database_version"]["eukaryome"],
             eukaryome_version=config["database_path"]["eukaryome_version"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/databases/download_eukaryome.log")
         shell:
             """
                 wget -P ./database/ --progress=bar https://sisu.ut.ee/wp-content/uploads/sites/643/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.zip

@@ -2,6 +2,8 @@
 <img src="documentation/images/lightmode/logo.png" alt="logo" width="500"/>
 </p>
 
+**Natrix2 — Bioinformatics Pipeline for Amplicon Data**
+
 ---
 
 ### About Natrix2
@@ -13,6 +15,8 @@ Natrix2 is an open-source bioinformatics pipeline for the preprocessing of long 
 ### Branch Selection
 
 To access the latest features and ongoing developments, it is recommended to use the [dev branch](https://github.com/dbeisser/Natrix2/tree/dev) of Natrix2, which contains recent updates and patches not yet available in the [main branch](https://github.com/dbeisser/Natrix2/tree/main). The main branch represents the stable version of the pipeline, providing validated and tested code suitable for routine analyses and reproducible workflows, while the dev branch is intended for testing and early access to new features.
+
+---
 
 ![DAG of an example workflow](documentation/images/lightmode/combined_graph.png)
 **Fig. 1**: DAG of the Natrix2 workflow: Schematic representation of the Natrix2 workflow. The processing of two split samples using AmpliconDuo is depicted. The color scheme represents the main steps, dashed lines outline the OTU variant, and dotted lines outline the ASV variant of the workflow. Stars depict updates to the original Natrix workflow. Details on the ONT part are depicted in Fig. 2.
@@ -153,9 +157,10 @@ This tutorial provides a step-by-step guide for preparing input data and running
 **FASTQ files must follow a specific naming convention:**
 
 <p align="center">
-<img src="documentation/images/lightmode/filename.png" alt="FASTQ file naming convention" width="400"/>
+<img src="documentation/images/lightmode/filename_2.png" alt="FASTQ file naming convention" width="550"/>
 </p>
-<p><b>Fig. 3</b>: Naming convention for FASTQ files</p>
+
+**Fig. 3**: Naming convention for FASTQ files
 
 ```shell
 sample_unit_direction.fastq.gz  # sampleID, A/B, R1/R2
@@ -429,11 +434,7 @@ docker build -t natrix2 .
 
 # Cluster Execution
 
-Natrix2 can be run on cluster systems using either Conda or the Docker container.
-This allows the workflow to efficiently use the computing resources available on
-the respective cluster system. For most common cluster environments, it is sufficient
-to add the `--cluster` option to the Snakemake command together with a job submission
-command such as `qsub`.
+Natrix2 can be run on different cluster systems using either Conda or the provided Docker container. This allows the workflow to efficiently use the computing resources currently available on the respective cluster system. For most common cluster computing environments, it is generally sufficient to add the `--cluster` option to the Snakemake command together with a job submission command such as `qsub`.
 
 An example command is shown below:
 
@@ -448,9 +449,7 @@ snakemake -s <path/to/Snakefile> --use-conda \
 Additional `qsub` arguments with brief explanations can be found in the
 [qsub documentation](http://bioinformatics.mdc-berlin.de/intro2UnixandSGE/sun_grid_engine_for_beginners/how_to_submit_a_job_using_qsub.html).
 
-To execute additional commands for each job, the `--jobscript <path/to/jobscript.sh>`
-option can be used. An example job script that loads `.bashrc` and activates the
-Natrix2 Conda environment before execution is shown below:
+To execute additional commands for each individual submitted job, the `--jobscript <path/to/jobscript.sh>` option can be used. An example job script that loads `.bashrc` and activates the Natrix2 Conda environment before execution is shown below:
 
 ```shell
 #!/usr/bin/env bash
@@ -465,11 +464,7 @@ conda activate natrix2
 {exec_job}
 ```
 
-Instead of passing cluster submission arguments directly to the Snakemake command,
-a Snakemake profile can be used to define cluster commands and resource settings.
-Profiles also allow rule-specific hardware requirements to be configured. For
-example, BLAST can benefit from more CPU cores, while other rules such as
-AmpliconDuo may require fewer resources.
+Instead of passing cluster submission arguments directly to the Snakemake command, a Snakemake profile can be used to define cluster commands and resource settings. Profiles also allow specific rule-specific hardware requirements to be configured more precisely. For example, BLAST can benefit from more CPU cores, while other individual rules such as AmpliconDuo may require fewer resources.
 
 Assigning appropriate resources to individual rules enables more efficient use of
 cluster resources and can reduce queue waiting times. Profile configuration depends
@@ -484,61 +479,45 @@ snakemake -s <path/to/Snakefile> --profile myprofile
 The Snakemake documentation provides detailed information and guidance on
 [profile creation](https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles),
 including the configuration of cluster-specific settings, resources, and execution
-parameters. Additional examples and predefined profiles for different cluster
-systems and workload managers are also available on the
-[Snakemake profiles GitHub page](https://github.com/snakemake-profiles/doc).
+parameters. Additional examples and profiles for cluster systems and workload managers are available on the [Snakemake profiles GitHub page](https://github.com/snakemake-profiles/doc).
 
 ---
 
 # Output Files
 
-After the workflow has finished, all results can be found in the output directory.
+After the workflow has finished, all generated results are stored in the specified output directory. The directory structure and available output files depend on the selected sequencing data type, sequence representation, and analysis options. The main final results for downstream analyses are collected in the finalData/ directory.
 
 <p align="center">
-<img src="documentation/images/lightmode/output_files.png" alt="ouput" width="700"/>
+<img src="documentation/images/lightmode/output_files_2.png" alt="ouput" width="700"/>
 </p>
 
-**Fig. 4**: The output file hierarchy: Blue nodes represent folders, orange nodes represent files that are created in both variants of the workflow, green nodes represent files exclusive to the OTU variant, and purple nodes represent files exclusive to the ASV variant of the workflow.
+**Fig. 4:** Overview of the main Natrix2 output files.
 
-| Folder                                | File(s)                    | Description                                                                                                              |
-|---------------------------------------|----------------------------|--------------------------------------------------------------------------------------------------------------------------|
-| qc                                    | FastQC reports             | Quality reports generated by the FastQC application.                                                                               |
-|                                       | MultiQC report             | Aggregated FastQC reports in a single file.                                                                              |
-| logs                                  | Logfiles                   | Logfiles of the different rules.                                                                                         |
-| assembly (one folder for each sample) | sample_low_qual.fastq      | Sequences from the sample that did not pass the PRINSEQ quality filtering.                                                     |
-|                                       | sample_assembled.fastq     | Sequences assembled with PANDAseq.                                                                                       |
-|                                       | sample_singletons.fastq    | Sequences that could not be assembled.                                                                                   |
-|                                       | sample.fasta               | FASTA file of the assembled sequences.                                                                                   |
-|                                       | sample.dereplicated.fasta  | Dereplicated sequences from the sample.                                                                                        |
-|                                       | sample_chimera.fasta       | Sequences from the sample that are thought to be of chimeric origin.                                                           |
-| finalData                             | sample.nonchimera.fasta    | Sequences from the sample that passed the chimera detection rule.                                                              |
-|                                       | full_table.csv             | Table containing the sequences of all samples and their abundances per sample.                                          |
-|                                       | full_table_mumu.csv        | Table containing the sequences of all samples, their abundances per sample, and the taxonomy after post-clustering with mumu. |
-|                                       | filtered_out_table.csv     | Table containing the sequences that did not pass the filtering rule.                                                     |
-|                                       | filtered.fasta             | The sequences from the filtered_table.csv file in FASTA format.                                                                 |
-|                                       | filtered_blast_table.csv   | Table containing the sequences from filtered_table.csv and the taxonomic information assigned to each.                 |
-| figures                               | ampliconduo_unfiltered.png | Discordance graph before filtering.                                                                                  |
-|                                       | ampliconduo_filtered.png   | Discordance graph after filtering.                                                                                       |
-|                                       | AmpliconDuo.Rdata          | RData file containing the results of the AmpliconDuo statistical analysis.                                               |
-| clustering                            | VSEARCH clustering files   | OTU clustered files with VSEARCH.                                                                                        |
-| filtering                             | unfiltered_table.csv       | Table containing representative sequences assembled with cd-hit.                                                              || filtering                             |                            |                                                                                                                          |
-|                                       | filtered_table.csv         | Table containing sequences passing the cutoff value.                                                                     || filtering                             |                            |                                                                                                                          |
-|                                       | filtered_out_table.csv     | Table containing sequences not passing the cutoff value.                                                                 || filtering                             |                            |                                                                                                                          |
-| mothur                                | Database assigned taxonomy | Taxonomy, FASTA, and CSV files with taxonomy assigned to the chosen database.                                                 |
-| quality_filtering                     | Filtered files             | Nanopore FASTQ files filtered by quality and length.                                                                        |
-| pychopper                             | output                     | Reoriented and primer-trimmed output of the first round of Pychopper.                                                      |
-|                                       | pychopper_unclass          | Reoriented and primer-trimmed output of the rescue-specific round of Pychopper.                                            |
-|                                       | reports                    | Reorientation and trimming reports for each file.                                                                        |
-|                                       | rescued                    | Sequences that were not able to orient and trim but could be rescued.                                               |
-|                                       | unclassified               | Sequences that were not able to orient and trim during the first round of Pychopper.                                 |
-|                                       | pychopper_merged           | Reoriented and primer-trimmed merged output of the first round and the rescue-specific round of Pychopper.                     |
-| read_correction                       | cd_hit                     | Representative sequences from assembled Nanopore sequences.                                                                |
-|                                       | counts_mapping             | Medaka alignment with raw reads for the quantification of Medaka representative sequences.                                   |
-|                                       | medaka                     | Medaka error-corrected sequences.                                                                                        |
-|                                       | minimap                    | FASTA files aligned to cd_hit representative sequences.                                                                 |
-|                                       | racon                      | Racon polished sequences for error correction.                                                                           |
+---
 
-<p><b>Table 1</b>: Output files from Natrix2</p>
+### Configuration-dependent output files
+
+| Folder | File(s) | Description |
+| --- | --- | --- |
+| qc/ | FastQC and MultiQC reports | Quality reports for raw reads. |
+| logfiles/ | Log files | Logs generated by workflow rules. |
+| demultiplexed/ | FASTQ files | Demultiplexed sequencing reads. |
+| assembly/ | Assembly and FASTA files | Assembled and filtered sequences. |
+| filtering/ | Filtering tables and FASTA files | Filtered sequences and tables. |
+| filtering/figures/ | AmpliconDuo results | AmpliconDuo analysis results. |
+| clustering/ | OTU or ASV files | SWARM, VSEARCH, or DADA2 results. |
+| mothur/ | Taxonomy files | Taxonomy assigned with MOTHUR. |
+| blast/ | BLAST taxonomy files | Taxonomy assigned with BLAST. |
+| finalData/ | full_table.csv | Abundance and taxonomy results. |
+|  | OTU_table.csv | Final abundance table. |
+|  | metadata_table.csv | Metadata for the abundance table. |
+|  | full_table_mumu.csv | MUMU abundance and taxonomy results. |
+|  | OTU_table_mumu.csv | Final MUMU abundance table. |
+| quality_filtering/ | Filtered FASTQ files | Quality-filtered Nanopore reads. |
+| pychopper/ | Processed reads and reports | Reads processed with Pychopper. |
+| read_correction/ | Corrected reads and mappings | Corrected Nanopore sequences. |
+
+**Table 1:** Natrix2 output files and directories.
 
 ---
 

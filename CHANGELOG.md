@@ -5,6 +5,20 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
 
 ---
 
+### [2026-09-29]
+
+- Improve `LOG-System` for selected workflow files:
+  - Update `classify.smk`, `databases.smk`, `demultiplexing.smk`
+  - Update `dereplication.smk`, `merging.smk`, `qcontrol.smk`
+  - Update `qfiltering.smk`, `rcorrection.smk`, `vsearch.smk`
+- Update `README.md` structure and content
+- Update image for FASTQ file naming conventions
+- Update `docker-compose.yaml`
+- Validate workflow execution using the provided test datasets
+- Update the Docker image with the latest changes
+
+---
+
 ### [2026-09-21]
 
 - Improve `LOG-System` for selected workflow files:

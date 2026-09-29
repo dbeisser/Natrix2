@@ -28,6 +28,8 @@ if config['dataset']['nanopore']:
             tmp = temp(expand(os.path.join(config["general"]["output_dir"],"fasta/{{sample}}_{{unit}}_R{read}.tmp"),read=reads)),
             # FASTA reads for clustering/polishing
             final = expand(os.path.join(config["general"]["output_dir"],"fasta/{{sample}}_{{unit}}_R{read}.fasta"),read=reads)
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/fastq2fasta/{sample}_{unit}.log")
         conda:
             "../envs/utilities/seqtk.yaml"
         shell:
@@ -46,10 +48,12 @@ if config['dataset']['nanopore']:
         output:
             # Clustered representative sequences
             expand(os.path.join(config["general"]["output_dir"],"read_correction/cd_hit/{{sample}}_{{unit}}_R{read}_rep.fasta"),read=reads)
-        threads: config["general"]["cores"]
         params:
             memory=config["general"]["memory"],
             length=config["nanopore"]["min_length"]
+        threads: config["general"]["cores"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/cd_hit/{sample}_{unit}.log")
         conda: "../envs/analysis/rcorrection.yaml"
         shell:
             "cd-hit-est -i {input} -o {output} -l {params.length} -c 0.8 -d 0 -M {params.memory} -T {threads}"
@@ -81,6 +85,8 @@ if config['dataset']['nanopore']:
             # Read-to-consensus alignment for Racon
             expand(os.path.join(config["general"]["output_dir"],"read_correction/minimap/{{sample}}_{{unit}}_R{read}_align_1.sam"),read=reads)
         threads: config["general"]["cores"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/minimap_align/{sample}_{unit}.log")
         conda:
             "../envs/analysis/rcorrection.yaml"
         shell:
@@ -100,6 +106,8 @@ if config['dataset']['nanopore']:
             # Racon-polished consensus FASTA
             final = expand(os.path.join(config["general"]["output_dir"],"read_correction/racon/{{sample}}_{{unit}}_R{read}_racon_1.fasta"),read=reads)
         threads: config["general"]["cores"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/racon_polishing/{sample}_{unit}.log")
         conda:
             "../envs/analysis/rcorrection.yaml"
         shell:
@@ -118,6 +126,8 @@ if config['dataset']['nanopore']:
             # Read-to-consensus alignment for Racon
             expand(os.path.join(config["general"]["output_dir"],"read_correction/minimap/{{sample}}_{{unit}}_R{read}_align_2.sam"),read=reads)
         threads: config["general"]["cores"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/minimap_align_2/{sample}_{unit}.log")
         conda:
             "../envs/analysis/rcorrection.yaml"
         shell:
@@ -137,6 +147,8 @@ if config['dataset']['nanopore']:
             # Racon-polished consensus FASTA
             final = expand(os.path.join(config["general"]["output_dir"],"read_correction/racon/{{sample}}_{{unit}}_R{read}_racon_2.fasta"),read=reads)
         threads: config["general"]["cores"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/racon_polishing_2/{sample}_{unit}.log")
         conda:
             "../envs/analysis/rcorrection.yaml"
         shell:
@@ -155,6 +167,8 @@ if config['dataset']['nanopore']:
             # Read-to-consensus alignment for Racon
             expand(os.path.join(config["general"]["output_dir"],"read_correction/minimap/{{sample}}_{{unit}}_R{read}_align_3.sam"),read=reads)
         threads: config["general"]["cores"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/minimap_align_3/{sample}_{unit}.log")
         conda:
             "../envs/analysis/rcorrection.yaml"
         shell:
@@ -174,6 +188,8 @@ if config['dataset']['nanopore']:
             # Racon-polished consensus FASTA
             final = expand(os.path.join(config["general"]["output_dir"],"read_correction/racon/{{sample}}_{{unit}}_R{read}_racon_3.fasta"),read=reads)
         threads: config["general"]["cores"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/racon_polishing_3/{sample}_{unit}.log")
         conda:
             "../envs/analysis/rcorrection.yaml"
         shell:
@@ -192,6 +208,8 @@ if config['dataset']['nanopore']:
             # Read-to-consensus alignment for Racon
             expand(os.path.join(config["general"]["output_dir"],"read_correction/minimap/{{sample}}_{{unit}}_R{read}_align_4.sam"),read=reads)
         threads: config["general"]["cores"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/minimap_align_4/{sample}_{unit}.log")
         conda:
             "../envs/analysis/rcorrection.yaml"
         shell:
@@ -211,6 +229,8 @@ if config['dataset']['nanopore']:
             # Racon-polished consensus FASTA
             final = expand(os.path.join(config["general"]["output_dir"],"read_correction/racon/{{sample}}_{{unit}}_R{read}_racon_4.fasta"),read=reads)
         threads: config["general"]["cores"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/racon_polishing_4/{sample}_{unit}.log")
         conda:
             "../envs/analysis/rcorrection.yaml"
         shell:
@@ -229,6 +249,8 @@ if config['dataset']['nanopore']:
             # Read-to-consensus alignment for Racon
             expand(os.path.join(config["general"]["output_dir"],"read_correction/minimap/{{sample}}_{{unit}}_R{read}_align_5.sam"),read=reads)
         threads: config["general"]["cores"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/minimap_align_5/{sample}_{unit}.log")
         conda:
             "../envs/analysis/rcorrection.yaml"
         shell:
@@ -248,6 +270,8 @@ if config['dataset']['nanopore']:
             # Racon-polished consensus FASTA
             final = expand(os.path.join(config["general"]["output_dir"],"read_correction/racon/{{sample}}_{{unit}}_R{read}_racon_5.fasta"),read=reads)
         threads: config["general"]["cores"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/racon_polishing_5/{sample}_{unit}.log")
         conda:
             "../envs/analysis/rcorrection.yaml"
         shell:
@@ -273,6 +297,8 @@ if config['dataset']['nanopore']:
             # Temporary Medaka consensus FASTA
             temp(expand(os.path.join(config["general"]["output_dir"],"read_correction/medaka/{{sample}}_{{unit}}_R{read}/temp/consensus.fasta"), read=reads))
         threads: config["general"]["cores"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/medaka_polishing/{sample}_{unit}.log")
         conda: "../envs/analysis/medaka.yaml"
         shell:
             """
@@ -289,6 +315,8 @@ if config['dataset']['nanopore']:
         output:
             # Cleaned Medaka consensus FASTA
             expand(os.path.join(config["general"]["output_dir"],"read_correction/medaka/{{sample}}_{{unit}}_R{read}/consensus.fasta"), read=reads)
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/rm_racon_header/{sample}_{unit}.log")
         shell:
             """
             sed "s/[>].*[^ ] />/" {input} > {output}
@@ -306,6 +334,8 @@ if config['dataset']['nanopore']:
             # Read-to-consensus alignment for abundance counting
             expand(os.path.join(config["general"]["output_dir"],"read_correction/counts_mapping/{{sample}}_{{unit}}_R{read}_align.sam"),read=reads)
         threads: config["general"]["cores"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/minimap_medaka/{sample}_{unit}.log")
         conda:
             "../envs/analysis/rcorrection.yaml"
         shell:
@@ -327,6 +357,8 @@ if config['dataset']['nanopore']:
             expand(os.path.join(config["general"]["output_dir"],"read_correction/counts_mapping/{{sample}}_{{unit}}_R{read}/counts.txt"),read=reads),
             # Filtered representative consensus FASTA
             expand(os.path.join(config["general"]["output_dir"],"read_correction/counts_mapping/{{sample}}_{{unit}}_R{read}/rep_consensus.fasta"),read=reads)
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/counts_minimap/{sample}_{unit}.log")
         conda: "../envs/utilities/samtools.yaml"
         script:
             "../scripts/analysis/counts_consensus_repeat.py"

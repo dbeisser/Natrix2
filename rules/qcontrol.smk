@@ -1,4 +1,5 @@
 import os
+
 if not config['dataset']['nanopore']:
     rule fastqc:
         input:
@@ -9,6 +10,8 @@ if not config['dataset']['nanopore']:
         params:
             config["general"]["output_dir"]
         threads: 20
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/qcontrol/fastqc/{sample}_{unit}_R{read}.log")
         conda:
             "../envs/preprocessing/qcontrol.yaml"
         shell:
@@ -22,6 +25,8 @@ if not config['dataset']['nanopore']:
             os.path.join(config["general"]["output_dir"],"qc/multiqc_report.html")
         params:
             config["general"]["output_dir"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/qcontrol/multiqc.log")
         conda:
             "../envs/preprocessing/qcontrol.yaml"
         shell:
@@ -38,6 +43,8 @@ else:
         params:
             config["general"]["output_dir"]
         threads: 20
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/qcontrol/fastqc/{sample}_{unit}_R{read}.log")
         conda:
             "../envs/preprocessing/qcontrol.yaml"
         shell:
@@ -51,6 +58,8 @@ else:
             os.path.join(config["general"]["output_dir"],"qc/multiqc_report.html")
         params:
             config["general"]["output_dir"]
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/qcontrol/multiqc.log")
         conda:
             "../envs/preprocessing/qcontrol.yaml"
         shell:

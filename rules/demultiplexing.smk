@@ -11,6 +11,8 @@ rule demultiplex:
         assembled = config['general']['already_assembled'],
         name_ext = config['merge']['name_ext'],
         output_dir = config['general']['output_dir']
+    log:
+        os.path.join(config["general"]["output_dir"], "logfiles/demultiplexing/demultiplex.log")
     conda:
         "../envs/preprocessing/demultiplexing.yaml"
     script:
@@ -21,6 +23,8 @@ rule unzip:
          os.path.join(config["general"]["output_dir"],"demultiplexed/{sample}_{unit}_R{read}.fastq.gz")
     output:
         temp(os.path.join(config["general"]["output_dir"],"demultiplexed/{sample}_{unit}_{read}.tmp"))
+    log:
+        os.path.join(config["general"]["output_dir"], "logfiles/demultiplexing/unzip/{sample}_{unit}_{read}.log")
     shell:
          "pigz -d -c {input} > {output}"
 
@@ -29,6 +33,8 @@ rule check_format:
         os.path.join(config["general"]["output_dir"],"demultiplexed/{sample}_{unit}_{read}.tmp")
     output:
         temp(os.path.join(config["general"]["output_dir"],"demultiplexed/{sample}_{unit}_{read}.fastq"))
+    log:
+        os.path.join(config["general"]["output_dir"], "logfiles/demultiplexing/check_format/{sample}_{unit}_{read}.log")
     shell:
         """
             if find {input} -not -type d -exec file '{{}}' ';' | grep CRLF

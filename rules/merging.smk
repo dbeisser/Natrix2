@@ -6,6 +6,8 @@ rule unfiltered_table:
     output:
         os.path.join(config["general"]["output_dir"],"filtering/unfiltered_table.csv"),
         temp(os.path.join(config["general"]["output_dir"],"filtering/unfiltered_dict.hdf5"))
+    log:
+        os.path.join(config["general"]["output_dir"], "logfiles/merging/unfiltered_table.log")
     conda:
         "../envs/utilities/unfiltered_table.yaml"
     script:
@@ -20,6 +22,8 @@ rule filtering:
     params:
         filter_method=config["merge"]["filter_method"],
         cutoff=config["merge"]["cutoff"]
+    log:
+        os.path.join(config["general"]["output_dir"], "logfiles/merging/filtering.log")
     conda:
         "../envs/classification/filtering.yaml"
     script:
@@ -35,10 +39,10 @@ rule ampliconduo:
         plot_ampduo=config["merge"]["plot_AmpDuo"],
         saving_format=config["merge"]["save_format"],
         p_corr=config["merge"]["ampli_corr"]
+    log:
+        os.path.join(config["general"]["output_dir"], "logfiles/merging/ampliconduo.log")
     conda:
         "../envs/analysis/ampliconduo.yaml"
-    log:
-        os.path.join(config["general"]["output_dir"],"logs/ampliconduo.log")
     script:
         "../scripts/analysis/ampliconduo.R"
 
@@ -49,6 +53,8 @@ if config['clustering']=="vsearch":
         output:
             os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
             os.path.join(config["general"]["output_dir"],"filtering/filtered_table.csv")
+        log:
+            os.path.join(config["general"]["output_dir"], "logfiles/merging/write_fasta.log")
         run:
             import csv
 
