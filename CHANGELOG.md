@@ -5,6 +5,16 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
 
 ---
 
+### [2026-10-01]
+
+- Update `README.md` structure and content
+- Update image for Natrix2 output files
+- Add image for Natrix2 test run
+- Validate workflow execution using the provided test datasets
+- Update the Docker image with the latest changes
+
+---
+
 ### [2026-09-29]
 
 - Improve `LOG-System` for selected workflow files:

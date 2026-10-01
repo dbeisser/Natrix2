@@ -2,7 +2,7 @@
 <img src="documentation/images/lightmode/logo.png" alt="logo" width="500"/>
 </p>
 
-**Natrix2 — Bioinformatics Pipeline for Amplicon Data**
+**Natrix2 — Pipeline for Amplicon Data — [Citation](#citation)**
 
 ---
 
@@ -14,9 +14,13 @@ Natrix2 is an open-source bioinformatics pipeline for the preprocessing of long 
 
 ### Branch Selection
 
-To access the latest features and ongoing developments, it is recommended to use the [dev branch](https://github.com/dbeisser/Natrix2/tree/dev) of Natrix2, which contains recent updates and patches not yet available in the [main branch](https://github.com/dbeisser/Natrix2/tree/main). The main branch represents the stable version of the pipeline, providing validated and tested code suitable for routine analyses and reproducible workflows, while the dev branch is intended for testing and early access to new features.
+**Branches: [main](https://github.com/dbeisser/Natrix2/tree/main) — [dev](https://github.com/dbeisser/Natrix2/tree/dev)** — To access the latest features and ongoing developments, it is recommended to use the dev branch of Natrix2, which contains recent updates and patches not yet available in the main branch. The main branch represents the stable version of the pipeline, providing validated and tested code suitable for routine analyses and reproducible workflows, while the dev branch is intended for testing and early access to new features.
 
 ---
+
+### Natrix2 Modules
+
+Natrix2 consists of several interconnected modules covering the main steps of amplicon data processing. The available modules provide dedicated workflows for Illumina and Nanopore sequencing data.
 
 ![DAG of an example workflow](documentation/images/lightmode/combined_graph.png)
 **Fig. 1**: DAG of the Natrix2 workflow: Schematic representation of the Natrix2 workflow. The processing of two split samples using AmpliconDuo is depicted. The color scheme represents the main steps, dashed lines outline the OTU variant, and dotted lines outline the ASV variant of the workflow. Stars depict updates to the original Natrix workflow. Details on the ONT part are depicted in Fig. 2.
@@ -64,6 +68,7 @@ To access the latest features and ongoing developments, it is recommended to use
   Installation example (Debian/Ubuntu):
 
   ```bash
+  # Install GNU Screen
   apt-get install screen
   ```
 
@@ -76,11 +81,13 @@ Using a terminal multiplexer is strongly recommended for running Natrix2, especi
 Conda can be installed via the [Anaconda](https://www.anaconda.com/) or [Miniconda](https://conda.io/en/latest/miniconda.html) platforms, with Miniconda3 being recommended for most users; on Linux systems, it can be obtained using:
 
 ```shell
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh # Download Miniconda3 installer
+# Download Miniconda3 installer
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 ```
 
 ```shell
-bash Miniconda3-latest-Linux-x86_64.sh # Run Miniconda3 installer
+# Run Miniconda3 installer
+bash Miniconda3-latest-Linux-x86_64.sh
 ```
 
 Dependencies will be automatically installed using Conda environments and can be found in the corresponding `environment` files in the `envs` folder and the `natrix2.yaml` file in the root directory of the pipeline.
@@ -88,8 +95,18 @@ Dependencies will be automatically installed using Conda environments and can be
 **Important:** After setting up your `natrix2.yaml` environment, make sure to check the [Sequence Count](#sequence-count) section before starting the workflow. To install Natrix2, you need the open-source package management system Conda and, if you want to run Natrix2 using the accompanying `pipeline.sh` script, GNU Screen. After cloning this repository to a folder of your choice, it is recommended to create a general Natrix2 Conda environment using the provided `natrix2.yaml` file; from the main folder of the cloned repository, run the following command:
 
 ```shell
-conda env create -f natrix2.yaml # Create the Natrix2 Conda environment
+# Create the Natrix2 Conda environment
+conda env create -f natrix2.yaml
 ```
+
+## Test run with Natrix2
+
+**Important:** Before starting your own analysis, it is recommended to perform a test run to verify that Natrix2 and all required dependencies are installed and configured correctly. The test run provides a simple way to check whether the complete workflow can be executed successfully and helps identify potential installation or configuration issues before processing your own amplicon sequencing data.
+
+![Natrix2 Test run](documentation/images/lightmode/natrix2_testrun.png)
+**Fig. 3**: Schematic overview of the Natrix2 workflow, illustrating the test run used to verify the installation and dependencies before performing a full analysis of user-provided amplicon sequencing data.
+
+---
 
 Natrix2 includes example [primertables](#primertable) (`/primer_table`), [configuration files](#configuration) (`/config_presets`), and amplicon datasets (`/input_data`). To test Natrix2 with the provided example data, start the pipeline launcher and select the available test run (`illumina_testrun`):
 
@@ -108,22 +125,28 @@ Test run: illumina_testrun (example config)
 $ > illumina_testrun
 ```
 
-The pipeline will then start a screen session using the project name (here, example_data) as the session name and begin downloading dependencies for the workflow rules. To detach from the screen session, press `Ctrl+a, d` (first press Ctrl+a, then d). Common GNU Screen commands:
+## Managing GNU Screen sessions
+
+When Natrix2 is launched using `pipeline.sh`, the pipeline starts a GNU Screen session using the project name (e.g., `example_data`) as the session name. This allows the workflow to continue running in the background while the required dependencies for individual workflow rules are prepared automatically.
+
+Use the following commands to manage or reattach to an active Screen session:
 
 ```shell
-# Manage screen sessions
-screen -ls # List active screen sessions
-screen -r # Reattach to the most recent session
-screen -r <session_name> # Reattach to a specific session
-screen -d -r <session_name> # Force reattach to a session
+# Manage Screen sessions
+screen -ls                    # List active Screen sessions
+screen -r                     # Reattach to the most recent session
+screen -r <session_name>      # Reattach to a specific session
+screen -d -r <session_name>   # Force reattach to a session
 ```
 
-Basic key bindings inside a screen session:
+Basic key bindings inside a Screen session:
 
 ```text
-Ctrl+a, d # Detach from the current session
-Ctrl+a, k # Kill the current session
+Ctrl+a, d    # Detach from the current session
+Ctrl+a, k    # Terminate the current session
 ```
+
+**Important:** Make sure that the Natrix2 Conda environment `natrix2` is activated when managing or reattaching to Screen sessions. This ensures that the required Natrix2 commands and dependencies are available.
 
 ---
 
@@ -136,7 +159,7 @@ Before starting the workflow, it is recommended to verify the number of sequence
 
 The tool compares the specified threshold with the sequence count of each input file. If the sequence count falls below the defined threshold, a warning is displayed. Affected files should be removed from the input directory before starting the workflow to ensure proper execution.
 
-### Using the nseqc Tool
+## Using the nseqc Tool
 
 Navigate to the Natrix2 main directory and run the following command:
 
@@ -160,10 +183,11 @@ This tutorial provides a step-by-step guide for preparing input data and running
 <img src="documentation/images/lightmode/filename_2.png" alt="FASTQ file naming convention" width="550"/>
 </p>
 
-**Fig. 3**: Naming convention for FASTQ files
+**Fig. 4**: Naming convention for FASTQ files
 
 ```shell
-sample_unit_direction.fastq.gz  # sampleID, A/B, R1/R2
+# sampleID, A/B, R1/R2
+sample_unit_direction.fastq.gz
 ```
 
 with:
@@ -211,19 +235,7 @@ Alternatively, run a config from `config_presets`:
 $ > config_presets/...
 ```
 
-The pipeline will start a screen session using the selected project name as the session name and begin executing the workflow. Required dependencies for individual workflow rules are automatically prepared during execution. To detach from the current screen session, press `Ctrl+a, d` (first press `Ctrl+a`, then `d`). Use the following commands to manage or reattach to an active screen session:
-
-```shell
-# Manage screen sessions
-screen -ls # List active screen sessions
-screen -r # Reattach to the most recent session
-screen -r <session_name> # Reattach to a specific session
-screen -d -r <session_name> # Force reattach to a session
-```
-**Important:** Make sure that the Natrix2 Conda environment (`natrix2`) is activated
-when managing or reattaching to screen sessions. This ensures that all required
-commands and dependencies are available. To detach from a running session, use
-`Ctrl+a, d`. To terminate a screen session, use `Ctrl+a, k`.
+After selecting a configuration, Natrix2 starts the workflow using the specified project settings and processes the corresponding input data. Required workflow dependencies are prepared automatically, and individual processing steps are executed according to the selected configuration. If the workflow is interrupted, it can be restarted using the same configuration to continue from previously completed steps.
 
 ## Running Natrix2 Manually
 
@@ -257,6 +269,8 @@ Here, `<project>` refers to the project name and `<cores>` specifies the number 
 snakemake --use-conda --configfile <project>.yaml --cores <cores> -n
 ```
 
+The dry run checks the workflow configuration and determines which processing steps would be executed without actually running them. This can be used to identify configuration issues, missing input files, or unresolved dependencies before starting the full Natrix2 workflow.
+
 ## Docker or Docker Compose
 
 Detailed setup instructions are available in the [Docker manual](documentation/manuals/docker_manual.pdf).
@@ -279,6 +293,10 @@ Download the latest Natrix2 image from [Docker Hub](https://hub.docker.com/r/dbe
 docker pull dbeisser/natrix2:latest
 ```
 
+The Docker image provides a preconfigured Natrix2 environment with the required software and dependencies for running the workflow. Using the container ensures a consistent and reproducible setup across different systems without requiring the individual installation of workflow dependencies.
+
+---
+
 #### Environment Setup
 
 **Step 1:**  
@@ -292,6 +310,8 @@ Open the configuration file `config.yaml` with a text editor and adjust the para
 
 **Step 4:**  
 Define the required paths in `config.yaml` so that Natrix2 can locate the input data correctly. If your samples are stored in a subdirectory, specify the corresponding path (e.g., `filename: input/samples`).
+
+---
 
 **Example folder structure:**
 
@@ -362,6 +382,8 @@ docker-compose --version
 
 All container-related directories are located under `/srv/docker/`.
 
+---
+
 **Step 1:**  
 Copy your `samples/` directory, `config.yaml`, and `primer.csv` to
 `/srv/docker/natrix2_cont_1/input/`. If the directory does not exist, create the
@@ -404,6 +426,8 @@ container in the `docker-compose.yaml` file.
 Once everything is configured correctly, start the container using the command
 below. During the first launch, required reference databases will be downloaded to
 `natrix2_cont_1/database/`, which may take some time.
+
+---
 
 **If multiple containers are required, create the corresponding directories as defined in `docker-compose.yaml`.**
 
@@ -491,7 +515,7 @@ After the workflow has finished, all generated results are stored in the specifi
 <img src="documentation/images/lightmode/output_files_2.png" alt="ouput" width="700"/>
 </p>
 
-**Fig. 4:** Overview of the main Natrix2 output files.
+**Fig. 5:** Overview of the main Natrix2 output files.
 
 ---
 
@@ -725,7 +749,7 @@ split-sample approach is shown below.
 <img src="documentation/images/splitsample_approach.png" alt="split_sample" width="300"/>
 </p>
 
-**Fig. 5:** Schematic representation of the split-sample approach. Extracted DNA from
+**Fig. 6:** Schematic representation of the split-sample approach. Extracted DNA from
 a single environmental sample is split and separately amplified and sequenced. The
 filtering rule compares the resulting read sets between the two split-samples and
 filters out all sequences that do not occur in both. Image adapted from Lange et al.
@@ -763,7 +787,7 @@ subsequent analysis steps, as illustrated in Figure 6.
 <img src="documentation/images/swarm_clustering.jpg" alt="split_sample" width="500"/>
 </p>
 
-**Fig. 6:** Schematic representation of the greedy clustering approach and the
+**Fig. 7:** Schematic representation of the greedy clustering approach and the
 iterative Swarm approach. The greedy approach (a), which uses a global clustering
 threshold *t* and input order–dependent centroid selection, can result in closely
 related amplicons being assigned to different OTUs. In contrast, the iterative
