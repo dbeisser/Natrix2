@@ -5,6 +5,18 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
 
 ---
 
+### [2026-10-05]
+
+- Update `README.md` structure and content
+- Update image for Natrix2 output files
+- Add image for split-sample approach
+- Update folder structure for images
+- Add image for nseqc tool section
+- Validate workflow execution using the provided test datasets
+- Update the Docker image with the latest changes
+
+---
+
 ### [2026-10-01]
 
 - Update `README.md` structure and content

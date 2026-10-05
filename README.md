@@ -1,5 +1,5 @@
 <p align="center">
-<img src="documentation/images/lightmode/logo.png" alt="logo" width="500"/>
+<img src="documentation/images/updated/logo.png" alt="logo" width="500"/>
 </p>
 
 **Natrix2 — Pipeline for Amplicon Data — [Citation](#citation)**
@@ -22,11 +22,11 @@ Natrix2 is an open-source bioinformatics pipeline for the preprocessing of long 
 
 Natrix2 consists of several interconnected modules covering the main steps of amplicon data processing. The available modules provide dedicated workflows for Illumina and Nanopore sequencing data.
 
-![DAG of an example workflow](documentation/images/lightmode/combined_graph.png)
-**Fig. 1**: DAG of the Natrix2 workflow: Schematic representation of the Natrix2 workflow. The processing of two split samples using AmpliconDuo is depicted. The color scheme represents the main steps, dashed lines outline the OTU variant, and dotted lines outline the ASV variant of the workflow. Stars depict updates to the original Natrix workflow. Details on the ONT part are depicted in Fig. 2.
+![DAG of an example workflow](documentation/images/updated/combined.png)
+**Figure 1:** DAG of the Natrix2 workflow: Schematic representation of the Natrix2 workflow. The processing of two split samples using AmpliconDuo is depicted. The color scheme represents the main steps, dashed lines outline the OTU variant, and dotted lines outline the ASV variant of the workflow. Stars depict updates to the original Natrix workflow. Details on the ONT part are depicted in Figure 2.
 
 ![DAG of an example workflow](documentation/images/dag_natrix2_workflow.png)
-**Fig. 2**: Schematic diagram of processing nanopore reads with Natrix2 for OTU generation and taxonomic assignment. The color scheme represents the main steps of this variant of the workflow.
+**Figure 2:** Schematic diagram of processing Nanopore reads with Natrix2 for OTU generation and taxonomic assignment. The color scheme represents the main steps of this variant of the workflow.
 
 ---
 
@@ -103,8 +103,8 @@ conda env create -f natrix2.yaml
 
 **Important:** Before starting your own analysis, it is recommended to perform a test run to verify that Natrix2 and all required dependencies are installed and configured correctly. The test run provides a simple way to check whether the complete workflow can be executed successfully and helps identify potential installation or configuration issues before processing your own amplicon sequencing data.
 
-![Natrix2 Test run](documentation/images/lightmode/natrix2_testrun.png)
-**Fig. 3**: Schematic overview of the Natrix2 workflow, illustrating the test run used to verify the installation and dependencies before performing a full analysis of user-provided amplicon sequencing data.
+![Natrix2 Test run](documentation/images/updated/testrun.png)
+**Figure 3:** Schematic overview of the Natrix2 workflow, illustrating the test run used to verify the installation and dependencies before performing a full analysis of user-provided amplicon sequencing data.
 
 ---
 
@@ -159,6 +159,9 @@ Before starting the workflow, it is recommended to verify the number of sequence
 
 The tool compares the specified threshold with the sequence count of each input file. If the sequence count falls below the defined threshold, a warning is displayed. Affected files should be removed from the input directory before starting the workflow to ensure proper execution.
 
+![nseqc Tool](documentation/images/updated/nseqc.png)
+**Figure 4:** Schematic overview of the nseqc tool, illustrating the sequence count check used to identify input files below the specified threshold before performing a full analysis of user-provided amplicon sequencing data.
+
 ## Using the nseqc Tool
 
 Navigate to the Natrix2 main directory and run the following command:
@@ -180,10 +183,10 @@ This tutorial provides a step-by-step guide for preparing input data and running
 **FASTQ files must follow a specific naming convention:**
 
 <p align="center">
-<img src="documentation/images/lightmode/filename_2.png" alt="FASTQ file naming convention" width="550"/>
+<img src="documentation/images/updated/filename.png" alt="FASTQ file naming convention" width="550"/>
 </p>
 
-**Fig. 4**: Naming convention for FASTQ files
+**Figure 5:** Naming convention for FASTQ files.
 
 ```shell
 # sampleID, A/B, R1/R2
@@ -512,10 +515,10 @@ parameters. Additional examples and profiles for cluster systems and workload ma
 After the workflow has finished, all generated results are stored in the specified output directory. The directory structure and available output files depend on the selected sequencing data type, sequence representation, and analysis options. The main final results for downstream analyses are collected in the finalData/ directory.
 
 <p align="center">
-<img src="documentation/images/lightmode/output_files_2.png" alt="ouput" width="700"/>
+<img src="documentation/images/updated/output.png" alt="Natrix2 output files" width="700"/>
 </p>
 
-**Fig. 5:** Overview of the main Natrix2 output files.
+**Figure 6:** Overview of the main Natrix2 output files.
 
 ---
 
@@ -547,146 +550,199 @@ After the workflow has finished, all generated results are stored in the specifi
 
 # Workflow
 
-## Initial Demultiplexing (Illumina Variant)
+## Initial Demultiplexing – Illumina
 
-Demultiplexing refers to the sorting of sequencing reads according to their  
-associated barcode sequences.
+Demultiplexing refers to the sorting of sequencing reads according to their
+associated barcode sequences. During this step, barcode information is used to
+assign reads to their corresponding samples, allowing sequencing data from
+multiple samples to be processed within the same sequencing run. The resulting
+demultiplexed reads are stored in separate FASTQ files and used as input for
+subsequent quality control and processing steps.
 
-## Quality Control (Illumina Variant)
+## Quality Control – Illumina
 
-For quality control, the pipeline uses the tools FastQC (Andrews 2010),  
-MultiQC (Ewels et al. 2016), and PRINSEQ (Schmieder and Edwards 2011).
+For quality control of Illumina sequencing data, Natrix2 uses FastQC
+(Andrews 2010), MultiQC (Ewels et al. 2016), and PRINSEQ
+(Schmieder and Edwards 2011). These tools are used to assess sequencing quality,
+summarize quality metrics across samples, and remove sequences that do not meet
+the quality requirements specified in the pipeline configuration. The resulting
+quality-controlled reads are used for subsequent processing steps.
 
-### FastQC
+### FastQC – Quality Assessment
 
-FastQC generates a quality report for each FASTQ file, providing information on  
-per-base and average sequence quality (based on Phred scores), GC content,  
-overrepresented sequences, adapter contamination, and k-mer composition.
+FastQC generates a quality report for each FASTQ file and provides information
+on several characteristics of the sequencing reads. These include per-base and
+average sequence quality based on Phred scores, GC content, overrepresented
+sequences, adapter contamination, and k-mer composition. The resulting reports
+provide an overview of sequencing quality and can be used to identify potential
+quality problems before further processing.
 
-### MultiQC
+### MultiQC – Quality Summary
 
-MultiQC aggregates individual FastQC reports into a single summary report,  
-allowing the quality assessment of all FASTQ files at once.
+MultiQC aggregates the individual FastQC reports into a single summary report,
+allowing the quality metrics of all FASTQ files to be assessed together. This
+provides an overview of sequencing quality across all samples and facilitates
+the identification of individual files that differ from the overall dataset.
+The combined report therefore simplifies the evaluation and comparison of
+quality metrics across the sequencing run.
 
-### PRINSEQ
+### PRINSEQ – Quality Filtering
 
-PRINSEQ is used to filter sequences with an average quality score below the  
-threshold specified in the pipeline configuration file.
+PRINSEQ is used to filter sequencing reads according to their average sequence
+quality. Reads with an average quality score below the threshold specified in
+the pipeline configuration file are removed from further processing. This step
+ensures that low-quality sequences are excluded from the dataset before
+subsequent assembly, filtering, and clustering steps are performed within the
+workflow.
 
-## Read Assembly (Illumina Variant)
+## Read Assembly – Illumina
 
 ### Primer Definition
 
-The `define_primer` rule specifies the subsequences that are removed during the
-assembly step. These subsequences are defined by entries in the configuration file
-and a primer table containing information on primer sequences, barcode sequences,
-and the length of poly-N regions. In addition to removing subsequences based on
-their nucleotide sequence, removal can also be performed solely based on their
-length using an offset. This offset-based approach is useful when primer regions
-contain many uncalled bases, which may otherwise prevent proper matching between
-the primer table entries and the sequencing reads.
+The `define_primer` rule specifies the subsequences that are removed during read
+processing. These are defined by entries in the configuration file and a primer
+table containing primer sequences, barcode sequences, and lengths of poly-N
+regions. Subsequence removal can also be performed solely based on length using
+an offset. This approach is useful when uncalled bases prevent proper matching
+between primer table entries and sequencing reads.
 
-### Assembly and Removal of Undesired Subsequences (OTU Variant)
+### PANDAseq – Read Assembly and Subsequence Removal
 
-For paired-end read assembly and removal of undesired subsequences, PANDAseq
-(Masella et al. 2012) is used. PANDAseq applies probabilistic error correction to
-assemble overlapping forward and reverse reads. After assembly and trimming,
-sequences are removed if they fall outside defined minimum or maximum length
-thresholds, have an assembly quality score below the threshold specified in the
-configuration file, or if the overlap between forward and reverse reads is
-insufficient. All thresholds can be adjusted in the configuration file.
+For paired-end reads in the OTU workflow, PANDAseq (Masella et al. 2012) is used
+to assemble overlapping forward and reverse reads while applying probabilistic
+error correction. After assembly and trimming, sequences are removed if they
+fall outside the configured length range, have an assembly quality score below
+the specified threshold, or provide insufficient overlap between forward and
+reverse reads. These thresholds can be adjusted in the configuration file.
 
-For single-end reads, the undesired subsequences (poly-N regions, barcodes, and
-primers) defined in the `define_primer` rule are removed first, followed by the
-filtering of sequences based on the configured length thresholds.
+For single-end reads, the undesired subsequences defined by the `define_primer`
+rule, including poly-N regions, barcodes, and primers, are removed before
+filtering. The resulting sequences are subsequently filtered according to the
+minimum and maximum sequence length thresholds specified in the pipeline
+configuration file. Sequences meeting the configured requirements are retained
+and passed to the subsequent processing and clustering steps of the OTU
+workflow for further sequence analysis.
 
-### Removal of Undesired Subsequences (ASV Variant)
+### Cutadapt – Subsequence Removal
 
-In the ASV variant of the workflow, Cutadapt (Martin 2011) is used to remove the  
-undesired subsequences defined in the primer table.
+In the ASV workflow, Cutadapt (Martin 2011) is used to remove undesired
+subsequences defined in the primer table from the sequencing reads. These
+subsequences include regions that are not required for downstream sequence
+analysis and therefore need to be removed before denoising. The resulting
+processed reads are subsequently passed to DADA2 for quality-aware denoising
+and generation of amplicon sequence variants.
 
-### ASV Denoising (ASV Variant)
+### DADA2 – ASV Denoising
 
 After subsequence removal, amplicon sequence variants (ASVs) are generated using
-the DADA2 algorithm (Callahan et al. 2016). DADA2 dereplicates the dataset and applies
-a denoising algorithm that infers true biological sequences based on sequence
-composition, quality scores, abundance, and an Illumina error model. Following ASV
-inference, exactly overlapping forward and reverse reads are assembled. The final
-ASVs are stored as FASTA files for downstream analyses.
+DADA2 (Callahan et al. 2016). DADA2 dereplicates the dataset and applies a
+denoising algorithm that infers biological sequences based on sequence
+composition, quality scores, abundance, and an Illumina error model. Following
+ASV inference, forward and reverse reads with exact overlaps are assembled. The
+resulting ASVs are stored as FASTA files for downstream analyses.
 
-## Quality Filtering (Nanopore Variant)
+## Quality Filtering – Nanopore
 
-For quality control and filtering of Nanopore reads, the pipeline uses Chopper  
-(De Coster and Rademakers 2023).
+For quality control and filtering of Nanopore sequencing data, Natrix2 uses
+Chopper (De Coster and Rademakers 2023). Chopper processes the input reads
+according to the quality requirements specified for the workflow and removes
+reads that do not meet the configured criteria. The resulting quality-filtered
+reads provide the input for subsequent read processing and correction steps
+within the Nanopore workflow.
 
-### Pychopper (Nanopore Variant)
+### Pychopper – Read Processing
 
-Pychopper reorients Oxford Nanopore reverse reads into forward reads based on a
-minimum mean base quality and removes sequencing adapters, barcodes, and primer
-sequences from the reads.
+Pychopper processes Oxford Nanopore reads by identifying their orientation and
+reorienting reverse reads into the forward direction. During this processing,
+sequencing adapters, barcodes, and primer sequences are removed from the reads.
+This generates consistently oriented and processed sequences and prepares the
+Nanopore reads for the subsequent read correction steps performed within the
+Natrix2 workflow.
 
-### Read Correction (Nanopore Variant)
+## Read Correction – Nanopore
 
-### CD-HIT Clustering
+Read correction is performed to improve the accuracy of processed Nanopore reads
+before downstream analysis. Natrix2 combines sequence clustering, read mapping,
+and consensus polishing to generate corrected representative sequences.
+CD-HIT-EST is used for initial clustering, followed by mapping with Minimap and
+consensus polishing with Racon and Medaka. The corrected sequences are then
+passed to subsequent processing steps within the workflow.
 
-The CD-HIT-EST algorithm (Fu et al. 2012) clusters sequences that are either identical
-or where one sequence is a subsequence of another, a process known as
-dereplication. The algorithm starts with the longest sequence in the dataset as the
-initial representative sequence and iterates through the remaining sequences in
-descending order of length. Each query sequence is compared against all current
-representative sequences. If the sequence identity threshold specified in the
-configuration file is met for a representative sequence, its count is incremented.
-If no representative meets the threshold, the query sequence is added as a new
-representative.
+### CD-HIT-EST – Sequence Clustering
 
-The resulting clusters are then mapped against the previously generated FASTA files
-using Minimap (Li 2018).
+CD-HIT-EST (Fu et al. 2012) clusters sequences that are identical or where one
+sequence is a subsequence of another, a process referred to as dereplication.
+The longest sequence is initially selected as a representative, and remaining
+sequences are processed in descending order of length. Reads meeting the
+configured sequence identity threshold are assigned to an existing
+representative, while unmatched reads form new representative sequences.
 
-### Racon
+The resulting clusters are mapped against the previously generated FASTA files
+using Minimap (Li 2018). This mapping establishes the relationships between the
+quality-filtered reads and the representative sequences generated during
+clustering. These read-to-sequence relationships provide the alignments required
+for subsequent consensus polishing and allow the representative sequences to be
+refined using information from the corresponding Nanopore reads.
 
-Error-corrected consensus sequences are generated by aligning quality-filtered reads
-to the clustered sequences using Racon, which performs distance-based consensus
-polishing.
+### Racon – Consensus Polishing
 
-### Medaka
+Racon is used to generate error-corrected consensus sequences from the clustered
+Nanopore reads. Quality-filtered reads are aligned to the representative
+sequences generated during clustering, and Racon uses these alignments to
+perform distance-based consensus polishing. This process improves the consensus
+sequence based on information from the corresponding reads. The resulting
+polished sequences are subsequently passed to Medaka for additional sequence
+correction.
 
-Medaka maps FASTA sequences against the Racon-polished consensus sequences using a
-neural network–based polishing approach to further improve sequence accuracy.
+### Medaka – Consensus Polishing
 
-## Similarity Clustering (Illumina and Nanopore Variant)
+Medaka performs an additional polishing step to further improve the accuracy of
+the Racon-corrected consensus sequences. The corresponding sequences are mapped
+against the Racon-polished consensus sequences, and a neural network–based
+approach is used to refine the sequence consensus. This provides an additional
+level of error correction before the resulting sequences are passed to the
+subsequent processing steps of the workflow.
 
-### Conversion of FASTQ to FASTA (OTU Variant)
+## Similarity Clustering – OTU
 
-In the OTU variant of the workflow, the `copy_to_fasta` rule converts FASTQ files to
-FASTA format. This reduces disk usage and enables the use of CD-HIT, which requires
-FASTA-formatted input files.
+### FASTQ to FASTA Conversion
 
-### CD-HIT Clustering
+In the OTU workflow, the `copy_to_fasta` rule converts FASTQ files into FASTA
+format before similarity clustering. This reduces disk usage by removing quality
+information that is no longer required at this stage and provides the
+FASTA-formatted sequence data required by CD-HIT-EST. The resulting FASTA files
+are subsequently used as input for the initial similarity clustering step of
+the workflow.
 
-The CD-HIT-EST algorithm (Fu et al. 2012) is used to cluster sequences based on
-sequence identity or subsequence relationships. As in the Nanopore workflow, the
-longest sequence is selected as the initial representative, and remaining sequences
-are processed in descending order of length. Sequences that meet the identity
-threshold defined in the configuration file are assigned to existing clusters,
-while others form new representative clusters.
+### CD-HIT-EST – Similarity Clustering
+
+CD-HIT-EST (Fu et al. 2012) is used to cluster sequences based on sequence
+identity or subsequence relationships. The longest sequence is selected as the
+initial representative, and remaining sequences are processed in descending
+order of length. Sequences meeting the identity threshold specified in the
+configuration file are assigned to existing clusters, whereas unmatched
+sequences are retained as new representative sequences for subsequent
+processing.
 
 ### Cluster Sorting
 
-The `cluster_sorting` rule uses the output of the `cdhit` rule to determine the
-number of sequences represented by each cluster. Representative sequences are then
-sorted in descending order based on cluster size. In addition, a specific header is
-added to each sequence, as required by the UCHIME chimera detection algorithm.
+The `cluster_sorting` rule uses the output generated by the `cdhit` rule to
+determine the number of sequences represented by each cluster. Representative
+sequences are subsequently sorted in descending order according to cluster size.
+In addition, the sequence headers are modified to provide the abundance
+information required by the subsequent UCHIME-based chimera detection step of
+the workflow.
 
-## Chimera Detection (Illumina and Nanopore Variant)
+## Chimera Detection
 
-### VSEARCH
+### VSEARCH – Chimera Detection
 
-VSEARCH is an open-source alternative to the USEARCH toolkit that aims to replicate
-the functionality of USEARCH algorithms, whose source code is not publicly available
-and is often only briefly described (Rognes et al. 2016). In Natrix2, the VSEARCH
-`uchime3_denovo` algorithm (hereafter referred to as VSEARCH3) is used as an
-alternative to UCHIME for the detection of chimeric sequences. VSEARCH3 is an
-implementation of the UCHIME2 algorithm with optimized default parameters.
+VSEARCH is an open-source alternative to the USEARCH toolkit that aims to
+replicate the functionality of USEARCH algorithms, whose source code is not
+publicly available and is often only briefly described (Rognes et al. 2016).
+In Natrix2, the VSEARCH `uchime3_denovo` algorithm, hereafter referred to as
+VSEARCH3, is used for the detection of chimeric sequences before subsequent
+processing and OTU generation.
 
 The UCHIME2 algorithm is described by Edgar (2016) as follows:
 
@@ -701,170 +757,211 @@ The UCHIME2 algorithm is described by Edgar (2016) as follows:
 > chimeric, and conversely if div<sub>T</sub> is small, the model is more likely to
 > be a fake."
 
-The main difference between the UCHIME2 and UCHIME3 algorithms lies in the abundance
-criteria used to select potential parent sequences. In UCHIME3, a potential parent
-must have at least sixteen times the abundance of the query sequence, whereas in
-UCHIME2, only a twofold abundance is required.
+The main difference between the UCHIME2 and UCHIME3 algorithms lies in the
+abundance criteria used to select potential parent sequences. In UCHIME3, a
+potential parent must have at least sixteen times the abundance of the query
+sequence, whereas UCHIME2 requires only a twofold abundance. These abundance
+requirements influence which sequences can be considered potential parents
+during the identification of chimeric sequences.
 
-## Table Creation and Filtering (Illumina and Nanopore Variant)
+## Table Creation and Filtering
 
-### Merging FASTA Files into a Single Table
+### Merging FASTA Files
 
-For downstream processing, the `unfiltered_table` rule merges all FASTA files into a
-single nested dictionary. In this structure, each sequence serves as a key, and the
-corresponding value is another dictionary containing all (split-) samples in which
-the sequence occurs, along with the respective sequence abundances. For intermediate
-pipeline processing, this data structure is temporarily stored in JSON format. To
-enable statistical analyses, the same information is additionally exported as a
-comma-separated table.
+For downstream processing, the `unfiltered_table` rule merges all FASTA files
+into a single nested dictionary. Each sequence serves as a key associated with
+the samples or split samples in which it occurs and their respective sequence
+abundances. The resulting data structure is temporarily stored in JSON format
+for intermediate processing and additionally exported as a comma-separated
+table for subsequent analyses.
 
-#### Filtering
+### Sequence Filtering
 
-In the filtering rule of the pipeline, all sequences that do not occur in both
-split-samples of at least one sample are removed. For single-sample data, the
-filtering rule applies an abundance cutoff value, which can be specified in the
-configuration file, to remove all sequences with abundances less than or equal to
-the defined threshold. Both the retained sequences and the filtered-out sequences
-are subsequently exported as comma-separated tables.
+During filtering, sequences that do not occur in both split samples of at least
+one sample are removed. For single-sample data, an abundance cutoff specified
+in the configuration file is applied instead, removing sequences with abundances
+less than or equal to the defined threshold. Both retained and filtered-out
+sequences are subsequently exported as comma-separated tables for downstream
+processing and inspection.
 
-### Conversion of Tables to FASTA Files
+### Conversion to FASTA
 
-Since the `swarm` rule requires FASTA-formatted input, the table resulting from the
-filtering step is converted into a FASTA file using the `write_fasta` rule.
+The filtered sequence table is converted back into FASTA format using the
+`write_fasta` rule. This conversion is required because the subsequent Swarm
+clustering step expects FASTA-formatted sequence input. The resulting FASTA file
+contains the sequences retained during filtering and therefore provides the
+input dataset used for subsequent OTU generation within the Natrix2 workflow.
 
-## AmpliconDuo / Split-Sample Approach (Illumina and Nanopore Variant)
+## AmpliconDuo and Split-Sample Filtering
 
-The pipeline supports both single-sample and split-sample FASTQ amplicon data. The
-split-sample protocol (Lange et al. 2015) aims to reduce the number of sequences
+The pipeline supports both single-sample and split-sample FASTQ amplicon data.
+The split-sample protocol (Lange et al. 2015) aims to reduce sequences
 originating from PCR or sequencing errors without relying on stringent abundance
-cutoffs, which may remove rare but biologically relevant sequences. In this
-approach, extracted DNA from a single sample is divided into two split-samples,
-which are then independently amplified and sequenced. Sequences that do not occur
-in both split-samples are considered erroneous and are filtered out. This method is
-based on the assumption that sequences generated by PCR or sequencing errors are
-unlikely to occur independently in both samples. A schematic overview of the
-split-sample approach is shown below.
+cutoffs, which may remove rare but biologically relevant sequences. Extracted
+DNA from a single sample is divided into two split samples that are independently
+amplified and sequenced.
+
+Sequences that do not occur in both split samples are considered erroneous and
+are filtered out. This approach assumes that sequences generated by PCR or
+sequencing errors are unlikely to occur independently in both experimental
+branches. Consequently, sequences occurring consistently in both split samples
+can be retained without relying exclusively on their abundance. A schematic
+overview of the split-sample approach is shown below.
 
 <p align="center">
-<img src="documentation/images/splitsample_approach.png" alt="split_sample" width="300"/>
+<img src="documentation/images/updated/splitsample.png" alt="Split-sample approach" width="450"/>
 </p>
 
-**Fig. 6:** Schematic representation of the split-sample approach. Extracted DNA from
-a single environmental sample is split and separately amplified and sequenced. The
-filtering rule compares the resulting read sets between the two split-samples and
-filters out all sequences that do not occur in both. Image adapted from Lange et al.
-(2015).
+**Figure 7:** Schematic representation of the split-sample approach. Extracted DNA from a single environmental sample is split and separately amplified and sequenced. The filtering rule compares the resulting read sets between the two split samples and filters out all sequences that do not occur in both. Image adapted from Lange et al. (2015).
 
-The initial proposal for the split-sample approach by Dr. Lange was accompanied by the release of the R package [AmpliconDuo](https://cran.r-project.org/web/packages/AmpliconDuo/index.html) for the statistical analysis of amplicon data produced by the aforementioned split-sample approach. It uses Fisher's exact test to detect significantly deviating read numbers between two experimental branches, A and B, from the sample S. To measure the discordance between two branches of a sample, the read-weighted discordance ∆<sup>r</sup><sub>Sθ</sub>, which is weighted by the average read number of sequence i in both branches, and the unweighted discordance ∆<sup>u</sup><sub>Sθ</sub> for each sequence i are calculated. If ∆<sup>u</sup><sub>Sθ</sub> = 0, each branch of sample S contains the same set of sequences, while if ∆<sup>r</sup><sub>Sθ</sub> = 0, the read numbers for each sequence in sample S are within the error margin set by the chosen false discovery rate. The results of the discordance calculations are then plotted for visualization purposes and written to an R data file to allow the filtering of significantly deviating sequences.
+The initial proposal for the split-sample approach by Dr. Lange was accompanied
+by the release of the R package [AmpliconDuo](https://cran.r-project.org/web/packages/AmpliconDuo/index.html)
+for statistical analysis of amplicon data generated using this approach.
+AmpliconDuo uses Fisher's exact test to identify significantly deviating read
+numbers between the two experimental branches, A and B, originating from the
+same sample S.
 
-## OTU Generation (Illumina and Nanopore Variant)
+To quantify discordance between both branches, the read-weighted discordance
+∆<sup>r</sup><sub>Sθ</sub>, weighted by the average read number of each sequence
+in both branches, and the unweighted discordance ∆<sup>u</sup><sub>Sθ</sub> are
+calculated. If ∆<sup>u</sup><sub>Sθ</sub> = 0, both branches contain the same
+set of sequences, whereas ∆<sup>r</sup><sub>Sθ</sub> = 0 indicates that the read
+numbers are within the error margin defined by the selected false discovery rate.
 
-### SWARM Clustering
+The resulting discordance values are plotted for visualization and written to
+an R data file for subsequent analysis. This allows sequences with significantly
+deviating read abundances between the two experimental branches to be identified
+and filtered. The AmpliconDuo analysis therefore provides an additional
+statistical assessment of the agreement between split samples and complements
+the sequence-based filtering performed within the Natrix2 workflow.
 
-OTUs are generated using the Swarm clustering algorithm (Mahé et al. 2015) in the
-corresponding pipeline rule. Swarm clusters sequences into OTUs using an iterative
-approach with a local clustering threshold. Initially, a pool of amplicons is
-created from the input file and an empty OTU is initialized. The first amplicon is
-removed from the pool and selected as the OTU seed. All remaining amplicons that
-differ from this seed by no more than a user-defined threshold (default: one
-nucleotide difference) are removed from the pool and added to the OTU as subseeds.
+## OTU Generation
 
-In subsequent iterations, all amplicons whose nucleotide difference to any of the
-existing subseeds does not exceed the threshold are added to the OTU. This iterative
-process continues until no further amplicons can be recruited, at which point the
-OTU is closed and a new OTU is initialized. This strategy avoids two major sources
-of variability associated with greedy clustering approaches: dependency on the
-input order, where the first sequence becomes the OTU centroid, and the use of a
-global similarity threshold that recruits all sequences within a fixed distance to
-the centroid.
+### SWARM – OTU Clustering
 
-Instead, Swarm produces a star-shaped minimum spanning tree, typically centered on
-a highly abundant amplicon, independent of the initial seed selection. The sequence
-located at the center of each OTU tree is used as the representative sequence for
-subsequent analysis steps, as illustrated in Figure 6.
+OTUs are generated using the Swarm clustering algorithm (Mahé et al. 2015).
+Swarm clusters sequences using an iterative approach based on a local clustering
+threshold. Initially, the first amplicon is selected as an OTU seed, and
+amplicons differing from this seed by no more than the configured threshold are
+added as subseeds. By default, the local threshold corresponds to one nucleotide
+difference between sequences.
 
-<p align="center">
-<img src="documentation/images/swarm_clustering.jpg" alt="split_sample" width="500"/>
-</p>
-
-**Fig. 7:** Schematic representation of the greedy clustering approach and the
-iterative Swarm approach. The greedy approach (a), which uses a global clustering
-threshold *t* and input order–dependent centroid selection, can result in closely
-related amplicons being assigned to different OTUs. In contrast, the iterative
-Swarm approach (b), which applies a local threshold *d*, forms OTUs containing only
-closely related amplicons with a centroid that emerges naturally during the
-iterative clustering process. Image from Mahé et al. (2015).
-
-### VSEARCH Clustering
-
-OTUs can alternatively be generated using the de novo clustering algorithm provided
-by the VSEARCH toolkit (Rognes et al. 2016). This algorithm follows a greedy,
-centroid-based approach with a configurable sequence similarity threshold defined
-in the pipeline configuration file. Input sequences are processed sequentially and
-compared against an initially empty database of centroid sequences. Each query
-sequence is assigned to the first centroid that meets or exceeds the similarity
-threshold; if no such centroid exists, the sequence is designated as a new
+In subsequent iterations, amplicons whose nucleotide difference from any
+existing subseed does not exceed the threshold are added to the OTU. This
+process continues until no additional amplicons can be recruited, after which
+the OTU is closed and a new OTU is initialized. The iterative procedure avoids
+the use of a single global similarity threshold around a predefined sequence
 centroid.
 
-## Sequence Comparison (Illumina and Nanopore Variant)
+This approach also reduces the dependency on sequence input order associated
+with greedy clustering methods. Swarm produces a star-shaped minimum spanning
+tree that is typically centered on a highly abundant amplicon. In contrast to
+greedy clustering based on a global threshold, Swarm iteratively extends each
+OTU using a local clustering threshold, as illustrated in Figure 8.
 
-Assigning taxonomic information to OTUs or ASVs is a key step in the analysis of
-environmental amplicon data, as taxonomic identities can be used to infer ecological
-characteristics of the sampled environment. To identify sequences similar to each
-OTU or ASV representative, the BLAST (Basic Local Alignment Search Tool) algorithm
-(Altschul et al. 1990) is used to search against the SILVA database (Pruesse et al.
-2007).
+<p align="center">
+<img src="documentation/images/swarm_clustering.jpg" alt="SWARM clustering approach" width="500"/>
+</p>
 
-The SILVA database contains curated and aligned rRNA sequence data generated through
-a multi-step curation process. While it provides extensive coverage of prokaryotic
-rRNA sequences, its representation of microbial eukaryotes is more limited. If the
-database is not available locally, the required files are automatically downloaded
-and the database is built using the `make_silva_db` rule. The BLAST search itself is
-performed in the `blast` rule using the nucleotide–nucleotide BLAST variant
-(BLASTn).
+**Figure 8:** Schematic representation of the greedy clustering approach and the iterative Swarm approach. The greedy approach (a), which uses a global clustering threshold *t* and input order–dependent centroid selection, can result in closely related amplicons being assigned to different OTUs. In contrast, the iterative Swarm approach (b), which applies a local threshold *d*, forms OTUs containing only closely related amplicons with a centroid that emerges naturally during the iterative clustering process. Image from Mahé et al. (2015).
 
-The tab-separated output of the BLAST rule contains the following information for
-each representative sequence, provided that the BLASTn results meet the criteria
-specified in the [configuration](#configuration) file:
+### VSEARCH – OTU Clustering
 
-| Column Nr. | Column Name | Description                                   |
-|------------|-------------|-----------------------------------------------|
-| 1.         | qseqid      | Query sequence identification                 |
-| 2.         | qlen        | Length of the query sequence                  |
-| 3.         | length      | Length of the alignment                       |
-| 4.         | pident      | Percentage of identical matches               |
-| 5.         | mismatch    | Number of mismatches                          |
-| 6.         | qstart      | Start of the alignment in the query sequence  |
-| 7.         | qend        | End of the alignment in the query sequence    |
-| 8.         | sstart      | Start of the alignment in the target sequence |
-| 9.         | send        | End of the alignment in the target sequence   |
-| 10.        | gaps        | Number of gaps                                |
-| 11.        | evalue      | E-value                                       |
-| 12.        | stitle      | Title (taxonomy) of the target sequence       |
+OTUs can alternatively be generated using the de novo clustering algorithm
+provided by VSEARCH (Rognes et al. 2016). This algorithm follows a greedy,
+centroid-based approach using a configurable sequence similarity threshold
+defined in the pipeline configuration file. Input sequences are processed
+sequentially and compared against an initially empty database of centroid
+sequences to determine their assignment to individual OTUs.
 
-<p><b>Table 2:</b> BLAST output column descriptions</p>
+Each query sequence is assigned to the first centroid that meets or exceeds the
+specified similarity threshold. If no suitable centroid is found, the query
+sequence is designated as a new centroid. This provides an alternative to the
+iterative local clustering strategy used by Swarm and allows the desired OTU
+clustering method to be selected through the Natrix2 configuration.
 
-## Merging of Results (Illumina and Nanopore Variant)
+## Sequence Comparison and Taxonomic Assignment
 
-The outputs generated by the `write_fasta`, `swarm`, and `blast` rules are merged
-into a single comma-separated table using the `merge_results` rule. For each
-representative sequence, this table contains the sequence identifier, the nucleotide
-sequence, the abundance of the sequence in each sample, the total abundance across
-all samples, and—if a BLAST hit is available—all annotation fields listed in
-Table 2.
+Assigning taxonomic information to OTUs or ASVs is an important step in the
+analysis of environmental amplicon data because taxonomic identities help
+characterize the organisms represented in the sampled environment. To identify
+sequences similar to each OTU or ASV representative, BLAST (Basic Local
+Alignment Search Tool; Altschul et al. 1990) is used to search against the SILVA
+reference database (Pruesse et al. 2007).
+
+### SILVA – Reference Database
+
+The SILVA database contains curated and aligned rRNA sequence data generated
+through a multi-step curation process. While it provides extensive coverage of
+prokaryotic rRNA sequences, its representation of microbial eukaryotes is more
+limited. If the database is not available locally, the required files are
+automatically downloaded and the database is built using the `make_silva_db`
+rule. Sequence comparison is subsequently performed using BLASTn.
+
+The tab-separated output of the BLAST rule contains the following information
+for each representative sequence, provided that the BLASTn results meet the
+criteria specified in the [configuration](#configuration) file:
+
+| Column Nr. | Column Name | Description |
+|------------|-------------|-------------|
+| 1. | qseqid | Query sequence identification |
+| 2. | qlen | Length of the query sequence |
+| 3. | length | Length of the alignment |
+| 4. | pident | Percentage of identical matches |
+| 5. | mismatch | Number of mismatches |
+| 6. | qstart | Start of the alignment in the query sequence |
+| 7. | qend | End of the alignment in the query sequence |
+| 8. | sstart | Start of the alignment in the target sequence |
+| 9. | send | End of the alignment in the target sequence |
+| 10. | gaps | Number of gaps |
+| 11. | evalue | E-value |
+| 12. | stitle | Title (taxonomy) of the target sequence |
+
+**Table 2:** BLAST output column descriptions.
+
+## Merging of Results
+
+The outputs generated by the `write_fasta`, `swarm`, and `blast` rules are
+merged into a single comma-separated table using the `merge_results` rule. For
+each representative sequence, the resulting table contains the sequence
+identifier, nucleotide sequence, abundance in each sample, and total abundance
+across all samples. If a BLAST hit is available, the corresponding annotation
+fields listed in Table 2 are additionally included in the final table.
 
 ---
 
 # Primertable
 
-The primertable should be a CSV file `project.csv` in the following format:
+The primertable contains the primer, barcode, and poly-N information required
+for sequence processing within Natrix2. It must be provided as a CSV file named
+`primer.csv`, with each row representing a sample and the corresponding forward
+and reverse sequence information. Empty fields can be used when no barcode or
+poly-N sequence is present. The sequence information is used to identify
+regions required during read processing. Examples from the Natrix2 test datasets
+with and without the split-sample approach are shown below.
 
-| Probe     | poly_N | Barcode_forward | specific_forward_primer | poly_N_rev | Barcode_reverse | specific_reverse_primer |
-|-----------|--------|-----------------|-------------------------|------------|-----------------|-------------------------|
-| S2016BY_A | NNNNN  |                 | GTACACACCGCCCGTC        | N          |                 | GCTGCGYYCTTCATCGDTR     |
-| S2016RU_A | NNNN   |                 | GTACACACCGCCCGTC        | NN         |                 | GCTGCGYYCTTCATCGDTR     |
+## With Split-Sample Approach
 
-<p><b>Table 3</b>: Example Primertable</p>
+Example from the Natrix2 test dataset `A071SE_16S_Illumina.csv`.
+
+| Probe | poly_N | Barcode_forward | specific_forward_primer | poly_N_rev | Barcode_reverse | specific_reverse_primer |
+|-------|--------|-----------------|-------------------------|------------|-----------------|-------------------------|
+| A071SE_A | NNNNN | TGATAGAGGGAT | GGCGVACGGGTGMGTAA | NNN | | TTACCGCGGCKGCTGGCAC |
+| A071SE_B | NNNNNN | GTAACAAGTGAG | GGCGVACGGGTGMGTAA | NNNN | | TTACCGCGGCKGCTGGCAC |
+
+**Table 3:** Example primertable using the split-sample approach.
+
+## Without Split-Sample Approach
+
+Example from the Natrix2 test dataset `16S_Cyprus_Nanopore.csv`.
+
+| Probe | poly_N | Barcode_forward | specific_forward_primer | poly_N_rev | Barcode_reverse | specific_reverse_primer |
+|-------|--------|-----------------|-------------------------|------------|-----------------|-------------------------|
+| 1Barcode_A | | CACAAAGACACCGACAACTTTCTT | AGAGTTTGATCMGGCT | | AAGAAAGTTGTCGGTGTCTTTGTG | CGGYTACCTTGTTACGACTT |
+| 2Barcode_A | | ACAGACGACTACAAACGGAATCGA | AGAGTTTGATCMGGCT | | TCGATTCCGTTTGTAGTCGTCTGT | CGGYTACCTTGTTACGACTT |
+| 3Barcode_A | | CCTGGTAACTGGGACACAAGACTC | AGAGTTTGATCMGGCT | | GAGTCTTGTGTCCCAGTTACCAGG | CGGYTACCTTGTTACGACTT |
+
+**Table 4:** Example primertable without the split-sample approach.
 
 ---
 
@@ -939,7 +1036,7 @@ Below are the explanations for the configfile `project.yaml` entries:
 | ident             | 90.0                                                      | Minimal identity overlap between target and query sequence.                                                                                                                                                                                   |
 | evalue            | 1e-51                                                     | Highest accepted evalue.                                                                                                                                                                                                                      |
 
-<p><b>Table 4:</b> Configuration options</p>
+<p><b>Table 5:</b> Configuration options</p>
 
 ---
 
