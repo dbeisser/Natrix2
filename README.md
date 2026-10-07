@@ -41,8 +41,8 @@ Natrix2 consists of several interconnected modules covering the main steps of am
 7. [Workflow](#workflow)
 8. [Primertable](#primertable)
 9. [Configuration](#configuration)
-10. [References](#references)
-11. [Citation](#citation)
+10. [Citation](#citation)
+11. [References](#references)
 12. [Troubleshooting](#troubleshooting)
 
 ---
@@ -1012,66 +1012,110 @@ assignment when using BLAST.
 
 ---
 
-# References
+# Citation
 
-- Köster, Johannes & Rahmann, Sven (2018). “Snakemake—a scalable bioinformatics workflow engine”. *Bioinformatics*, 34(20), pp. 3600–3602. https://doi.org/10.1093/bioinformatics/bty350
-- Ewels, P. et al. (2016). “MultiQC: Summarizes analysis results for multiple tools and samples in a single report”. *Bioinformatics*, 32(19), pp. 3047–3048. https://doi.org/10.1093/bioinformatics/btw354
-- Anaconda, Inc. (2012). *Conda: Package, dependency and environment management for any language.* https://docs.conda.io
-- Van Rossum, G., & Drake, F. L. (2009). *Python 3 Reference Manual.* CreateSpace, Scotts Valley, CA. https://www.python.org
-- R Core Team. (2023). *R: A Language and Environment for Statistical Computing.* R Foundation for Statistical Computing, Vienna, Austria. https://www.R-project.org
-- Andrews, S. (2010). *FastQC: A quality control tool for high throughput sequence data.* https://www.bioinformatics.babraham.ac.uk/projects/fastqc/
-- Martin, M. (2011). “Cutadapt removes adapter sequences from high-throughput sequencing reads”. *EMBnet.journal*, 17(1), p. 10. https://doi.org/10.14806/ej.17.1.200
-- Schmieder, Robert & Edwards, Robert A. (2011). “Quality control and preprocessing of metagenomic datasets”. *Bioinformatics*, 27(6), pp. 863–864. https://doi.org/10.1093/bioinformatics/btr026
-- Masella, Andre P. et al. (2012). “PANDAseq: paired-end assembler for Illumina sequences”. *BMC Bioinformatics*, 13(1), p. 31. https://doi.org/10.1186/1471-2105-13-31
-- Callahan, B. J. et al. (2016). “DADA2: High-resolution sample inference from Illumina amplicon data”. *Nature Methods*, 13(7), pp. 581–583. https://doi.org/10.1038/nmeth.3869
-- Fu, Limin et al. (2012). “CD-HIT: accelerated for clustering the next-generation sequencing data”. *Bioinformatics*, 28(23), pp. 3150–3152. https://doi.org/10.1093/bioinformatics/bts565
-- Mahé, Frédéric et al. (2015). “Swarm v2: highly-scalable and high-resolution amplicon clustering”. *PeerJ*, 3. https://doi.org/10.7717/peerj.1420
-- Li, Heng (2016). “Minimap and miniasm: fast mapping and de novo assembly for noisy long sequences”. *Bioinformatics*, 32(14), pp. 2103–2110. https://doi.org/10.1093/bioinformatics/btw152
-- Edgar, Robert (2016). “UCHIME2: improved chimera prediction for amplicon sequencing”. *bioRxiv*. https://doi.org/10.1101/074252
-- Rognes, Torbjørn et al. (2016). “VSEARCH: a versatile open source tool for metagenomics”. *PeerJ Preprints*. https://doi.org/10.7287/peerj.preprints.2409v1
-- Pruesse, E. et al. (2007). “SILVA: a comprehensive online resource for quality checked and aligned ribosomal RNA sequence data compatible with ARB”. *Nucleic Acids Research*, 35(21), pp. 7188–7196. https://doi.org/10.1093/nar/gkm864
-- Abarenkov, K. et al. (2023). “The UNITE database for molecular identification and taxonomic communication of fungi and other eukaryotes: sequences, taxa and classifications reconsidered”. *Nucleic Acids Research*. https://doi.org/10.1093/nar/gkad1039
-- Altschul, Stephen F. et al. (1990). “Basic local alignment search tool”. *Journal of Molecular Biology*, 215(3), pp. 403–410. https://doi.org/10.1016/S0022-2836(05)80360-2
-- Lange, Anja et al. (2015). “AmpliconDuo: A Split-Sample Filtering Protocol for High-Throughput Amplicon Sequencing of Microbial Communities”. *PLOS ONE*, 10(11). https://doi.org/10.1371/journal.pone.0141590
-- De Coster, Wouter & Rademakers, Rosa (2023). “NanoPack2: population-scale evaluation of long-read sequencing data”. *Bioinformatics*, 39(5). https://doi.org/10.1093/bioinformatics/btad311
+**Natrix2 is based on [Natrix](https://github.com/MW55/Natrix). If you use Natrix2, please cite:**
 
 ---
 
-# Citation
+**Natrix2** – Improved amplicon workflow with novel Oxford Nanopore Technologies
+support and enhancements in clustering, classification and taxonomic databases.
+Deep, A.; Bludau, D.; Welzel, M.; Clemens, S.; Heider, D.; Boenigk, J.; and
+Beisser, D. *Metabarcoding and Metagenomics*, 7: e109389. Oct 2023.
+https://doi.org/10.3897/mbmg.7.109389
 
-**Natrix2 is based on the [Natrix](https://github.com/MW55/Natrix) pipeline — if you use this workflow, please cite**:
+---
 
-**Natrix2** – Improved amplicon workflow with novel Oxford Nanopore Technologies support and enhancements in clustering, classification and taxonomic databases. Deep, A.; Bludau, D.; Welzel, M.; Clemens, S.; Heider, D.; Boenigk, J.; and Beisser, D. Metabarcoding and Metagenomics, 7: e109389. Oct 2023. [https://mbmg.pensoft.net/article/109389/](https://mbmg.pensoft.net/article/109389/)
+**Natrix** – A Snakemake-based workflow for processing, clustering, and
+taxonomically assigning amplicon sequencing reads. Welzel, M.; Lange, A.;
+Heider, D.; Schwarz, M.; Freisleben, B.; Jensen, M.; Boenigk, J.; and
+Beisser, D. *BMC Bioinformatics*, 21: 526. Nov 2020.
+https://doi.org/10.1186/s12859-020-03852-4
 
-**Natrix**: a Snakemake-based workflow for processing, clustering, and taxonomically assigning amplicon sequencing reads. Welzel, M.; Lange, A.; Heider, D.; Schwarz, M.; Freisleben, B.; Jensen, M.; Boenigk, J.; and Beisser, D. BMC Bioinformatics, 21(1). Nov 2020. [https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-03852-4](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-03852-4)
+---
+
+# References
+
+**Workflow**
+
+- Köster, Johannes & Rahmann, Sven (2018). “Snakemake—a scalable bioinformatics workflow engine”. *Bioinformatics*, 34(20), pp. 3600–3602. https://doi.org/10.1093/bioinformatics/bty350
+- Anaconda, Inc. (2012). *Conda: Package, dependency and environment management for any language.* https://docs.conda.io
+- Van Rossum, G., & Drake, F. L. (2009). *Python 3 Reference Manual.* CreateSpace, Scotts Valley, CA. https://www.python.org
+- R Core Team. (2023). *R: A Language and Environment for Statistical Computing.* R Foundation for Statistical Computing, Vienna, Austria. https://www.R-project.org
+
+**Preprocessing**
+
+- Andrews, S. (2010). *FastQC: A quality control tool for high throughput sequence data.* https://www.bioinformatics.babraham.ac.uk/projects/fastqc/
+- Ewels, P. et al. (2016). “MultiQC: Summarizes analysis results for multiple tools and samples in a single report”. *Bioinformatics*, 32(19), pp. 3047–3048. https://doi.org/10.1093/bioinformatics/btw354
+- Schmieder, Robert & Edwards, Robert A. (2011). “Quality control and preprocessing of metagenomic datasets”. *Bioinformatics*, 27(6), pp. 863–864. https://doi.org/10.1093/bioinformatics/btr026
+- Martin, M. (2011). “Cutadapt removes adapter sequences from high-throughput sequencing reads”. *EMBnet.journal*, 17(1), p. 10. https://doi.org/10.14806/ej.17.1.200
+- De Coster, Wouter & Rademakers, Rosa (2023). “NanoPack2: population-scale evaluation of long-read sequencing data”. *Bioinformatics*, 39(5). https://doi.org/10.1093/bioinformatics/btad311
+- Oxford Nanopore Technologies. *Pychopper: A tool for identifying, orienting, trimming, and rescuing full-length Nanopore reads.* https://github.com/epi2me-labs/pychopper
+- Masella, Andre P. et al. (2012). “PANDAseq: paired-end assembler for Illumina sequences”. *BMC Bioinformatics*, 13(1), p. 31. https://doi.org/10.1186/1471-2105-13-31
+
+**Processing**
+
+- Callahan, B. J. et al. (2016). “DADA2: High-resolution sample inference from Illumina amplicon data”. *Nature Methods*, 13(7), pp. 581–583. https://doi.org/10.1038/nmeth.3869
+- Fu, Limin et al. (2012). “CD-HIT: accelerated for clustering the next-generation sequencing data”. *Bioinformatics*, 28(23), pp. 3150–3152. https://doi.org/10.1093/bioinformatics/bts565
+- Li, Heng (2018). “Minimap2: pairwise alignment for nucleotide sequences”. *Bioinformatics*, 34(18), pp. 3094–3100. https://doi.org/10.1093/bioinformatics/bty191
+- Vaser, Robert et al. (2017). “Fast and accurate de novo genome assembly from long uncorrected reads”. *Genome Research*, 27(5), pp. 737–746. https://doi.org/10.1101/gr.214270.116
+- Oxford Nanopore Technologies. *Medaka: Neural-network consensus polishing for Oxford Nanopore sequencing data.* https://github.com/nanoporetech/medaka
+- Edgar, Robert (2016). “UCHIME2: improved chimera prediction for amplicon sequencing”. *bioRxiv*. https://doi.org/10.1101/074252
+- Rognes, Torbjørn et al. (2016). “VSEARCH: a versatile open source tool for metagenomics”. *PeerJ Preprints*. https://doi.org/10.7287/peerj.preprints.2409v1
+- Mahé, Frédéric et al. (2015). “Swarm v2: highly-scalable and high-resolution amplicon clustering”. *PeerJ*, 3. https://doi.org/10.7717/peerj.1420
+
+**Filtering**
+
+- Lange, Anja et al. (2015). “AmpliconDuo: A Split-Sample Filtering Protocol for High-Throughput Amplicon Sequencing of Microbial Communities”. *PLOS ONE*, 10(11). https://doi.org/10.1371/journal.pone.0141590
+- Mahé, Frédéric. *MUMU: C++ implementation of LULU for post-clustering curation of metabarcoding data.* https://github.com/frederic-mahe/mumu
+
+**Classification**
+
+- Schloss, Patrick D. et al. (2009). “Introducing mothur: Open-source, platform-independent, community-supported software for describing and comparing microbial communities”. *Applied and Environmental Microbiology*, 75(23), pp. 7537–7541. https://doi.org/10.1128/AEM.01541-09
+- Altschul, Stephen F. et al. (1990). “Basic local alignment search tool”. *Journal of Molecular Biology*, 215(3), pp. 403–410. https://doi.org/10.1016/S0022-2836(05)80360-2
+- Guillou, Laure et al. (2013). “The Protist Ribosomal Reference database (PR2): a catalog of unicellular eukaryote Small Sub-Unit rRNA sequences with curated taxonomy”. *Nucleic Acids Research*, 41(D1), pp. D597–D604. https://doi.org/10.1093/nar/gks1160
+- Pruesse, E. et al. (2007). “SILVA: a comprehensive online resource for quality checked and aligned ribosomal RNA sequence data compatible with ARB”. *Nucleic Acids Research*, 35(21), pp. 7188–7196. https://doi.org/10.1093/nar/gkm864
+- Abarenkov, K. et al. (2023). “The UNITE database for molecular identification and taxonomic communication of fungi and other eukaryotes: sequences, taxa and classifications reconsidered”. *Nucleic Acids Research*. https://doi.org/10.1093/nar/gkad1039
+- Tedersoo, Leho et al. (2024). “EUKARYOME: the rRNA gene reference database for identification of all eukaryotes”. *Database*, 2024, baae043. https://doi.org/10.1093/database/baae043
+- Krabberød, Anders K. et al. (2025). “The Ribosomal Operon Database: A Full-Length rDNA Operon Database Derived From Genome Assemblies”. *Molecular Ecology Resources*, 25, e14031.  
+https://doi.org/10.1111/1755-0998.14031
+- Sayers, Eric W. et al. (2025). “Database resources of the National Center for Biotechnology Information in 2025”. *Nucleic Acids Research*, 53(D1), pp. D20–D29. https://doi.org/10.1093/nar/gkae979
 
 ---
 
 # Troubleshooting
 
-Running complex bioinformatics workflows can sometimes lead to unexpected behavior or failed executions. Below is a collection of common issues that may occur during installation or pipeline runs, along with typical causes and hints for troubleshooting.
+Running complex bioinformatics workflows can sometimes lead to unexpected
+behavior or failed executions. Below is a collection of common issues that may
+occur during installation or pipeline execution, along with typical causes and
+suggestions for effective troubleshooting and problem resolution.
 
-## Pipeline failure causes
+## Pipeline Failures
 
-- Negative controls or low-read samples. No sequences generated, missing outputs.  
-- Empty or corrupted input files. These prevent the pipeline from generating expected results.  
-- Sample names in `units.tsv` and `Primertable` must exactly match filenames.  
-- Insufficient computational resources. Jobs may fail if memory, disk space, or CPU are exhausted.  
-- Interrupted execution. Stopped workflows or failed jobs can lead to incomplete outputs.  
-- Conda or dependency issues. Broken environments may cause rule failures.  
-- File permission errors. Missing read/write access may prevent file creation.  
+- Negative controls or low-read samples may result in missing or empty outputs.
+- If low read counts are suspected, verify the input files using the `nseqc` tool.
+- Empty or corrupted input files may prevent successful pipeline execution.
+- Sample identifiers in `units.tsv`, the primertable, and filenames must match exactly.
+- Insufficient memory, disk space, or CPU resources may cause jobs to fail.
+- Interrupted workflow executions may result in incomplete or missing output files.
+- Broken Conda environments or dependency conflicts may cause workflow rules to fail.
+- Missing read or write permissions may prevent required files from being created.
 
-## Problems with installation
+## Installation Problems
 
-- Conda must be correctly installed and available in the PATH.  
-- The pipeline requires a clean environment without leftovers from previous installations.  
-- Snakemake environments must be valid; if broken, delete `.snakemake/conda/` and rerun.  
-- The Snakemake version should match the one recommended in this repository.  
-- Conflicts with other Python setups or package managers (pip, mamba) may cause errors.  
+- Conda must be correctly installed and available in the system `PATH`.
+- Previous or incomplete installations may cause environment or dependency conflicts.
+- Delete `.snakemake/conda/` to rebuild broken Snakemake environments.
+- The Snakemake version should match the version recommended for Natrix2.
+- Other Python environments or package managers may cause dependency conflicts.
 
-## Runtime or output issues
- 
-- Configuration mismatches. Incorrect settings in the config file can affect processing steps.
-- Missing reference data. Ensure databases and indices are downloaded and correctly referenced.  
-- Unexpected runtime errors. Crashes or empty outputs may indicate a bug or broken dependency.  
-- Inconsistent results. Check log files and Snakemake reports for warnings or failed rules.  
+## Runtime Issues
+
+- Incorrect configuration settings may affect processing steps or workflow execution.
+- Unsupported file formats may prevent input data from being processed.
+- Incorrect file paths may prevent input data or databases from being found.
+- Missing reference data may cause taxonomic classification steps to fail.
+- Unexpected errors or empty outputs may indicate rule or dependency problems.
+- Check log files and Snakemake output for warnings or failed rules.
+
+---
