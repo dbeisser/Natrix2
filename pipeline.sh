@@ -31,7 +31,7 @@ if [[ "$varname" != *.yaml ]]; then
 fi
 
 # Built-in config presets
-if [[ "$varname" == "illumina_testrun.yaml" ]]; then
+if [[ "$varname" == "1.yaml" || "$varname" == "illumina_testrun.yaml" ]]; then
     varname="config_presets/illumina_testrun.yaml"
 fi
 

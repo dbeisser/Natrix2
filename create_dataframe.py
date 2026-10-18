@@ -1,11 +1,15 @@
-import pathlib
-import yaml
-import pandas as pd
-import numpy as np
-from glob import glob
+# Python standard library
 import os
-import sys
+import pathlib
 import re
+import shutil
+import sys
+from glob import glob
+
+# Third-party libraries
+import numpy as np
+import pandas as pd
+import yaml
 
 # Build the sample table containing sample IDs, sequencing units, and FASTQ paths.
 # Snakemake uses this table to resolve wildcards and locate the input files.
@@ -343,5 +347,23 @@ if __name__ == '__main__':
     # match exactly before writing units.tsv.
     validate_primer_samples(file_list, config)
 
-    pathlib.Path(config["general"]["output_dir"]).mkdir(parents=True, exist_ok=True)
+    # Create the output directory before saving files.
+    output_dir = pathlib.Path(config["general"]["output_dir"])
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Save the original configuration file if backup is enabled.
+    backup_enabled = config["general"].get("backup_config", False)
+
+    if not isinstance(backup_enabled, bool):
+        sys.exit("ERROR: 'general.backup_config' must be TRUE or FALSE.")
+
+    if backup_enabled:
+        source = pathlib.Path(sys.argv[1]).resolve()
+        destination = output_dir / source.name
+
+        if source != destination.resolve():
+            shutil.copy2(source, destination)
+
+        print(f"Configuration backup saved:\n{destination}")
+
     df.to_csv(os.path.join(config["general"]["output_dir"],config["general"]['units']), sep='\t')

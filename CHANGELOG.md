@@ -5,6 +5,20 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
 
 ---
 
+### [2026-10-18]
+
+- Improve logging in `classify.smk`, `chimera.smk`, and `qcontrol.smk`
+- Update `README.md` structure and content
+- Improve rule documentation in Snakemake workflow files
+- Add optional config backup to `create_dataframe.py`
+- Add `backup_config` parameter to all preset configuration files
+- Add `1` as a shortcut for the Natrix2 test run in `pipeline.sh`
+- Pin Python to version 3.11 in `qcontrol.yaml`
+- Validate workflow execution using the provided test datasets
+- Update the Docker image with the latest changes
+
+---
+
 ### [2026-10-07]
 
 - Update `README.md` structure and content

@@ -1,5 +1,13 @@
 import os
 
+# Classify processed sequences taxonomically using MOTHUR and the selected reference database.
+# The workflow supports Illumina and Nanopore datasets and uses the configured
+# classification method, search strategy, and confidence cutoff.
+# MOTHUR generates taxonomy assignments and classification summaries.
+# The resulting taxonomy files are cleaned to remove redundant "unclassified" entries.
+# Finally, taxonomy assignments are merged with the corresponding abundance table
+# to produce the final result tables for downstream analysis.
+
 # [Dataset-specific workflow: Illumina data]
 if not config['dataset']['nanopore'] and config['classify']['mothur']:
     # DATABASE: PR2
@@ -26,11 +34,24 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    mothur "#set.logfile(name={log}); classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
-                    # sed -i "s/([^()]*)//g" {params.input}/*.taxonomy
-                    input_dir=$(dirname {input[0]});
-                    mv $input_dir/*.taxonomy {output[1]};
-                    mv $input_dir/*.summary {output[0]};
+                    # Log stdout and stderr
+                    exec &> >(tee {log:q})
+
+                    # Classify with MOTHUR
+                    mothur "#set.logfile(name={log}.mothur); \
+                            classify.seqs(fasta={input[0]}, \
+                            cutoff={params.cutoff}, \
+                            reference={params.template}, \
+                            taxonomy={params.taxonomy}, \
+                            method={params.method}, \
+                            processors={params.threads}, \
+                            output=simple, \
+                            search={params.search})"
+
+                    # Move classification results
+                    input_dir=$(dirname {input[0]:q})
+                    mv "$input_dir"/*.taxonomy {output[1]:q}
+                    mv "$input_dir"/*.summary {output[0]:q}
                 """
     
     # DATABASE: UNITE
@@ -57,11 +78,24 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    mothur "#classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
-                    # sed -i "s/([^()]*)//g" {params.input}/*.taxonomy
-                    input_dir=$(dirname {input[0]});
-                    mv $input_dir/*.taxonomy {output[1]};
-                    mv $input_dir/*.summary {output[0]};
+                    # Log stdout and stderr
+                    exec &> >(tee {log:q})
+
+                    # Classify with MOTHUR
+                    mothur "#set.logfile(name={log}.mothur); \
+                            classify.seqs(fasta={input[0]}, \
+                            cutoff={params.cutoff}, \
+                            reference={params.template}, \
+                            taxonomy={params.taxonomy}, \
+                            method={params.method}, \
+                            processors={params.threads}, \
+                            output=simple, \
+                            search={params.search})"
+
+                    # Move classification results
+                    input_dir=$(dirname {input[0]:q})
+                    mv "$input_dir"/*.taxonomy {output[1]:q}
+                    mv "$input_dir"/*.summary {output[0]:q}
                 """
     
     # DATABASE: SILVA
@@ -88,11 +122,24 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    mothur "#classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
-                    # sed -i "s/([^()]*)//g" {params.input}/*.taxonomy
-                    input_dir=$(dirname {input[0]});
-                    mv $input_dir/*.taxonomy {output[1]};
-                    mv $input_dir/*.summary {output[0]};
+                    # Log stdout and stderr
+                    exec &> >(tee {log:q})
+
+                    # Classify with MOTHUR
+                    mothur "#set.logfile(name={log}.mothur); \
+                            classify.seqs(fasta={input[0]}, \
+                            cutoff={params.cutoff}, \
+                            reference={params.template}, \
+                            taxonomy={params.taxonomy}, \
+                            method={params.method}, \
+                            processors={params.threads}, \
+                            output=simple, \
+                            search={params.search})"
+
+                    # Move classification results
+                    input_dir=$(dirname {input[0]:q})
+                    mv "$input_dir"/*.taxonomy {output[1]:q}
+                    mv "$input_dir"/*.summary {output[0]:q}
                 """
 
     # DATABASE: ROD
@@ -119,11 +166,24 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    mothur "#set.logfile(name={log}); classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
-                    # sed -i "s/([^()]*)//g" {params.input}/*.taxonomy
-                    input_dir=$(dirname {input[0]});
-                    mv $input_dir/*.taxonomy {output[1]};
-                    mv $input_dir/*.summary {output[0]};
+                    # Log stdout and stderr
+                    exec &> >(tee {log:q})
+
+                    # Classify with MOTHUR
+                    mothur "#set.logfile(name={log}.mothur); \
+                            classify.seqs(fasta={input[0]}, \
+                            cutoff={params.cutoff}, \
+                            reference={params.template}, \
+                            taxonomy={params.taxonomy}, \
+                            method={params.method}, \
+                            processors={params.threads}, \
+                            output=simple, \
+                            search={params.search})"
+
+                    # Move classification results
+                    input_dir=$(dirname {input[0]:q})
+                    mv "$input_dir"/*.taxonomy {output[1]:q}
+                    mv "$input_dir"/*.summary {output[0]:q}
                 """
 
     # DATABASE: Eukaryome
@@ -150,11 +210,24 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    mothur "#classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
-                    # sed -i "s/([^()]*)//g" {params.input}/*.taxonomy
-                    input_dir=$(dirname {input[0]});
-                    mv $input_dir/*.taxonomy {output[1]};
-                    mv $input_dir/*.summary {output[0]};
+                    # Log stdout and stderr
+                    exec &> >(tee {log:q})
+
+                    # Classify with MOTHUR
+                    mothur "#set.logfile(name={log}.mothur); \
+                            classify.seqs(fasta={input[0]}, \
+                            cutoff={params.cutoff}, \
+                            reference={params.template}, \
+                            taxonomy={params.taxonomy}, \
+                            method={params.method}, \
+                            processors={params.threads}, \
+                            output=simple, \
+                            search={params.search})"
+
+                    # Move classification results
+                    input_dir=$(dirname {input[0]:q})
+                    mv "$input_dir"/*.taxonomy {output[1]:q}
+                    mv "$input_dir"/*.summary {output[0]:q}
                 """
 
     # Removes redundant 'unclassified' entries from the taxonomy file (/mothur_out_raw.taxonomy)
@@ -216,10 +289,24 @@ elif config['dataset']['nanopore']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    mothur "#set.logfile(name={log}); classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
-                    #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
-                    mv {params.input}/*.taxonomy {params.output}/mothur/pr2/mothur_out_raw.taxonomy;
-                    mv {params.input}/*.summary {params.output}/mothur/pr2/mothur_out_raw.summary;
+                    # Log stdout and stderr
+                    exec &> >(tee {log:q})
+
+                    # Classify with MOTHUR
+                    mothur "#set.logfile(name={log}.mothur); \
+                            classify.seqs(fasta={input[0]}, \
+                            cutoff={params.cutoff}, \
+                            reference={params.template}, \
+                            taxonomy={params.taxonomy}, \
+                            method={params.method}, \
+                            processors={params.threads}, \
+                            output=simple, \
+                            search={params.search})"
+
+                    # Move classification results
+                    input_dir=$(dirname {input[0]:q})
+                    mv "$input_dir"/*.taxonomy {output[1]:q}
+                    mv "$input_dir"/*.summary {output[0]:q}
                 """
 
     # DATABASE: UNITE
@@ -248,10 +335,24 @@ elif config['dataset']['nanopore']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    mothur "#classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
-                    #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
-                    mv {params.input}/*.taxonomy {params.output}/mothur/unite/mothur_out_raw.taxonomy;
-                    mv {params.input}/*.summary {params.output}/mothur/unite/mothur_out_raw.summary;
+                    # Log stdout and stderr
+                    exec &> >(tee {log:q})
+
+                    # Classify with MOTHUR
+                    mothur "#set.logfile(name={log}.mothur); \
+                            classify.seqs(fasta={input[0]}, \
+                            cutoff={params.cutoff}, \
+                            reference={params.template}, \
+                            taxonomy={params.taxonomy}, \
+                            method={params.method}, \
+                            processors={params.threads}, \
+                            output=simple, \
+                            search={params.search})"
+
+                    # Move classification results
+                    input_dir=$(dirname {input[0]:q})
+                    mv "$input_dir"/*.taxonomy {output[1]:q}
+                    mv "$input_dir"/*.summary {output[0]:q}
                 """
     
     # DATABASE: SILVA
@@ -281,10 +382,24 @@ elif config['dataset']['nanopore']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    mothur "#classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
-                    #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
-                    mv {params.input}/*.taxonomy {params.output}/mothur/silva/mothur_out_raw.taxonomy;
-                    mv {params.input}/*.summary {params.output}/mothur/silva/mothur_out_raw.summary;
+                    # Log stdout and stderr
+                    exec &> >(tee {log:q})
+
+                    # Classify with MOTHUR
+                    mothur "#set.logfile(name={log}.mothur); \
+                            classify.seqs(fasta={input[0]}, \
+                            cutoff={params.cutoff}, \
+                            reference={params.template}, \
+                            taxonomy={params.taxonomy}, \
+                            method={params.method}, \
+                            processors={params.threads}, \
+                            output=simple, \
+                            search={params.search})"
+
+                    # Move classification results
+                    input_dir=$(dirname {input[0]:q})
+                    mv "$input_dir"/*.taxonomy {output[1]:q}
+                    mv "$input_dir"/*.summary {output[0]:q}
                 """
 
     # DATABASE: ROD
@@ -312,10 +427,24 @@ elif config['dataset']['nanopore']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    mothur "#set.logfile(name={log}); classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
-                    #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
-                    mv {params.input}/*.taxonomy {params.output}/mothur/rod/mothur_out.taxonomy;
-                    mv {params.input}/*.summary {params.output}/mothur/rod/mothur_out.summary;
+                    # Log stdout and stderr
+                    exec &> >(tee {log:q})
+
+                    # Classify with MOTHUR
+                    mothur "#set.logfile(name={log}.mothur); \
+                            classify.seqs(fasta={input[0]}, \
+                            cutoff={params.cutoff}, \
+                            reference={params.template}, \
+                            taxonomy={params.taxonomy}, \
+                            method={params.method}, \
+                            processors={params.threads}, \
+                            output=simple, \
+                            search={params.search})"
+
+                    # Move classification results
+                    input_dir=$(dirname {input[0]:q})
+                    mv "$input_dir"/*.taxonomy {output[1]:q}
+                    mv "$input_dir"/*.summary {output[0]:q}
                 """
 
     # DATABASE: Eukaryome
@@ -344,10 +473,24 @@ elif config['dataset']['nanopore']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    mothur "#classify.seqs(fasta={input[0]}, cutoff={params.cutoff}, reference={params.template}, taxonomy={params.taxonomy}, method={params.method}, processors={params.threads}, output=simple, search={params.search})";
-                    #sed -i "s/([^()]*)//g" {params.input}/*.taxonomy 
-                    mv {params.input}/*.taxonomy {params.output}/mothur/eukaryome/mothur_out.taxonomy;
-                    mv {params.input}/*.summary {params.output}/mothur/eukaryome/mothur_out.summary;
+                    # Log stdout and stderr
+                    exec &> >(tee {log:q})
+
+                    # Classify with MOTHUR
+                    mothur "#set.logfile(name={log}.mothur); \
+                            classify.seqs(fasta={input[0]}, \
+                            cutoff={params.cutoff}, \
+                            reference={params.template}, \
+                            taxonomy={params.taxonomy}, \
+                            method={params.method}, \
+                            processors={params.threads}, \
+                            output=simple, \
+                            search={params.search})"
+
+                    # Move classification results
+                    input_dir=$(dirname {input[0]:q})
+                    mv "$input_dir"/*.taxonomy {output[1]:q}
+                    mv "$input_dir"/*.summary {output[0]:q}
                 """
 
     # Removes redundant 'unclassified' entries from the taxonomy file (/mothur_out_raw.taxonomy)

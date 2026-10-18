@@ -335,6 +335,7 @@ Define the required paths in `config.yaml` so that Natrix2 can locate the input 
 general:
     filename: input/samples       # Path to samples directory
     output_dir: output/results    # Path to results directory
+    backup_config: FALSE          # Backup config file
     primertable: input/primer.csv # Path to primer table
     cores: 20                     # Number of CPU cores
     memory: 10000                 # RAM in megabytes
@@ -986,6 +987,7 @@ used as a reference when preparing a configuration for a new analysis.
 |--------|---------------------------------|-------------|
 | filename | input_data/illumina/16S_Prok_Samples/A071SE | Input data directory. |
 | output_dir | results_illumina_testrun | Output directory. |
+| backup_config | FALSE | Backup config file. |
 | primertable | primer_table/A071SE_16S_Illumina.csv | Primer table. |
 | cores | 20 | Available CPU cores. |
 | memory | 10000 | Available memory in MB. |
@@ -1036,14 +1038,14 @@ https://doi.org/10.1186/s12859-020-03852-4
 
 # References
 
-**Workflow**
+## Workflow
 
 - Köster, Johannes & Rahmann, Sven (2018). “Snakemake—a scalable bioinformatics workflow engine”. *Bioinformatics*, 34(20), pp. 3600–3602. https://doi.org/10.1093/bioinformatics/bty350
 - Anaconda, Inc. (2012). *Conda: Package, dependency and environment management for any language.* https://docs.conda.io
 - Van Rossum, G., & Drake, F. L. (2009). *Python 3 Reference Manual.* CreateSpace, Scotts Valley, CA. https://www.python.org
 - R Core Team. (2023). *R: A Language and Environment for Statistical Computing.* R Foundation for Statistical Computing, Vienna, Austria. https://www.R-project.org
 
-**Preprocessing**
+## Preprocessing
 
 - Andrews, S. (2010). *FastQC: A quality control tool for high throughput sequence data.* https://www.bioinformatics.babraham.ac.uk/projects/fastqc/
 - Ewels, P. et al. (2016). “MultiQC: Summarizes analysis results for multiple tools and samples in a single report”. *Bioinformatics*, 32(19), pp. 3047–3048. https://doi.org/10.1093/bioinformatics/btw354
@@ -1053,7 +1055,7 @@ https://doi.org/10.1186/s12859-020-03852-4
 - Oxford Nanopore Technologies. *Pychopper: A tool for identifying, orienting, trimming, and rescuing full-length Nanopore reads.* https://github.com/epi2me-labs/pychopper
 - Masella, Andre P. et al. (2012). “PANDAseq: paired-end assembler for Illumina sequences”. *BMC Bioinformatics*, 13(1), p. 31. https://doi.org/10.1186/1471-2105-13-31
 
-**Processing**
+## Processing
 
 - Callahan, B. J. et al. (2016). “DADA2: High-resolution sample inference from Illumina amplicon data”. *Nature Methods*, 13(7), pp. 581–583. https://doi.org/10.1038/nmeth.3869
 - Fu, Limin et al. (2012). “CD-HIT: accelerated for clustering the next-generation sequencing data”. *Bioinformatics*, 28(23), pp. 3150–3152. https://doi.org/10.1093/bioinformatics/bts565
@@ -1064,12 +1066,12 @@ https://doi.org/10.1186/s12859-020-03852-4
 - Rognes, Torbjørn et al. (2016). “VSEARCH: a versatile open source tool for metagenomics”. *PeerJ Preprints*. https://doi.org/10.7287/peerj.preprints.2409v1
 - Mahé, Frédéric et al. (2015). “Swarm v2: highly-scalable and high-resolution amplicon clustering”. *PeerJ*, 3. https://doi.org/10.7717/peerj.1420
 
-**Filtering**
+## Filtering
 
 - Lange, Anja et al. (2015). “AmpliconDuo: A Split-Sample Filtering Protocol for High-Throughput Amplicon Sequencing of Microbial Communities”. *PLOS ONE*, 10(11). https://doi.org/10.1371/journal.pone.0141590
 - Mahé, Frédéric. *MUMU: C++ implementation of LULU for post-clustering curation of metabarcoding data.* https://github.com/frederic-mahe/mumu
 
-**Classification**
+## Classification
 
 - Schloss, Patrick D. et al. (2009). “Introducing mothur: Open-source, platform-independent, community-supported software for describing and comparing microbial communities”. *Applied and Environmental Microbiology*, 75(23), pp. 7537–7541. https://doi.org/10.1128/AEM.01541-09
 - Altschul, Stephen F. et al. (1990). “Basic local alignment search tool”. *Journal of Molecular Biology*, 215(3), pp. 403–410. https://doi.org/10.1016/S0022-2836(05)80360-2
