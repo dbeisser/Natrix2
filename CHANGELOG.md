@@ -5,6 +5,17 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
 
 ---
 
+### [2026-10-20]
+
+- Update `README.md` installation and environment documentation
+- Support custom Conda environment names in `pipeline.sh`
+- Add Conda environment validation and error handling to `pipeline.sh`
+- Improve Conda environment activation within GNU Screen sessions
+- Validate workflow execution using the provided test datasets
+- Update the Docker image with the latest changes
+
+---
+
 ### [2026-10-18]
 
 - Improve logging in `classify.smk`, `chimera.smk`, and `qcontrol.smk`

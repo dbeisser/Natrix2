@@ -51,8 +51,8 @@ Natrix2 consists of several interconnected modules covering the main steps of am
 
 **We strongly recommend running Natrix2 on a Linux-based system, as most bioinformatics tools and dependencies are developed and tested in Unix-like environments.**
 
-- [Linux](https://ubuntu.com/) – recommended operating system   
-  The pipeline was developed and tested on the Ubuntu distribution. Linux provides a stable and high-performance environment for computationally intensive bioinformatics workflows and ensures compatibility with most scientific software.
+- [Linux](https://ubuntu.com/) – recommended operating system  
+  The pipeline was developed and tested on the Ubuntu distribution. Linux provides a stable, reliable, and high-performance environment for computationally intensive bioinformatics workflows. It ensures compatibility with most scientific software and offers efficient resource management, making it particularly suitable for processing large sequencing datasets and running complex bioinformatics analyses.
 
 - [Snakemake](https://snakemake.readthedocs.io/en/stable/) – workflow management system    
   Workflow management system for defining, organizing, and executing reproducible and scalable data analyses. Workflows are described in a readable, Python-based language and executed with automatic handling of dependencies, parallelization, and reproducibility across different computing environments.
@@ -61,24 +61,26 @@ Natrix2 consists of several interconnected modules covering the main steps of am
   Cross-platform package and environment manager used to install all required software in isolated, reproducible environments. Conda ensures that the correct versions of all dependencies are used and allows easy sharing of the computational environment.
 
 - [GNU Screen](https://www.gnu.org/software/screen/) – terminal multiplexer  
-  Allows long-running pipeline executions to continue in detached sessions, preventing termination if the terminal connection is interrupted (e.g., SSH disconnects). GNU Screen is widely available on Linux systems.
-
-  Alternatively, [tmux](https://github.com/tmux/tmux) can be used for the same purpose.
+  Allows long-running pipeline executions to continue in detached sessions, preventing workflow interruptions caused by terminal disconnections (e.g., SSH disconnects). GNU Screen is widely available on Linux systems and is recommended for running Natrix2 workflows. Alternatively, [tmux](https://github.com/tmux/tmux) can be used for the same purpose.
 
   Installation example (Debian/Ubuntu):
 
-  ```bash
+  ```shell
   # Install GNU Screen
-  apt-get install screen
+  sudo apt-get install screen
   ```
 
-Using a terminal multiplexer is strongly recommended for running Natrix2, especially for long analyses on remote systems. It allows the workflow to continue running if the remote connection is interrupted, helping to ensure stable and uninterrupted execution.
+Using a terminal multiplexer is strongly recommended when running Natrix2, especially for long-running analyses on remote systems. It allows the workflow to continue executing even if the remote connection is interrupted, helping to ensure stable and uninterrupted pipeline execution.
 
 ---
 
 # Installation
 
-Conda can be installed via the [Anaconda](https://www.anaconda.com/) or [Miniconda](https://conda.io/en/latest/miniconda.html) platforms, with Miniconda3 being recommended for most users; on Linux systems, it can be obtained using:
+To install Natrix2, you need the open-source package management system Conda to manage the required software dependencies and environments. Additionally, GNU Screen is required if you want to run Natrix2 using the accompanying `pipeline.sh` script. This allows the pipeline to run in a persistent terminal session, ensuring that the workflow continues executing even after disconnecting from the terminal.
+
+## Install Conda
+
+Conda can be installed via the [Anaconda](https://www.anaconda.com/) or [Miniconda](https://conda.io/en/latest/miniconda.html) platforms, with Miniconda3 being recommended for most users. On Linux systems, it can be installed using:
 
 ```shell
 # Download Miniconda3 installer
@@ -90,14 +92,49 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh
 ```
 
-Dependencies will be automatically installed using Conda environments and can be found in the corresponding `environment` files in the `envs` folder and the `natrix2.yaml` file in the root directory of the pipeline.
+Follow the instructions and initialize Conda for terminal use.
 
-**Important:** After setting up your `natrix2.yaml` environment, make sure to check the [Sequence Count](#sequence-count) section before starting the workflow. To install Natrix2, you need the open-source package management system Conda and, if you want to run Natrix2 using the accompanying `pipeline.sh` script, GNU Screen. After cloning this repository to a folder of your choice, it is recommended to create a general Natrix2 Conda environment using the provided `natrix2.yaml` file; from the main folder of the cloned repository, run the following command:
+## Clone Repository
+
+For the latest updates and development features, use the `dev` branch:
 
 ```shell
-# Create the Natrix2 Conda environment
+# Clone the development branch (latest updates)
+git clone -b dev https://github.com/dbeisser/Natrix2.git
+```
+
+To clone the `main` branch, use the following command:
+
+```shell
+# Clone the main branch
+git clone https://github.com/dbeisser/Natrix2.git
+```
+
+Navigate to the Natrix2 directory to continue the installation.
+
+## Create Environment
+
+Dependencies will be automatically installed using Conda environments and can be found in the corresponding `environment` files in the `envs` folder and the `natrix2.yaml` file in the root directory of the pipeline.
+
+From the main folder of the cloned repository, create the Natrix2 Conda environment using:
+
+```shell
+# Create the Natrix2 environment named natrix2
 conda env create -f natrix2.yaml
 ```
+
+Alternatively, you can specify a custom environment name using the `-n` option:
+
+```shell
+# Create the Natrix2 environment with a custom name
+conda env create -f natrix2.yaml -n env_name
+```
+
+**Note:** If you use a custom Conda environment name, specify it when launching `pipeline.sh`.
+
+---
+
+**Important:** Before starting the workflow, make sure to carefully review the [Sequence Count](#sequence-count) section. This section provides important information on how to properly validate your input data and identify potential issues that could affect workflow execution. Following these recommendations can help prevent unnecessary errors and ensure a smooth, reliable, and successful execution of the entire Natrix2 pipeline.
 
 ## Test run with Natrix2
 
@@ -116,7 +153,9 @@ $ ./pipeline.sh
 
 # Pipeline launcher output
 Natrix2 Pipeline Launcher
+Custom Conda ENV: ./pipeline.sh env_name
 Exit launcher: enter 'exit' or 'quit'
+
 Enter config:
 Project:  your_config.yaml (root directory)
 Test run: illumina_testrun (example config)
@@ -147,6 +186,20 @@ Ctrl+a, k    # Terminate the current session
 ```
 
 **Important:** Make sure that the Natrix2 Conda environment `natrix2` is activated when managing or reattaching to Screen sessions. This ensures that the required Natrix2 commands and dependencies are available.
+
+## Managing Conda Environments
+
+Natrix2 uses Conda environments to manage the dependencies required for pipeline execution. The following commands can be used to list, activate, deactivate, or remove Conda environments.
+
+```shell
+# Manage Conda environments
+conda env list                     # List available Conda environments
+conda activate natrix2             # Activate the Natrix2 environment
+conda deactivate                   # Deactivate the current environment
+conda env remove -n natrix2        # Remove the Natrix2 environment
+```
+
+**Important:** If you specified a custom environment name during installation, make sure to replace `natrix2` with your chosen environment name in the commands above. This ensures that the correct Conda environment is used when managing dependencies. When updating a custom environment, use the `-n env_name` option to explicitly target the correct environment and avoid unintended changes to other environments.
 
 ---
 
@@ -214,7 +267,7 @@ The primertable, configuration file, and FASTQ folder must be located in the roo
 
 ## Running Natrix2 using `pipeline.sh`
 
-Once everything is configured correctly, Natrix2 can be started using the `pipeline.sh` launcher. The launcher allows you to select a project configuration from the root directory or start one of the provided test runs.
+Once everything is configured correctly, Natrix2 can be started using the `pipeline.sh` launcher. The launcher allows you to select a project configuration from the root directory or start one of the provided test runs. By default, `pipeline.sh` uses the `natrix2` Conda environment:
 
 ```shell
 # Launch Natrix2 using pipeline.sh
@@ -222,13 +275,22 @@ $ ./pipeline.sh
 
 # Pipeline launcher output
 Natrix2 Pipeline Launcher
+Custom Conda ENV: ./pipeline.sh env_name
 Exit launcher: enter 'exit' or 'quit'
+
 Enter config:
 Project:  your_config.yaml (root directory)
 Test run: illumina_testrun (example config)
 
 # Run config from root directory
 $ > illumina_otu_swarm_mumu_mothur_pr2.yaml
+```
+
+To use a custom Conda environment, provide its name when launching the pipeline:
+
+```shell
+# Launch Natrix2 with a custom Conda environment
+./pipeline.sh env_name
 ```
 
 Alternatively, run a config from `config_presets`:
@@ -245,7 +307,7 @@ After selecting a configuration, Natrix2 starts the workflow using the specified
 To run the preparation script and Snakemake manually, first activate the Natrix2 Conda environment:
 
 ```shell
-# Activate the Natrix2 Conda environment
+# Activate Natrix2; use your custom env_name if specified
 conda activate natrix2
 ```
 
