@@ -5,6 +5,18 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
 
 ---
 
+### [2026-10-29]
+
+- Improve rule documentation and logging across Snakemake workflows
+  - `assembly.smk`, `chimera.smk`, `qcontrol.smk`
+  - `classify.smk`, `blast.smk`, `clustering.smk`
+  - `databases.smk`, `demultiplexing.smk`, `dereplication.smk`
+  - `merging.smk`, `mumu.smk`, `qfiltering.smk`
+- Validate workflow execution using the provided test datasets
+- Update the Docker image with the latest changes
+
+---
+
 ### [2026-10-20]
 
 - Update `README.md` installation and environment documentation

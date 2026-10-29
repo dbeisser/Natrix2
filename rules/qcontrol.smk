@@ -21,7 +21,8 @@ if not config['dataset']['nanopore']:
         conda:
             "../envs/preprocessing/qcontrol.yaml"
         shell:
-            "fastqc -o {params}/qc/ {input} -t {threads} > {log} 2>&1"
+            # Run FastQC; log stdout and stderr to file and terminal
+            "fastqc -o {params}/qc/ {input} -t {threads} 2>&1 | tee {log:q}"
 
     # Combine the individual FastQC results into a single MultiQC report.
     # MultiQC collects the generated FastQC ZIP archives and summarizes
@@ -40,7 +41,8 @@ if not config['dataset']['nanopore']:
         conda:
             "../envs/preprocessing/qcontrol.yaml"
         shell:
-            "multiqc {params}/qc/ -o {params}/qc/ > {log} 2>&1"
+            # Run MultiQC; log stdout and stderr to file and terminal
+            "multiqc {params}/qc/ -o {params}/qc/ 2>&1 | tee {log:q}"
 
 
 else:
@@ -64,7 +66,8 @@ else:
         conda:
             "../envs/preprocessing/qcontrol.yaml"
         shell:
-            "fastqc -o {params}/qc/ {input} -t {threads} > {log} 2>&1"
+            # Run FastQC; log stdout and stderr to file and terminal
+            "fastqc -o {params}/qc/ {input} -t {threads} 2>&1 | tee {log:q}"
 
 
     # Combine the individual FastQC results into a single MultiQC report.
@@ -84,4 +87,5 @@ else:
         conda:
             "../envs/preprocessing/qcontrol.yaml"
         shell:
-            "multiqc {params}/qc/ -o {params}/qc/ > {log} 2>&1"
+            # Run MultiQC; log stdout and stderr to file and terminal
+            "multiqc {params}/qc/ -o {params}/qc/ 2>&1 | tee {log:q}"

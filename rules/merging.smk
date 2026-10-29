@@ -1,5 +1,10 @@
 import os
 
+# Build and filter sequence-abundance tables from non-chimeric sample data.
+# Optionally run AmpliconDuo analysis and prepare FASTA input for VSEARCH.
+
+# Generate an unfiltered sequence-abundance table and an intermediate HDF5
+# file from the non-chimeric FASTA files of the sequencing units.
 rule unfiltered_table:
     input:
         expand(os.path.join(config["general"]["output_dir"],"assembly/{unit.sample}_{unit.unit}.nonchimera.fasta"), unit=units.reset_index().itertuples())
@@ -13,6 +18,8 @@ rule unfiltered_table:
     script:
         "../scripts/utilities/unfiltered_table.py"
 
+# Apply the configured filtering method and cutoff to the intermediate data.
+# Write separate tables for retained and excluded sequences.
 rule filtering:
     input:
         os.path.join(config["general"]["output_dir"],"filtering/unfiltered_dict.hdf5")
@@ -29,6 +36,8 @@ rule filtering:
     script:
         "../scripts/preprocessing/filtering.py"
 
+# Run the AmpliconDuo R script using filtered and unfiltered tables.
+# Pass plot settings and the multiple-testing correction method; save RData.
 rule ampliconduo:
     input:
         filtered_table=os.path.join(config["general"]["output_dir"],"filtering/filtered_table_temp.csv"),
@@ -46,7 +55,10 @@ rule ampliconduo:
     script:
         "../scripts/analysis/ampliconduo.R"
 
+# [VSEARCH-specific output preparation]
 if config['clustering']=="vsearch":
+    # Convert retained sequences to FASTA and add matching sequence IDs to
+    # a CSV table. FASTA headers record each sequence's summed abundance.
     rule write_fasta:
         input:
             os.path.join(config["general"]["output_dir"],"filtering/filtered_table_temp.csv")
@@ -57,7 +69,6 @@ if config['clustering']=="vsearch":
             os.path.join(config["general"]["output_dir"], "logfiles/merging/write_fasta.log")
         run:
             import csv
-
             with open(input[0],"r") as csv_in, open(
                     output[0],"w") as fasta_out, open(output[1],"w") as csv_out:
                 filtered_table = csv.reader(csv_in)

@@ -1,12 +1,26 @@
 import os
 
+# Process Illumina FASTQ reads and generate assembled sequence files.
+# The workflow prepares primer settings, quality-filters reads with PRINSEQ,
+# processes reads with Cutadapt, assembles reads using the configured
+# assembly settings, and converts the resulting FASTQ files to FASTA
+# for subsequent sequence processing.
+
+# [Dataset-specific workflow: Illumina data]
 if not config['dataset']['nanopore']:
+
+    # Return the expected demultiplexed FASTQ input path(s) for a sample/unit.
+    # Return both numbered reads (1 and 2) for paired-end units; otherwise return only read 1.
     def get_fastq(wildcards):
         if not is_single_end(wildcards.sample, wildcards.unit):
             return expand(os.path.join(config["general"]["output_dir"],"demultiplexed/{sample}_{unit}_{group}.fastq"),
                             group=[1,2], **wildcards)
         return os.path.join(config["general"]["output_dir"],"demultiplexed/{sample}_{unit}_1.fastq").format(**wildcards)
 
+    # Prepare the primer table used by downstream read-processing rules.
+    # The primer information from the user-provided primer table is combined
+    # with the configured settings (paired-end mode, primer offset, and whether
+    # barcodes or all primers have already been removed).
     rule define_primer:
         input:
             primer_table=config["general"]["primertable"]
@@ -24,6 +38,10 @@ if not config['dataset']['nanopore']:
         script:
             "../scripts/preprocessing/define_primer.py"
 
+    # Process demultiplexed reads with the PRINSEQ helper script.
+    # Pass the configured quality threshold to the helper script to
+    # produce FASTQ files for subsequent processing.
+    # The filtered reads are temporary and deleted once no longer needed.
     rule prinseq:
         input:
             sample=get_fastq
@@ -40,6 +58,10 @@ if not config['dataset']['nanopore']:
         script:
             "../scripts/preprocessing/prinseq.py"
 
+    # Process quality-filtered reads using the Cutadapt helper script
+    # and the generated primer table.
+    # Pass the configured minimum and maximum lengths to the script.
+    # The trimmed reads are temporary and deleted once no longer needed.
     rule cutadapt:
         input:
             expand(
@@ -63,6 +85,11 @@ if not config['dataset']['nanopore']:
         script:
             "../scripts/preprocessing/cutadapt.py"
 
+    # Generate assembled FASTQ reads using the assembly helper script.
+    # Pass paired-end, overlap, quality, and length settings to the script;
+    # the generated primer table is also provided as input.
+    # The behavior for single-end units is determined by the helper script.
+    # The result is one assembled FASTQ file per sample/unit.
     rule assembly:
         input:
             expand(
@@ -87,6 +114,10 @@ if not config['dataset']['nanopore']:
         script:
             "../scripts/analysis/assembly.py"
 
+    # Convert assembled FASTQ to FASTA using seqtk.
+    # The FASTA output contains sequences without FASTQ quality scores.
+    # It is provided for downstream sequence processing.
+    # The FASTA file is temporary and deleted once no longer needed.
     rule copy_to_fasta:
         input:
             os.path.join(config["general"]["output_dir"],"assembly/{sample}_{unit}/{sample}_{unit}_assembled.fastq")
@@ -97,4 +128,7 @@ if not config['dataset']['nanopore']:
         conda:
             "../envs/utilities/seqtk.yaml"
         shell:
-            "seqtk seq -a {input} > {output}"
+            """
+                # Convert FASTQ to FASTA (stderr to log, sequences to FASTA file)
+                seqtk seq -a {input:q} 2>&1 > {output:q} | tee {log:q}
+            """

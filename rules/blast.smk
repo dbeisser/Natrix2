@@ -1,7 +1,19 @@
 import os
 
+# Assign taxonomy to query sequences using BLAST and reference lineage data.
+# Depending on configuration, the workflow prepares SILVA, NCBI, ROD, or
+# Eukaryome BLAST database resources and a taxonomy lookup table.
+# BLASTN searches the selected query FASTA against the database.
+# Subsequent rules annotate hits with lineage information and merge
+# annotations with an abundance table for downstream analysis.
+
+# [Database setup: SILVA]
 if config["blast"]["database"] == "silva":
 
+    # Retrieve a SILVA SSU Ref FASTA release and build a nucleotide BLAST database.
+    # Select the highest versioned matching file listed in the SILVA FTP directory.
+    # Decompress the FASTA with pigz and index it using makeblastdb
+    # with BLAST database format version 5.
     rule make_silva_db:
         output:
             expand(config["blast"]["db_path"] + "{file_extension}", file_extension=[".ndb", ".nhr", ".nin", ".nog", ".nos", ".not", ".nsq", ".ntf", ".nto"]),
@@ -14,13 +26,22 @@ if config["blast"]["database"] == "silva":
             "../envs/classification/blast.yaml"
         shell:
             """
-                dir_name=$(dirname {params[0]});
-                latest_file=$(wget -qO- https://ftp.arb-silva.de/current/Exports/ | grep -oP 'SILVA_\d+\.\d+_SSURef_tax_silva.fasta.gz' | sort -V | tail -n 1);
-                wget -P $dir_name/ --progress=bar https://ftp.arb-silva.de/current/Exports/$latest_file;
-                pigz -d -c $dir_name/$latest_file > $dir_name/silva.db.fasta;
-                makeblastdb -in $dir_name/silva.db.fasta -dbtype nucl -parse_seqids -out $dir_name/silva.db -blastdb_version 5
+                # Find the latest SILVA release (variables are not piped, otherwise they would be lost)
+                dir_name=$(dirname {params[0]})
+                latest_file=$(wget -qO- https://ftp.arb-silva.de/current/Exports/ | grep -oP 'SILVA_\d+\.\d+_SSURef_tax_silva.fasta.gz' | sort -V | tail -n 1)
+                echo "Latest SILVA release: $latest_file" 2>&1 | tee {log:q}
+
+                # Download and decompress SILVA (stderr to log, sequences to FASTA file)
+                wget -P $dir_name/ --progress=bar https://ftp.arb-silva.de/current/Exports/$latest_file 2>&1 | tee -a {log:q}
+                pigz -d -c $dir_name/$latest_file 2>&1 > $dir_name/silva.db.fasta | tee -a {log:q}
+
+                # Build BLAST database
+                makeblastdb -in $dir_name/silva.db.fasta -dbtype nucl -parse_seqids -out $dir_name/silva.db -blastdb_version 5 2>&1 | tee -a {log:q}
             """
 
+    # Build a taxonomic lineage table from the SILVA reference FASTA headers.
+    # The lineage information is stored as an HDF5 file (tax_lineage.h5),
+    # which is later used to translate BLAST hits into full taxonomic ranks.
     rule create_silva_taxonomy:
         input: 
             config["blast"]["db_path"] + ".fasta"
@@ -34,8 +55,13 @@ if config["blast"]["database"] == "silva":
             "../scripts/classification/create_silva_taxonomy.py"
 
 
+# [Database setup: NCBI]
 elif config["blast"]["database"] == "ncbi":
 
+    # Download the configured preformatted NCBI BLAST database from AWS
+    # using update_blastdb.pl with decompression enabled.
+    # Record completion using a marker file
+    # (.downloaded.ok), which is the declared rule output.
     rule make_ncbi_db:
         output:
             marker=config["blast"]["db_path"] + config["blast"]["db_type"] + ".downloaded.ok"
@@ -48,14 +74,20 @@ elif config["blast"]["database"] == "ncbi":
             "../envs/classification/blast.yaml"
         shell:
             """
-                mkdir -p {params.db_dir}
-                echo "[{params.db_type}] Downloading into: {params.db_dir}" > {log}
-                ( cd {params.db_dir} && update_blastdb.pl --source aws --decompress --verbose --verbose {params.db_type} ) >> {log} 2>&1
-                echo "[{params.db_type}] Done." >> {log}
+                # Download NCBI database; log stdout and stderr to file and terminal
+                mkdir -p {params.db_dir} 2>&1 | tee {log:q}
+                echo "[{params.db_type}] Downloading into: {params.db_dir}" 2>&1 | tee -a {log:q}
+                ( cd {params.db_dir} && update_blastdb.pl --source aws --decompress --verbose --verbose {params.db_type} ) 2>&1 | tee -a {log:q}
+                echo "[{params.db_type}] Done." 2>&1 | tee -a {log:q}
+
+                # Create marker file after successful download
                 touch {output.marker}
                 sleep 10
             """
 
+    # Download the NCBI taxonomy dump (new_taxdump) and the BLAST taxonomy
+    # database (taxdb). The taxonomy dump is extracted to provide
+    # fullnamelineage.dmp, which links NCBI taxonomy IDs to full lineages.
     rule download_taxonomy:
         output:
             os.path.join(config["blast"]["db_path"], "fullnamelineage.dmp")
@@ -67,12 +99,15 @@ elif config["blast"]["database"] == "ncbi":
             "../envs/classification/blast.yaml"
         shell:
             """
+                # Download NCBI taxonomy; log stdout and stderr to file and terminal
                 dir_name={params.db_path}
-                wget -N -P $dir_name/ --progress=bar ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz
-                wget -N -P $dir_name/ --progress=bar ftp://ftp.ncbi.nlm.nih.gov/blast/db/taxdb.tar.gz
-                tar xvzf $dir_name/new_taxdump.tar.gz -C $dir_name
+                wget -N -P $dir_name/ --progress=bar ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz 2>&1 | tee {log:q}
+                wget -N -P $dir_name/ --progress=bar ftp://ftp.ncbi.nlm.nih.gov/blast/db/taxdb.tar.gz 2>&1 | tee -a {log:q}
+                tar xvzf $dir_name/new_taxdump.tar.gz -C $dir_name 2>&1 | tee -a {log:q}
             """
 
+    # Convert the NCBI lineage file (fullnamelineage.dmp) into an HDF5 lookup
+    # table (tax_lineage.h5) for fast mapping of BLAST taxonomy IDs to lineages.
     rule create_blast_taxonomy:
         input:
             os.path.join(config["blast"]["db_path"], "fullnamelineage.dmp")
@@ -86,8 +121,12 @@ elif config["blast"]["database"] == "ncbi":
             "../scripts/classification/create_blast_taxonomy.py"
 
 
+# [Database setup: ROD]
 elif config["blast"]["database"] == "rod":
 
+    # Download the ROD reference database release from GitHub and build a
+    # BLAST database. The FASTA headers are cleaned ('|' replaced by spaces),
+    # indexed with makeblastdb, and temporary download files are removed.
     rule make_ROD_db:
         output:
             expand(config["blast"]["db_path"] + "{file_extension}", file_extension=[".ndb", ".nhr", ".nin", ".nog", ".nos", ".not", ".nsq", ".ntf", ".nto"]),
@@ -101,21 +140,25 @@ elif config["blast"]["database"] == "rod":
             "../envs/classification/blast.yaml"
         shell:
             """
-                wget -O database/v{params.db_version}-goldenrod.zip --progress=bar https://github.com/krabberod/ROD/archive/refs/tags/v{params.db_version}-goldenrod.zip;
+                # Download and extract ROD; log stdout and stderr to file and terminal
+                wget -O database/v{params.db_version}-goldenrod.zip --progress=bar https://github.com/krabberod/ROD/archive/refs/tags/v{params.db_version}-goldenrod.zip 2>&1 | tee {log:q}
+                unzip -o database/v{params.db_version}-goldenrod.zip -d database/ 2>&1 | tee -a {log:q}
 
-                unzip -o database/v{params.db_version}-goldenrod.zip -d database/;
+                # Decompress and clean FASTA headers (stderr to log, sequences to FASTA file)
+                gunzip -c database/ROD-{params.db_version}-goldenrod/ROD_v{params.db_version}_reference_sequences.fasta.gz 2>&1 > {params.db_path}.{params.db_version}_reference_sequences_lang.fasta | tee -a {log:q}
+                sed 's/|/ /g' {params.db_path}.{params.db_version}_reference_sequences_lang.fasta 2>&1 > {params.db_path}.{params.db_version}_reference_sequences.fasta | tee -a {log:q}
 
-                gunzip -c database/ROD-{params.db_version}-goldenrod/ROD_v{params.db_version}_reference_sequences.fasta.gz > {params.db_path}.{params.db_version}_reference_sequences_lang.fasta
-                sed 's/|/ /g' {params.db_path}.{params.db_version}_reference_sequences_lang.fasta > {params.db_path}.{params.db_version}_reference_sequences.fasta
+                # Build BLAST database
+                makeblastdb -in {params.db_path}.{params.db_version}_reference_sequences.fasta -dbtype nucl -parse_seqids -out {params.db_path} -blastdb_version 5 2>&1 | tee -a {log:q}
 
-                makeblastdb -in {params.db_path}.{params.db_version}_reference_sequences.fasta -dbtype nucl -parse_seqids -out {params.db_path} -blastdb_version 5
-
-                mv {params.db_path}.{params.db_version}_reference_sequences.fasta {params.db_path}.fasta
-
-                rm database/v{params.db_version}-goldenrod.zip
-                rm -r database/ROD-{params.db_version}-goldenrod
+                # Rename FASTA and remove temporary files
+                mv {params.db_path}.{params.db_version}_reference_sequences.fasta {params.db_path}.fasta 2>&1 | tee -a {log:q}
+                rm database/v{params.db_version}-goldenrod.zip 2>&1 | tee -a {log:q}
+                rm -r database/ROD-{params.db_version}-goldenrod 2>&1 | tee -a {log:q}
             """
 
+    # Build a taxonomic lineage table from the ROD reference FASTA headers
+    # and store it as an HDF5 file (tax_lineage.h5) for later BLAST annotation.
     rule create_ROD_taxonomy:
         input: 
             config["blast"]["db_path"] + ".fasta"
@@ -129,8 +172,12 @@ elif config["blast"]["database"] == "rod":
             "../scripts/classification/create_rod_taxonomy.py"
 
 
+# [Database setup: Eukaryome]
 elif config["blast"]["database"] == "eukaryome":
 
+    # Download the Eukaryome reference database (mothur format) and build a
+    # BLAST database. The FASTA and taxonomy (.tax) files are extracted,
+    # the FASTA is indexed with makeblastdb, and temporary files are removed.
     rule make_Eukaryome_db:
         output:
             expand(config["blast"]["db_path"] + "{file_extension}", file_extension=[".ndb", ".nhr", ".nin", ".nog", ".nos", ".not", ".nsq", ".ntf", ".nto"]),
@@ -146,19 +193,26 @@ elif config["blast"]["database"] == "eukaryome":
             "../envs/classification/blast.yaml"
         shell:
             """
-                wget -P ./database/ --progress=bar https://sisu.ut.ee/wp-content/uploads/sites/643/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.zip
-                python3 -m zipfile -e database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.zip database/
-                cat database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.fasta > {params.db_path}.{params.db_version}.fasta
-                cat database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.tax > {params.db_path}.tax
-                makeblastdb -in {params.db_path}.{params.db_version}.fasta -dbtype nucl -parse_seqids -out {params.db_path} -blastdb_version 5
+                # Download and extract Eukaryome; log stdout and stderr to file and terminal
+                wget -P ./database/ --progress=bar https://sisu.ut.ee/wp-content/uploads/sites/643/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.zip 2>&1 | tee {log:q}
+                python3 -m zipfile -e database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.zip database/ 2>&1 | tee -a {log:q}
 
-                rm database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.zip
-                rm database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.fasta
-                rm database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.tax
+                # Copy FASTA and taxonomy files (stderr to log, content to file)
+                cat database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.fasta 2>&1 > {params.db_path}.{params.db_version}.fasta | tee -a {log:q}
+                cat database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.tax 2>&1 > {params.db_path}.tax | tee -a {log:q}
 
-		        mv {params.db_path}.{params.db_version}.fasta {params.db_path}.fasta
+                # Build BLAST database
+                makeblastdb -in {params.db_path}.{params.db_version}.fasta -dbtype nucl -parse_seqids -out {params.db_path} -blastdb_version 5 2>&1 | tee -a {log:q}
+
+                # Remove temporary files and rename FASTA
+                rm database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.zip 2>&1 | tee -a {log:q}
+                rm database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.fasta 2>&1 | tee -a {log:q}
+                rm database/mothur_EUK_{params.eukaryome_version}_v{params.db_version}.tax 2>&1 | tee -a {log:q}
+                mv {params.db_path}.{params.db_version}.fasta {params.db_path}.fasta 2>&1 | tee -a {log:q}
             """
 
+    # Build a taxonomic lineage table from the Eukaryome taxonomy file (.tax)
+    # and store it as an HDF5 file (tax_lineage.h5) for later BLAST annotation.
     rule create_Eukaryome_taxonomy:
         input: 
             config["blast"]["db_path"] + ".tax"
@@ -172,30 +226,32 @@ elif config["blast"]["database"] == "eukaryome":
             "../scripts/classification/create_eukaryome_taxonomy.py"
 
 
+# Align the representative sequences against the selected BLAST database.
+# The query file depends on the dataset and clustering method (OTU
+# representatives, vsearch centroids, or filtered sequences).
+# BLASTN uses the configured identity and E-value thresholds. For NCBI,
+# the configured maximum hit count is used; other databases use a limit of one.
+# Results are written as a tabular BLAST output (outfmt 6).
 rule blast:
     input:
+        # Query sequences: OTU representatives (Illumina), vsearch centroids
+        # (Nanopore + vsearch) or filtered sequences (all other cases)
         query = os.path.join(config["general"]["output_dir"],"clustering/representatives.fasta") \
             if config["general"]["seq_rep"] == "OTU" and not config["dataset"]["nanopore"] \
             else os.path.join(config["general"]["output_dir"],"clustering/vsearch_mod.fasta") \
             if config["clustering"]== "vsearch" and config["dataset"]["nanopore"] \
             else os.path.join(config["general"]["output_dir"],"filtering/filtered.fasta"),
 
-        db_ready = (
-            config["blast"]["db_path"] + config["blast"]["db_type"] + ".downloaded.ok"
-            if config["blast"]["database"] == "ncbi"
-            else expand(config["blast"]["db_path"] + "{ext}",
-                        ext=[".ndb", ".nhr", ".nin", ".nog", ".nos", ".not", ".nsq", ".ntf", ".nto"])
-            if config["blast"]["database"] in ["silva", "rod", "eukaryome"]
-            else []
-        )
+        # Database files: marker file for NCBI, index files for local databases
+        db_ready = (config["blast"]["db_path"] + config["blast"]["db_type"] + ".downloaded.ok" if config["blast"]["database"] == "ncbi"
+            else expand(config["blast"]["db_path"] + "{ext}", ext=[".ndb", ".nhr", ".nin", ".nog", ".nos", ".not", ".nsq", ".ntf", ".nto"])
+            if config["blast"]["database"] in ["silva", "rod", "eukaryome"] else [])
     output:
         os.path.join(config["general"]["output_dir"],"blast/blast_taxonomy.tsv")
     params:
-        db_path = (
-            config["blast"]["db_path"] + config["blast"]["db_type"]
+        db_path = (config["blast"]["db_path"] + config["blast"]["db_type"]
             if config["blast"]["database"] == "ncbi"
-            else config["blast"]["db_path"]
-        ),
+            else config["blast"]["db_path"]),
         max_target_seqs=str(config["blast"]["max_target_seqs"]) if config["blast"]["database"] == "ncbi" else "1",
         ident=str(config["blast"]["ident"]),
         evalue=str(config["blast"]["evalue"]),
@@ -208,13 +264,16 @@ rule blast:
         "../envs/classification/blast.yaml"
     shell:
         """
-            echo "Running BLAST with database: {params.db_path}" > {log}
-            echo "Query file: {input.query}" >> {log}
-            echo "Threads: {threads}" >> {log}
-            echo "Database info:" >> {log}
-            blastdbcmd -db {params.db_path} -info >> {log} 2>&1
+            # Write run information to log
+            echo "Running BLAST with database: {params.db_path}" 2>&1 | tee {log:q}
+            echo "Query file: {input.query}" 2>&1 | tee -a {log:q}
+            echo "Threads: {threads}" 2>&1 | tee -a {log:q}
+            echo "Database info:" 2>&1 | tee -a {log:q}
+            blastdbcmd -db {params.db_path} -info 2>&1 | tee -a {log:q}
 
-            blastn -num_threads {threads} \
+            # Run BLAST
+            blastn \
+                -num_threads {threads} \
                 -query {input.query} \
                 -db {params.db_path} \
                 -max_target_seqs {params.max_target_seqs} \
@@ -222,13 +281,19 @@ rule blast:
                 -evalue {params.evalue} \
                 -outfmt {params.out6} \
                 -out {output} \
-                2>> {log}
+                2>&1 | tee -a {log:q}
         """
 
 
+# [Taxonomy assignment and result merging for the selected database]
 if config['blast']['blast']:
+    # DATABASE: NCBI
 	if config["blast"]["database"]=="ncbi":
 
+		# Assign full NCBI taxonomic lineages to the BLAST hits using the
+		# taxonomy IDs (staxid) and the lineage table (tax_lineage.h5).
+		# Selected taxonomic classes can be dropped via the configuration.
+		# Writes a temporary lineage table and a table containing all hits.
 		rule ncbi_taxonomy:
 			input:
 				blast_result = os.path.join(config["general"]["output_dir"],"blast/blast_taxonomy.tsv"),
@@ -246,15 +311,18 @@ if config['blast']['blast']:
 			script:
 				"../scripts/classification/ncbi_taxonomy.py"
 
+		# Combine annotated BLAST results with the selected abundance table
+		# (SWARM, VSEARCH, or filtered input as selected below).
+		# Write full, taxonomy-filtered, abundance, and metadata tables.
+		# Taxonomy filtering is applied in the merge script.
 		rule merge_results:
 			input:
-				merged=os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") \
-                if config["general"]["seq_rep"] == "OTU" and not config["dataset"]["nanopore"] \
-                else os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv") \
-                if config["clustering"]== "vsearch" and config["dataset"]["nanopore"] \
+				merged=os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv") \
+                if config["clustering"] == "vsearch" and config["dataset"]["nanopore"] \
+                else os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") \
+                if config["general"]["seq_rep"] == "OTU" and not config["dataset"]["nanopore"] and config["clustering"] == "swarm" \
                 else os.path.join(config["general"]["output_dir"],"filtering/filtered_table.csv"),
-                
-                blast_result=os.path.join(config["general"]["output_dir"],"blast/blast_taxonomic_lineage.tsv")
+				blast_result=os.path.join(config["general"]["output_dir"],"blast/blast_taxonomic_lineage.tsv")
 			output:
 				complete=os.path.join(config["general"]["output_dir"],"finalData/blast_ncbi/full_table.csv"),
 				filtered=os.path.join(config["general"]["output_dir"],"finalData/blast_ncbi/filtered_full_table.csv"),
@@ -272,8 +340,12 @@ if config['blast']['blast']:
                 else "../scripts/utilities/merge_results.py"
 
 
+    # DATABASE: SILVA
 	elif config["blast"]["database"] == "silva":
 
+		# Assign SILVA taxonomic lineages to the BLAST hits using the lineage
+		# table (tax_lineage.h5). Selected taxonomic classes can be dropped
+		# via the configuration. The result is a temporary lineage table.
 		rule silva_taxonomy:
 			input:
 				blast_result = os.path.join(config["general"]["output_dir"],"blast/blast_taxonomy.tsv"),
@@ -289,6 +361,10 @@ if config['blast']['blast']:
 			script:
 				"../scripts/classification/silva_taxonomy.py"
 
+		# Combine annotated BLAST results with the selected abundance table
+		# (SWARM, VSEARCH, or filtered input as selected below).
+		# Write full, taxonomy-filtered, abundance, and metadata tables.
+		# Taxonomy filtering is applied in the merge script.
 		rule merge_results:
 			input:
 				merged=os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv") \
@@ -314,8 +390,12 @@ if config['blast']['blast']:
                 else "../scripts/utilities/merge_results.py"
 
 
+    # DATABASE: Eukaryome
 	elif config["blast"]["database"] == "eukaryome":
 
+		# Assign Eukaryome taxonomic lineages to the BLAST hits using the lineage
+		# table (tax_lineage.h5). Selected taxonomic classes can be dropped
+		# via the configuration. The result is a temporary lineage table.
 		rule Eukaryome_taxonomy:
 			input:
 				blast_result = os.path.join(config["general"]["output_dir"],"blast/blast_taxonomy.tsv"),
@@ -331,6 +411,10 @@ if config['blast']['blast']:
 			script:
 				"../scripts/classification/eukaryome_taxonomy.py"
 
+		# Combine annotated BLAST results with the selected abundance table
+		# (SWARM, VSEARCH, or filtered input as selected below).
+		# Write full, taxonomy-filtered, abundance, and metadata tables.
+		# Taxonomy filtering is applied in the merge script.
 		rule merge_results:
 			input:
 				merged=os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv") \
@@ -356,8 +440,12 @@ if config['blast']['blast']:
                 else "../scripts/utilities/merge_results.py"
 
 
+	# DATABASE: ROD
 	elif config["blast"]["database"] == "rod":
 
+		# Assign ROD taxonomic lineages to the BLAST hits using the lineage
+		# table (tax_lineage.h5). The SILVA taxonomy script is reused here,
+		# since both databases share the same lineage format.
 		rule ROD_taxonomy:
 			input:
 				blast_result = os.path.join(config["general"]["output_dir"],"blast/blast_taxonomy.tsv"),
@@ -372,15 +460,19 @@ if config['blast']['blast']:
 				"../envs/classification/blast.yaml"
 			script:
 				"../scripts/classification/silva_taxonomy.py"
-
+		
+        # Combine annotated BLAST results with the selected abundance table
+		# (SWARM, VSEARCH, or filtered input as selected below).
+		# Write full, taxonomy-filtered, abundance, and metadata tables.
+		# Taxonomy filtering is applied in the merge script.
 		rule merge_results:
 			input:
-                merged=os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv") \
+				merged=os.path.join(config["general"]["output_dir"],"clustering/vsearch_table.csv") \
                 if config["clustering"] == "vsearch" and config["dataset"]["nanopore"] \
                 else os.path.join(config["general"]["output_dir"],"clustering/swarm_table.csv") \
                 if config["general"]["seq_rep"] == "OTU" and not config["dataset"]["nanopore"] and config["clustering"] == "swarm" \
                 else os.path.join(config["general"]["output_dir"],"filtering/filtered_table.csv"),
-                blast_result=os.path.join(config["general"]["output_dir"],"blast/blast_taxonomic_lineage.tsv")
+				blast_result=os.path.join(config["general"]["output_dir"],"blast/blast_taxonomic_lineage.tsv")
 			output:
 				complete=os.path.join(config["general"]["output_dir"],"finalData/blast_rod/full_table.csv"),
 				filtered=os.path.join(config["general"]["output_dir"],"finalData/blast_rod/filtered_full_table.csv"),

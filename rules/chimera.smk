@@ -1,11 +1,11 @@
 import os
 
-# Detect potential chimeric sequences using VSEARCH (UCHIME3 de novo).
-# Chimeras are artificial sequences that can arise during PCR amplification
-# and may lead to an overestimation of microbial diversity.
-# The rule performs reference-free chimera detection on the input sequences
-# and separates them into chimeric and non-chimeric FASTA files.
-# Additionally, it generates a UCHIME report with the detection results.
+# Identify putative chimeric sequences with VSEARCH (UCHIME3 de novo).
+# Chimeric sequences can arise during PCR amplification
+# and may inflate estimated sequence diversity.
+# The rule checks dereplicated OTU sequences or DADA-derived sequences
+# and writes putative chimeric and non-chimeric sequences to FASTA files.
+# It also writes a temporary UCHIME report.
 rule vsearch_chim:
     input:
         os.path.join(config["general"]["output_dir"],"assembly/{sample}_{unit}/{sample}_{unit}.dereplicated.fasta") if config["general"]["seq_rep"] == "OTU" else os.path.join(config["general"]["output_dir"],"assembly/{sample}_{unit}/{sample}_{unit}_dada.fasta")
@@ -24,18 +24,14 @@ rule vsearch_chim:
          "../envs/analysis/vsearch.yaml"
     shell:
         """
-            # Log stdout and stderr
-            mkdir -p "$(dirname {log})"
-            vsearch_log="{log}.vsearch"
-
-            # Detect chimeras with VSEARCH
+            # Detect chimeras with VSEARCH; log stdout and stderr to file and terminal
             vsearch --uchime3_denovo {input} \
-                    -uchimeout {output.uchime_out} \
-                    -chimeras {output.chim} \
-                    -nonchimeras {output.nonchim} \
-                    -xn {params.beta} \
-                    -dn {params.pseudo_c} \
-                    --threads {threads} \
-                    -abskew {params.abskew} \
-                    --log "$vsearch_log" 2>&1 | tee {log}
+                --uchimeout {output.uchime_out} \
+                --chimeras {output.chim} \
+                --nonchimeras {output.nonchim} \
+                --xn {params.beta} \
+                --dn {params.pseudo_c} \
+                --abskew {params.abskew} \
+                --threads {threads} \
+                2>&1 | tee {log:q}
         """

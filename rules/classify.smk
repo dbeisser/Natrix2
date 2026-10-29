@@ -1,12 +1,12 @@
 import os
 
-# Classify processed sequences taxonomically using MOTHUR and the selected reference database.
-# The workflow supports Illumina and Nanopore datasets and uses the configured
-# classification method, search strategy, and confidence cutoff.
-# MOTHUR generates taxonomy assignments and classification summaries.
-# The resulting taxonomy files are cleaned to remove redundant "unclassified" entries.
-# Finally, taxonomy assignments are merged with the corresponding abundance table
-# to produce the final result tables for downstream analysis.
+# Assign sequence taxonomy with MOTHUR and a configured reference database.
+# Separate rule branches provide inputs for Illumina and Nanopore datasets.
+# Classification uses the configured search method, classifier, and cutoff.
+# MOTHUR produces taxonomy assignments and summary files.
+# A downstream script processes the raw taxonomy and summary files.
+# The merge rule combines taxonomy assignments with an abundance table
+# and writes final tables for subsequent analysis.
 
 # [Dataset-specific workflow: Illumina data]
 if not config['dataset']['nanopore'] and config['classify']['mothur']:
@@ -34,10 +34,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    # Log stdout and stderr
-                    exec &> >(tee {log:q})
-
-                    # Classify with MOTHUR
+                    # Classify with MOTHUR (log stdout and stderr to file and terminal)
                     mothur "#set.logfile(name={log}.mothur); \
                             classify.seqs(fasta={input[0]}, \
                             cutoff={params.cutoff}, \
@@ -46,12 +43,12 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                             method={params.method}, \
                             processors={params.threads}, \
                             output=simple, \
-                            search={params.search})"
+                            search={params.search})" 2>&1 | tee {log:q}
 
-                    # Move classification results
+                    # Move classification results (append errors to log)
                     input_dir=$(dirname {input[0]:q})
-                    mv "$input_dir"/*.taxonomy {output[1]:q}
-                    mv "$input_dir"/*.summary {output[0]:q}
+                    mv "$input_dir"/*.taxonomy {output[1]:q} 2>&1 | tee -a {log:q}
+                    mv "$input_dir"/*.summary {output[0]:q} 2>&1 | tee -a {log:q}
                 """
     
     # DATABASE: UNITE
@@ -78,10 +75,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    # Log stdout and stderr
-                    exec &> >(tee {log:q})
-
-                    # Classify with MOTHUR
+                    # Classify with MOTHUR (log stdout and stderr to file and terminal)
                     mothur "#set.logfile(name={log}.mothur); \
                             classify.seqs(fasta={input[0]}, \
                             cutoff={params.cutoff}, \
@@ -90,12 +84,12 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                             method={params.method}, \
                             processors={params.threads}, \
                             output=simple, \
-                            search={params.search})"
+                            search={params.search})" 2>&1 | tee {log:q}
 
-                    # Move classification results
+                    # Move classification results (append errors to log)
                     input_dir=$(dirname {input[0]:q})
-                    mv "$input_dir"/*.taxonomy {output[1]:q}
-                    mv "$input_dir"/*.summary {output[0]:q}
+                    mv "$input_dir"/*.taxonomy {output[1]:q} 2>&1 | tee -a {log:q}
+                    mv "$input_dir"/*.summary {output[0]:q} 2>&1 | tee -a {log:q}
                 """
     
     # DATABASE: SILVA
@@ -122,10 +116,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    # Log stdout and stderr
-                    exec &> >(tee {log:q})
-
-                    # Classify with MOTHUR
+                    # Classify with MOTHUR (log stdout and stderr to file and terminal)
                     mothur "#set.logfile(name={log}.mothur); \
                             classify.seqs(fasta={input[0]}, \
                             cutoff={params.cutoff}, \
@@ -134,12 +125,12 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                             method={params.method}, \
                             processors={params.threads}, \
                             output=simple, \
-                            search={params.search})"
+                            search={params.search})" 2>&1 | tee {log:q}
 
-                    # Move classification results
+                    # Move classification results (append errors to log)
                     input_dir=$(dirname {input[0]:q})
-                    mv "$input_dir"/*.taxonomy {output[1]:q}
-                    mv "$input_dir"/*.summary {output[0]:q}
+                    mv "$input_dir"/*.taxonomy {output[1]:q} 2>&1 | tee -a {log:q}
+                    mv "$input_dir"/*.summary {output[0]:q} 2>&1 | tee -a {log:q}
                 """
 
     # DATABASE: ROD
@@ -166,10 +157,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    # Log stdout and stderr
-                    exec &> >(tee {log:q})
-
-                    # Classify with MOTHUR
+                    # Classify with MOTHUR (log stdout and stderr to file and terminal)
                     mothur "#set.logfile(name={log}.mothur); \
                             classify.seqs(fasta={input[0]}, \
                             cutoff={params.cutoff}, \
@@ -178,12 +166,12 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                             method={params.method}, \
                             processors={params.threads}, \
                             output=simple, \
-                            search={params.search})"
+                            search={params.search})" 2>&1 | tee {log:q}
 
-                    # Move classification results
+                    # Move classification results (append errors to log)
                     input_dir=$(dirname {input[0]:q})
-                    mv "$input_dir"/*.taxonomy {output[1]:q}
-                    mv "$input_dir"/*.summary {output[0]:q}
+                    mv "$input_dir"/*.taxonomy {output[1]:q} 2>&1 | tee -a {log:q}
+                    mv "$input_dir"/*.summary {output[0]:q} 2>&1 | tee -a {log:q}
                 """
 
     # DATABASE: Eukaryome
@@ -210,10 +198,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    # Log stdout and stderr
-                    exec &> >(tee {log:q})
-
-                    # Classify with MOTHUR
+                    # Classify with MOTHUR (log stdout and stderr to file and terminal)
                     mothur "#set.logfile(name={log}.mothur); \
                             classify.seqs(fasta={input[0]}, \
                             cutoff={params.cutoff}, \
@@ -222,12 +207,12 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
                             method={params.method}, \
                             processors={params.threads}, \
                             output=simple, \
-                            search={params.search})"
+                            search={params.search})" 2>&1 | tee {log:q}
 
-                    # Move classification results
+                    # Move classification results (append errors to log)
                     input_dir=$(dirname {input[0]:q})
-                    mv "$input_dir"/*.taxonomy {output[1]:q}
-                    mv "$input_dir"/*.summary {output[0]:q}
+                    mv "$input_dir"/*.taxonomy {output[1]:q} 2>&1 | tee -a {log:q}
+                    mv "$input_dir"/*.summary {output[0]:q} 2>&1 | tee -a {log:q}
                 """
 
     # Removes redundant 'unclassified' entries from the taxonomy file (/mothur_out_raw.taxonomy)
@@ -243,7 +228,7 @@ if not config['dataset']['nanopore'] and config['classify']['mothur']:
         script:
             "../scripts/classification/filter_unclassified.py"
 
-    # Merge Mothur taxonomy assignments with the abundance/clustering table and export final result tables.
+    # Merge MOTHUR taxonomy and abundance data into final output tables.
     rule merge_output:
         input:
             os.path.join(config["general"]["output_dir"],"mothur/{database}/mothur_out.taxonomy"),
@@ -289,10 +274,7 @@ elif config['dataset']['nanopore']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    # Log stdout and stderr
-                    exec &> >(tee {log:q})
-
-                    # Classify with MOTHUR
+                    # Classify with MOTHUR (log stdout and stderr to file and terminal)
                     mothur "#set.logfile(name={log}.mothur); \
                             classify.seqs(fasta={input[0]}, \
                             cutoff={params.cutoff}, \
@@ -301,12 +283,12 @@ elif config['dataset']['nanopore']:
                             method={params.method}, \
                             processors={params.threads}, \
                             output=simple, \
-                            search={params.search})"
+                            search={params.search})" 2>&1 | tee {log:q}
 
-                    # Move classification results
+                    # Move classification results (append errors to log)
                     input_dir=$(dirname {input[0]:q})
-                    mv "$input_dir"/*.taxonomy {output[1]:q}
-                    mv "$input_dir"/*.summary {output[0]:q}
+                    mv "$input_dir"/*.taxonomy {output[1]:q} 2>&1 | tee -a {log:q}
+                    mv "$input_dir"/*.summary {output[0]:q} 2>&1 | tee -a {log:q}
                 """
 
     # DATABASE: UNITE
@@ -335,10 +317,7 @@ elif config['dataset']['nanopore']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    # Log stdout and stderr
-                    exec &> >(tee {log:q})
-
-                    # Classify with MOTHUR
+                    # Classify with MOTHUR (log stdout and stderr to file and terminal)
                     mothur "#set.logfile(name={log}.mothur); \
                             classify.seqs(fasta={input[0]}, \
                             cutoff={params.cutoff}, \
@@ -347,12 +326,12 @@ elif config['dataset']['nanopore']:
                             method={params.method}, \
                             processors={params.threads}, \
                             output=simple, \
-                            search={params.search})"
+                            search={params.search})" 2>&1 | tee {log:q}
 
-                    # Move classification results
+                    # Move classification results (append errors to log)
                     input_dir=$(dirname {input[0]:q})
-                    mv "$input_dir"/*.taxonomy {output[1]:q}
-                    mv "$input_dir"/*.summary {output[0]:q}
+                    mv "$input_dir"/*.taxonomy {output[1]:q} 2>&1 | tee -a {log:q}
+                    mv "$input_dir"/*.summary {output[0]:q} 2>&1 | tee -a {log:q}
                 """
     
     # DATABASE: SILVA
@@ -382,10 +361,7 @@ elif config['dataset']['nanopore']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    # Log stdout and stderr
-                    exec &> >(tee {log:q})
-
-                    # Classify with MOTHUR
+                    # Classify with MOTHUR (log stdout and stderr to file and terminal)
                     mothur "#set.logfile(name={log}.mothur); \
                             classify.seqs(fasta={input[0]}, \
                             cutoff={params.cutoff}, \
@@ -394,12 +370,12 @@ elif config['dataset']['nanopore']:
                             method={params.method}, \
                             processors={params.threads}, \
                             output=simple, \
-                            search={params.search})"
+                            search={params.search})" 2>&1 | tee {log:q}
 
-                    # Move classification results
+                    # Move classification results (append errors to log)
                     input_dir=$(dirname {input[0]:q})
-                    mv "$input_dir"/*.taxonomy {output[1]:q}
-                    mv "$input_dir"/*.summary {output[0]:q}
+                    mv "$input_dir"/*.taxonomy {output[1]:q} 2>&1 | tee -a {log:q}
+                    mv "$input_dir"/*.summary {output[0]:q} 2>&1 | tee -a {log:q}
                 """
 
     # DATABASE: ROD
@@ -427,10 +403,7 @@ elif config['dataset']['nanopore']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    # Log stdout and stderr
-                    exec &> >(tee {log:q})
-
-                    # Classify with MOTHUR
+                    # Classify with MOTHUR (log stdout and stderr to file and terminal)
                     mothur "#set.logfile(name={log}.mothur); \
                             classify.seqs(fasta={input[0]}, \
                             cutoff={params.cutoff}, \
@@ -439,12 +412,12 @@ elif config['dataset']['nanopore']:
                             method={params.method}, \
                             processors={params.threads}, \
                             output=simple, \
-                            search={params.search})"
+                            search={params.search})" 2>&1 | tee {log:q}
 
-                    # Move classification results
+                    # Move classification results (append errors to log)
                     input_dir=$(dirname {input[0]:q})
-                    mv "$input_dir"/*.taxonomy {output[1]:q}
-                    mv "$input_dir"/*.summary {output[0]:q}
+                    mv "$input_dir"/*.taxonomy {output[1]:q} 2>&1 | tee -a {log:q}
+                    mv "$input_dir"/*.summary {output[0]:q} 2>&1 | tee -a {log:q}
                 """
 
     # DATABASE: Eukaryome
@@ -473,10 +446,7 @@ elif config['dataset']['nanopore']:
                 "../envs/classification/mothur.yaml"
             shell:
                 """
-                    # Log stdout and stderr
-                    exec &> >(tee {log:q})
-
-                    # Classify with MOTHUR
+                    # Classify with MOTHUR (log stdout and stderr to file and terminal)
                     mothur "#set.logfile(name={log}.mothur); \
                             classify.seqs(fasta={input[0]}, \
                             cutoff={params.cutoff}, \
@@ -485,12 +455,12 @@ elif config['dataset']['nanopore']:
                             method={params.method}, \
                             processors={params.threads}, \
                             output=simple, \
-                            search={params.search})"
+                            search={params.search})" 2>&1 | tee {log:q}
 
-                    # Move classification results
+                    # Move classification results (append errors to log)
                     input_dir=$(dirname {input[0]:q})
-                    mv "$input_dir"/*.taxonomy {output[1]:q}
-                    mv "$input_dir"/*.summary {output[0]:q}
+                    mv "$input_dir"/*.taxonomy {output[1]:q} 2>&1 | tee -a {log:q}
+                    mv "$input_dir"/*.summary {output[0]:q} 2>&1 | tee -a {log:q}
                 """
 
     # Removes redundant 'unclassified' entries from the taxonomy file (/mothur_out_raw.taxonomy)
@@ -506,7 +476,7 @@ elif config['dataset']['nanopore']:
         script:
             "../scripts/classification/filter_unclassified.py"
 
-    # Merge Mothur taxonomy assignments with the abundance/clustering table and export final result tables.
+    # Merge MOTHUR taxonomy and abundance data into final output tables.
     rule merge_output:
         input:
             os.path.join(config["general"]["output_dir"],"mothur/{database}/mothur_out.taxonomy"),
