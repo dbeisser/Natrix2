@@ -3,22 +3,20 @@ import os
 # Nanopore Read Correction and Polishing Workflow
 #
 # Pipeline:
-#   FASTQ => FASTA => CD-HIT clustering => 5x (minimap2 + racon) => Medaka CNN
-#   => Consensus abundance mapping
+#   FASTQ => FASTA => CD-HIT clustering => minimap2/Racon polishing
+#   => Medaka consensus polishing => Consensus read-support counting
 #
 # Design:
 #   - CD-HIT collapses redundant reads to provide representative seeds
-#   - Each racon round uses the previous consensus as reference, progressively
-#     reducing the error rate; minimap2 provides the SAM input racon requires
-#   - Medaka (neural network) replaces a 6th racon round for better accuracy
-#     on systematic ONT errors (e.g. homopolymers)
-
+#   - Five Racon polishing rounds are defined; the Medaka input is selected
+#     by config["nanopore"]["racon"]. Minimap2 creates the required alignments.
+#   - Medaka performs a subsequent neural-network-based polishing step.
 
 if config['dataset']['nanopore']:
 
-    # Convert pychopper/quality-filtered FASTQ => FASTA.
-    # seqtk handles format conversion; sed cleans up headers by stripping
-    # everything after the last "|" for unambiguous downstream identifiers.
+    # Convert Nanopore FASTQ reads to FASTA using seqtk.
+    # The sed expression modifies header text up to a pipe delimiter;
+    # it does not validate uniqueness of the resulting identifiers.
     rule fastq2fasta:
         input:
             # Full-length Nanopore FASTQ reads
@@ -34,12 +32,14 @@ if config['dataset']['nanopore']:
             "../envs/utilities/seqtk.yaml"
         shell:
             """
-            seqtk seq -a {input} > {output.tmp};
+            # Convert FASTQ to FASTA, keeping sequence data separate from logs.
+            seqtk seq -a {input} 2>&1 > {output.tmp:q} | tee {log:q};
+            # Apply the existing FASTA-header substitution.
             sed "s/[>].*[^|]|/>/" {output.tmp} > {output.final}
             """
-                            
-    # Cluster reads at 80 % identity (CD-HIT-EST) to produce a non-redundant
-    # representative set used as the round-1 polishing reference.
+
+    # Cluster input reads with CD-HIT-EST at 80% identity and write
+    # representative sequences for the first Racon-polishing round.
     # Params: -l min length, -c identity, -d 0 unlimited header, -M memory, -T threads
     rule cd_hit:
         input:
@@ -56,8 +56,10 @@ if config['dataset']['nanopore']:
             os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/cd_hit/{sample}_{unit}.log")
         conda: "../envs/analysis/rcorrection.yaml"
         shell:
-            "cd-hit-est -i {input} -o {output} -l {params.length} -c 0.8 -d 0 -M {params.memory} -T {threads}"
-
+            """
+            # Cluster reads into representative sequences.
+            cd-hit-est -i {input} -o {output} -l {params.length} -c 0.8 -d 0 -M {params.memory} -T {threads} 2>&1 | tee {log:q}
+            """
 
 # Iterative polishing: rounds 1–5 (minimap2 + racon)
 #
@@ -74,7 +76,8 @@ if config['dataset']['nanopore']:
 # sed tracks polishing history in headers (">rp2rp1" = rounds 1+2 done)
 # to avoid duplicate identifiers and enable traceability.
 
-    # --- Round 1 ---
+    # ROUND_1 (ref: CD-HIT representatives => out: _align_1.sam, header: unchanged)
+    # Map input reads to CD-HIT representatives and write SAM alignments.
     rule minimap_align:
         input:
             # Clustered representative sequences
@@ -90,8 +93,12 @@ if config['dataset']['nanopore']:
         conda:
             "../envs/analysis/rcorrection.yaml"
         shell:
-            "minimap2 -ax map-ont -t {threads} {input[0]}  {input[1]} > {output}"
+            """
+            # Align input reads to the current consensus reference.
+            minimap2 -ax map-ont -t {threads} {input[0]} {input[1]} 2>&1 > {output:q} | tee {log:q}
+            """
 
+    # Polish first-round consensus sequences and prefix FASTA headers.
     rule racon_polishing:
         input:
             # Raw FASTA reads
@@ -112,11 +119,14 @@ if config['dataset']['nanopore']:
             "../envs/analysis/rcorrection.yaml"
         shell:
             """
-                racon  -m 8 -x -6 -g -8 -w 500 -t {threads} {input[0]} {input[1]} {input[2]} > {output.tmp};
-                sed "s/[>]/>rp1;/" {output.tmp} > {output.final}
+            # Polish consensus sequences with Racon.
+            racon  -m 8 -x -6 -g -8 -w 500 -t {threads} {input[0]} {input[1]} {input[2]} 2>&1 > {output.tmp:q} | tee {log:q};
+            # Add the rp1 identifier to FASTA headers.
+            sed "s/[>]/>rp1;/" {output.tmp} > {output.final}
             """
 
-    # --- Round 2 (ref: _racon_1 => out: _racon_2, header: >rp1 => >rp2rp1) ---
+    # ROUND_2 (ref: _racon_1 => out: _racon_2, header: >rp1 => >rp2rp1)
+    # Align reads against the round-1 Racon consensus.
     rule minimap_align_2:
         input:
             expand(os.path.join(config["general"]["output_dir"],"read_correction/racon/{{sample}}_{{unit}}_R{read}_racon_1.fasta"),read=reads),
@@ -131,8 +141,12 @@ if config['dataset']['nanopore']:
         conda:
             "../envs/analysis/rcorrection.yaml"
         shell:
-            "minimap2 -ax map-ont -t {threads} {input[0]}  {input[1]} > {output}"
+            """
+            # Align input reads to the current consensus reference.
+            minimap2 -ax map-ont -t {threads} {input[0]} {input[1]} 2>&1 > {output:q} | tee {log:q}
+            """
 
+    # Generate the round-2 Racon consensus from the corresponding alignments.
     rule racon_polishing_2:
         input:
             # Raw FASTA reads
@@ -153,11 +167,14 @@ if config['dataset']['nanopore']:
             "../envs/analysis/rcorrection.yaml"
         shell:
             """
-                racon  -m 8 -x -6 -g -8 -w 500 -t {threads} {input[0]} {input[1]} {input[2]} > {output.tmp};
+                # Polish consensus sequences with Racon.
+                racon  -m 8 -x -6 -g -8 -w 500 -t {threads} {input[0]} {input[1]} {input[2]} 2>&1 > {output.tmp:q} | tee {log:q};
+                # Add the rp2 identifier to FASTA headers.
                 sed "s/[>]rp1/>rp2rp1/" {output.tmp} > {output.final}
             """
 
-    # --- Round 3 (ref: _racon_2 => out: _racon_3, header: >rp2rp1 => >rp3rp2rp1) ---
+    # ROUND_3 (ref: _racon_2 => out: _racon_3, header: >rp2rp1 => >rp3rp2rp1)
+    # Align reads against the round-2 Racon consensus.
     rule minimap_align_3:
         input:
             expand(os.path.join(config["general"]["output_dir"],"read_correction/racon/{{sample}}_{{unit}}_R{read}_racon_2.fasta"),read=reads),
@@ -172,8 +189,12 @@ if config['dataset']['nanopore']:
         conda:
             "../envs/analysis/rcorrection.yaml"
         shell:
-            "minimap2 -ax map-ont -t {threads} {input[0]}  {input[1]} > {output}"
+            """
+            # Align input reads to the current consensus reference.
+            minimap2 -ax map-ont -t {threads} {input[0]} {input[1]} 2>&1 > {output:q} | tee {log:q}
+            """
 
+    # Generate the round-3 Racon consensus from the corresponding alignments.
     rule racon_polishing_3:
         input:
             # Raw FASTA reads
@@ -194,11 +215,14 @@ if config['dataset']['nanopore']:
             "../envs/analysis/rcorrection.yaml"
         shell:
             """
-                racon  -m 8 -x -6 -g -8 -w 500 -t {threads} {input[0]} {input[1]} {input[2]} > {output.tmp};
-                sed "s/[>]rp2rp1/>rp3rp2rp1/" {output.tmp} > {output.final}
+            # Polish consensus sequences with Racon.
+            racon  -m 8 -x -6 -g -8 -w 500 -t {threads} {input[0]} {input[1]} {input[2]} 2>&1 > {output.tmp:q} | tee {log:q};
+            # Add the rp3 identifier to FASTA headers.
+            sed "s/[>]rp2rp1/>rp3rp2rp1/" {output.tmp} > {output.final}
             """
 
-    # --- Round 4 (ref: _racon_3 => out: _racon_4, header: >rp3rp2rp1 => >rp4rp3rp2rp1) ---
+    # ROUND_4 (ref: _racon_3 => out: _racon_4, header: >rp3rp2rp1 => >rp4rp3rp2rp1)
+    # Align reads against the round-3 Racon consensus.
     rule minimap_align_4:
         input:
             expand(os.path.join(config["general"]["output_dir"],"read_correction/racon/{{sample}}_{{unit}}_R{read}_racon_3.fasta"),read=reads),
@@ -213,8 +237,12 @@ if config['dataset']['nanopore']:
         conda:
             "../envs/analysis/rcorrection.yaml"
         shell:
-            "minimap2 -ax map-ont -t {threads} {input[0]}  {input[1]} > {output}"
+            """
+            # Align input reads to the current consensus reference.
+            minimap2 -ax map-ont -t {threads} {input[0]} {input[1]} 2>&1 > {output:q} | tee {log:q}
+            """
 
+    # Generate the round-4 Racon consensus from the corresponding alignments.
     rule racon_polishing_4:
         input:
             # Raw FASTA reads
@@ -235,11 +263,14 @@ if config['dataset']['nanopore']:
             "../envs/analysis/rcorrection.yaml"
         shell:
             """
-                racon  -m 8 -x -6 -g -8 -w 500 -t {threads} {input[0]} {input[1]} {input[2]} > {output.tmp};
-                sed "s/[>]rp3rp2rp1/>rp4rp3rp2rp1/" {output.tmp} > {output.final}
+            # Polish consensus sequences with Racon.
+            racon  -m 8 -x -6 -g -8 -w 500 -t {threads} {input[0]} {input[1]} {input[2]} 2>&1 > {output.tmp:q} | tee {log:q};
+            # Add the rp4 identifier to FASTA headers.
+            sed "s/[>]rp3rp2rp1/>rp4rp3rp2rp1/" {output.tmp} > {output.final}
             """
 
-    # --- Round 5 (ref: _racon_4 => out: _racon_5, header: >rp4rp3rp2rp1 => >rp5rp4rp3rp2rp1) ---
+    # ROUND_5 (ref: _racon_4 => out: _racon_5, header: >rp4rp3rp2rp1 => >rp5rp4rp3rp2rp1)
+    # Align reads against the round-4 Racon consensus.
     rule minimap_align_5:
         input:
             expand(os.path.join(config["general"]["output_dir"],"read_correction/racon/{{sample}}_{{unit}}_R{read}_racon_4.fasta"),read=reads),
@@ -254,8 +285,12 @@ if config['dataset']['nanopore']:
         conda:
             "../envs/analysis/rcorrection.yaml"
         shell:
-            "minimap2 -ax map-ont -t {threads} {input[0]}  {input[1]} > {output}"
+            """
+            # Align input reads to the current consensus reference.
+            minimap2 -ax map-ont -t {threads} {input[0]} {input[1]} 2>&1 > {output:q} | tee {log:q}
+            """
 
+    # Generate the round-5 Racon consensus from the corresponding alignments.
     rule racon_polishing_5:
         input:
             # Raw FASTA reads
@@ -276,10 +311,11 @@ if config['dataset']['nanopore']:
             "../envs/analysis/rcorrection.yaml"
         shell:
             """
-                racon  -m 8 -x -6 -g -8 -w 500 -t {threads} {input[0]} {input[1]} {input[2]} > {output.tmp};
-                sed "s/[>]rp4rp3rp2rp1/>rp5rp4rp3rp2rp1/" {output.tmp} > {output.final}
+            # Polish consensus sequences with Racon.
+            racon  -m 8 -x -6 -g -8 -w 500 -t {threads} {input[0]} {input[1]} {input[2]} 2>&1 > {output.tmp:q} | tee {log:q};
+            # Add the rp5 identifier to FASTA headers.
+            sed "s/[>]rp4rp3rp2rp1/>rp5rp4rp3rp2rp1/" {output.tmp} > {output.final}
             """
-
 
     # Neural-network polishing with Medaka as final correction step.
     # Input: all raw reads + racon consensus after N rounds (config: nanopore.racon).
@@ -302,8 +338,11 @@ if config['dataset']['nanopore']:
         conda: "../envs/analysis/medaka.yaml"
         shell:
             """
+            # Disable GPU visibility for the Medaka invocation.
             export CUDA_VISIBLE_DEVICES=''
-            medaka_consensus -i {input.fasta_file} -d {input.racon_file} -o {params.out_dir} -t {threads}
+            # Produce a polished consensus from Racon sequences and reads.
+            # Polish the selected Racon consensus using Medaka.
+            medaka_consensus -i {input.fasta_file} -d {input.racon_file} -o {params.out_dir} -t {threads} 2>&1 | tee {log:q}
             """
 
     # Strip compound racon-history headers from Medaka output (e.g. ">rp5rp4...")
@@ -319,6 +358,7 @@ if config['dataset']['nanopore']:
             os.path.join(config["general"]["output_dir"], "logfiles/rcorrection/rm_racon_header/{sample}_{unit}.log")
         shell:
             """
+            # Rewrite FASTA headers using the existing sed expression.
             sed "s/[>].*[^ ] />/" {input} > {output}
             """
 
@@ -340,7 +380,8 @@ if config['dataset']['nanopore']:
             "../envs/analysis/rcorrection.yaml"
         shell:
             """
-            minimap2 -ax map-ont -t {threads} {input[0]} {input[1]} > {output}
+            # Align Nanopore reads to the reference sequences using minimap2.
+            minimap2 -ax map-ont -t {threads} {input[0]} {input[1]} 2>&1 > {output:q} | tee {log:q}
             """
 
     # Count raw reads per consensus (abundance proxy) and output a filtered

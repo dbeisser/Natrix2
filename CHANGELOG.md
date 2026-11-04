@@ -5,6 +5,18 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
 
 ---
 
+### [2026-11-04]
+
+- Improve rule documentation and logging in Snakemake workflows
+  - `pychopper.smk`, `rcorrection.smk`, `vsearch.smk`
+- Improve Pychopper statistics output
+- Update software citations in `CITATION.cff` and `README.md`
+- Update `.gitignore` to improve file and directory exclusions
+- Validate workflow execution using the provided test datasets
+- Update the Docker image with the latest changes
+
+---
+
 ### [2026-10-29]
 
 - Improve rule documentation and logging across Snakemake workflows

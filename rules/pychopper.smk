@@ -12,7 +12,6 @@ import os
 # consistent 5' to 3' direction. Reads that fail standard classification are
 # re-processed with a rescue algorithm to recover reads with incomplete primer matches.
 
-
 if config['dataset']['nanopore'] and config['nanopore']['pychopper']:
 
     # Extract forward (SSP) and reverse (VNP) primers from the primer table
@@ -33,8 +32,10 @@ if config['dataset']['nanopore'] and config['nanopore']['pychopper']:
             os.path.join(config["general"]["output_dir"],"logfiles/pychopper/define_pychop_primer.log")
         shell:
                 """
+                # Extract the two primer fields from row 2 of the CSV table.
                 forward_primer=$(sed -n "2p" {params.primer} | cut -d, -f4);
                 reverse_primer=$(sed -n "2p" {params.primer} | cut -d, -f7);
+                # Write the primer FASTA and the Pychopper orientation settings.
                 printf ">SSP\n$forward_primer\n>VNP\n$reverse_primer" > {output.primers};
                 echo "+:SSP,-VNP|-:VNP,-SSP" > {output.primers_config}
                 """
@@ -61,6 +62,8 @@ if config['dataset']['nanopore'] and config['nanopore']['pychopper']:
             out_fastq = temp(expand(os.path.join(config["general"]["output_dir"],"pychopper/output/normal/{{sample}}_{{unit}}_R{read}.fastq"), read=reads)),
             # Pychopper classification report
             pdf_out = expand(os.path.join(config["general"]["output_dir"],"pychopper/reports/normal/{{sample}}_{{unit}}_R{read}.pdf"), read=reads),
+            # Pychopper classification statistics
+            stats = expand(os.path.join(config["general"]["output_dir"], "pychopper/reports/normal/{{sample}}_{{unit}}_R{read}.tsv"), read=reads),
             # Reads forwarded to rescue mode
             unclass_fastq = temp(expand(os.path.join(config["general"]["output_dir"],"pychopper/unclassified/normal/{{sample}}_{{unit}}_R{read}.fastq"), read=reads)),
             # Lower-confidence reads from standard run
@@ -76,9 +79,23 @@ if config['dataset']['nanopore'] and config['nanopore']['pychopper']:
         conda:
             "../envs/preprocessing/pychopper.yaml"
         shell:
-                """
-                pychopper -m edlib -b {input.primers} -Q {params.qual} -z {params.length} -l {output.length_out} -c {input.primers_config} -r {output.pdf_out} -u {output.unclass_fastq} -w {output.rescue_fastq} -t {threads} {input.fastq} {output.out_fastq};
-                """
+            """
+            # Classify, trim, and orient reads; write reports and read subsets.
+            pychopper \
+                -m edlib \
+                -b {input.primers} \
+                -Q {params.qual} \
+                -z {params.length} \
+                -l {output.length_out} \
+                -c {input.primers_config} \
+                -r {output.pdf_out} \
+                -S {output.stats:q} \
+                -u {output.unclass_fastq} \
+                -w {output.rescue_fastq} \
+                -t {threads} \
+                {input.fastq} \
+                {output.out_fastq} 2>&1 | tee {log:q}
+            """
 
     # Re-run pychopper with -x rescue on reads unclassified in the standard pass.
     # The rescue algorithm uses relaxed primer matching and can recover
@@ -101,6 +118,8 @@ if config['dataset']['nanopore'] and config['nanopore']['pychopper']:
             unclass_rescue_fastq = temp(expand(os.path.join(config["general"]["output_dir"],"pychopper/rescued/rescue/{{sample}}_{{unit}}_R{read}.fastq"), read=reads)),
             # Rescue-mode classification report
             unclass_pdf = expand(os.path.join(config["general"]["output_dir"],"pychopper/reports/rescue/{{sample}}_{{unit}}_R{read}.pdf"),  read=reads),
+            # Pychopper rescue classification statistics
+            stats = expand(os.path.join(config["general"]["output_dir"], "pychopper/reports/rescue/{{sample}}_{{unit}}_R{read}.tsv"), read=reads),
             # Rescue reads filtered out by minimum length
             length_out = temp(expand(os.path.join(config["general"]["output_dir"], "pychopper/unclassified/rescue/{{sample}}_{{unit}}_R{read}_length_out.fastq"), read=reads))
         params:
@@ -113,7 +132,22 @@ if config['dataset']['nanopore'] and config['nanopore']['pychopper']:
             "../envs/preprocessing/pychopper.yaml"
         shell:
             """
-            pychopper -m edlib -x rescue -b {input.primers} -Q {params.qual} -z {params.length} -l {output.length_out} -c {input.primers_config} -r {output.unclass_pdf} -u {output.unclass_unclass_fastq} -w {output.unclass_rescue_fastq} -t {threads} {input.unclass_fastq} {output.unclass_out_fastq};
+            # Reprocess unclassified reads using Pychopper rescue mode.
+            pychopper \
+                -m edlib \
+                -x rescue \
+                -b {input.primers} \
+                -Q {params.qual} \
+                -z {params.length} \
+                -l {output.length_out} \
+                -c {input.primers_config} \
+                -r {output.unclass_pdf} \
+                -S {output.stats:q} \
+                -u {output.unclass_unclass_fastq} \
+                -w {output.unclass_rescue_fastq} \
+                -t {threads} \
+                {input.unclass_fastq} \
+                {output.unclass_out_fastq} 2>&1 | tee {log:q}
             """
 
     # Combine classified reads from the standard and rescue runs into a single
@@ -131,5 +165,6 @@ if config['dataset']['nanopore'] and config['nanopore']['pychopper']:
             os.path.join(config["general"]["output_dir"],"logfiles/pychopper/merge_pychopper/{sample}_{unit}.log")
         shell:
             """
+            # Concatenate the classified read sets without changing their content.
             cat {input.out_fastq} {input.unclass_out_fastq} > {output.pychopper_merged}
             """

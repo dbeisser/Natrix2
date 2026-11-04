@@ -1,3 +1,5 @@
+# Cluster filtered FASTA sequences with VSEARCH and write centroid,
+# OTU-abundance, and cluster-assignment outputs.
 rule vsearch_clust:
     input:
         fasta=os.path.join(config["general"]["output_dir"], "filtering/filtered.fasta"),
@@ -14,15 +16,16 @@ rule vsearch_clust:
         "../envs/analysis/vsearch.yaml"
     shell:
         """
-            vsearch --cluster_fast {input} \
+        # Cluster filtered sequences and write centroid, OTU abundance and assignment files.
+        vsearch --cluster_fast {input.fasta:q} \
             --threads {threads} \
             --id {params.id} \
-            --centroids {output[0]} \
-            --otutabout {output[1]}\ 
-            --uc {output[2]}
+            --centroids {output[0]:q} \
+            --otutabout {output[1]:q} \
+            --uc {output[2]:q} 2>&1 | tee {log:q}
         """
 
-## to make cluster file for merging
+# Prepare cluster identifiers for merging in the downstream script.
 rule  write_clusters_uc:
     input:
         os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus_tab.txt")
@@ -33,6 +36,7 @@ rule  write_clusters_uc:
     script:
         "../scripts/analysis/vsearch_uc.py"
 
+# Merge VSEARCH cluster identifiers with the filtered abundance table.
 rule clust_merge_results_vsearch:
     input:
         merged=os.path.join(config["general"]["output_dir"],"clustering/vsearch_clusters_names.txt"),
@@ -46,6 +50,7 @@ rule clust_merge_results_vsearch:
     script:
         "../scripts/utilities/merge_clust_results.py"
 
+# Generate a FASTA file with headers prepared for downstream analysis.
 rule vsearch_header:
     input:
         os.path.join(config["general"]["output_dir"],"clustering/vsearch_all_otus.fasta"),

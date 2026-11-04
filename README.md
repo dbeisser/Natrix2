@@ -1078,19 +1078,26 @@ assignment when using BLAST.
 
 # Citation
 
-**Natrix2 is based on [Natrix](https://github.com/MW55/Natrix). If you use Natrix2, please cite:**
+**Natrix2 is based on [Natrix](https://github.com/MW55/Natrix). Please cite the software and related publications below.**
 
 ---
 
-**Natrix2** – Improved amplicon workflow with novel Oxford Nanopore Technologies
-support and enhancements in clustering, classification and taxonomic databases.
+**Natrix2 – Software** – A Snakemake-based workflow for processing, clustering,
+and taxonomic classification of Illumina and Oxford Nanopore amplicon sequencing data.
+Deep, A.; Bludau, D.; Welzel, M.; Clemens, S.; Heider, D.; Boenigk, J.;
+Beisser, D.; and Finke, D.
+GitHub Repository: https://github.com/dbeisser/Natrix2
+
+---
+
+**Natrix2 – Publication** – Improved amplicon workflow with novel Oxford Nanopore Technologies support and enhancements in clustering, classification and taxonomic databases.
 Deep, A.; Bludau, D.; Welzel, M.; Clemens, S.; Heider, D.; Boenigk, J.; and
 Beisser, D. *Metabarcoding and Metagenomics*, 7: e109389. Oct 2023.
 https://doi.org/10.3897/mbmg.7.109389
 
 ---
 
-**Natrix** – A Snakemake-based workflow for processing, clustering, and
+**Natrix – Publication** – A Snakemake-based workflow for processing, clustering, and
 taxonomically assigning amplicon sequencing reads. Welzel, M.; Lange, A.;
 Heider, D.; Schwarz, M.; Freisleben, B.; Jensen, M.; Boenigk, J.; and
 Beisser, D. *BMC Bioinformatics*, 21: 526. Nov 2020.
