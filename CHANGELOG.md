@@ -5,6 +5,18 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
 
 ---
 
+### [2026-11-11]
+
+- Improve documentation in `Snakefile`
+- Update Python version in `qcontrol.yaml` to `python=3.12`
+- Update tool versions: `multiqc=1.35`, `fastqc=0.13.0`
+- Adapt `qcontrol.smk` to FastQC 0.13.0
+- Verify compatibility of updated tool versions
+- Validate workflow execution using the provided test datasets
+- Update the Docker image with the latest changes
+
+---
+
 ### [2026-11-04]
 
 - Improve rule documentation and logging in Snakemake workflows

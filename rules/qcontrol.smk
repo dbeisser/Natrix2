@@ -22,7 +22,7 @@ if not config['dataset']['nanopore']:
             "../envs/preprocessing/qcontrol.yaml"
         shell:
             # Run FastQC; log stdout and stderr to file and terminal
-            "fastqc -o {params}/qc/ {input} -t {threads} 2>&1 | tee {log:q}"
+            "fastqc --outdir {params}/qc/ {input} -t {threads} 2>&1 | tee {log:q}"
 
     # Combine the individual FastQC results into a single MultiQC report.
     # MultiQC collects the generated FastQC ZIP archives and summarizes
@@ -67,7 +67,7 @@ else:
             "../envs/preprocessing/qcontrol.yaml"
         shell:
             # Run FastQC; log stdout and stderr to file and terminal
-            "fastqc -o {params}/qc/ {input} -t {threads} 2>&1 | tee {log:q}"
+            "fastqc --outdir {params}/qc/ {input} -t {threads} 2>&1 | tee {log:q}"
 
 
     # Combine the individual FastQC results into a single MultiQC report.

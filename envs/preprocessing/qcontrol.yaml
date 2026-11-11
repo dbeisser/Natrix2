@@ -1,9 +1,8 @@
 name: qcontrol
 channels:
-  - bioconda
-  - defaults
   - conda-forge
+  - bioconda
 dependencies:
-  - python=3.11
-  - fastqc=0.12.1
-  - multiqc=1.33
+  - python=3.12
+  - fastqc=0.13.0
+  - multiqc=1.35
