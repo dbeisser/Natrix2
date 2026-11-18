@@ -5,6 +5,21 @@ This document summarizes all notable changes to **Natrix2**, including updates, 
 
 ---
 
+### [2026-11-18]
+
+- Improve code documentation in `prinseq.py`
+- Add error handling to `prinseq.py`
+- Refactor and update the entire `prinseq.py` script
+- Remove `perl-threaded` dependency from `prinseq.yaml`
+- Update tool versions: `chopper=0.12.0`
+- Update Python version in `qcontrol.yaml` to `python=3.13`
+- Fix channel configuration in environment files
+- Verify compatibility of updated tool versions
+- Validate workflow execution using the provided test datasets
+- Update the Docker image with the latest changes
+
+---
+
 ### [2026-11-11]
 
 - Improve documentation in `Snakefile`

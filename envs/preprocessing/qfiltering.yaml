@@ -1,7 +1,6 @@
 name: qfiltering
 channels:
-  - bioconda
   - conda-forge
-  - defaults
+  - bioconda
 dependencies:
-  - chopper
+  - chopper=0.12.0
